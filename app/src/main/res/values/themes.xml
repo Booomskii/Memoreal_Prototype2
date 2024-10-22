@@ -1,0 +1,25 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Memoreal_Prototype" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimaryVariant">@color/memo_orange</item>
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/layout_background</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/border1</item>
+        <item name="colorSecondaryVariant">@color/memo_light_orange</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Text styles -->
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
+    </style>
+
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/memo_orange</item>
+    </style>
+
+    <style name="Theme.Memoreal_Prototype" parent="Base.Theme.Memoreal_Prototype" />
+</resources>
