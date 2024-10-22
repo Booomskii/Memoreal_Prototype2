@@ -1,0 +1,207 @@
+<resources>
+    <string name="app_name">Memoreal_Prototype</string>
+    <string name="memorealTitle">Memoreal</string>
+    <!--Memoreal Login and Sign Up page-->
+    <string name="loginMemoreal">Login to Memoreal</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="noAccount">Don\'t have an account?</string>
+    <string name="login">LOGIN</string>
+    <string name="or">or</string>
+    <string name="loginGuest">LOGIN AS GUEST USER</string>
+    <string name="createAcc">Create Account</string>
+    <string name="emailAddress">EMAIL ADDRESS</string>
+    <string name="emailAddress2">Email Address</string>
+    <string name="confirmPass">Confirm Password</string>
+    <string name="signup">Sign up Now</string>
+    <string name="editPersonalInfo">Edit Your Personal Info</string>
+    <string name="firstName">First Name</string>
+    <string name="lastName">Last Name</string>
+    <string name="mi">M.I.</string>
+    <string name="bdate">Birth Date</string>
+    <string name="contactNum">Contact Number</string>
+    <string name="cont">Continue</string>
+    <string name="termsAndConditions">By signing up, you agree to our Terms, Privacy Policy, and Cookie Use. Memoreal may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy. Learn more.</string>
+    <string name="signUp">Sign up to Memoreal</string>
+    <string name="skip">>| Skip for Now</string>
+    <string name="accountDetails">Account Details</string>
+    <string name="personalDetails">Personal Details</string>
+    <!--Memoreal Home Page-->
+    <string name="welcome">Welcome\!</string>
+    <string name="userPlaceholder">User</string>
+    <string name="searchBarHint">Search here</string>
+    <string name="createObituaryButton">CREATE OBITUARY</string>
+    <string name="browse">BROWSE</string>
+    <!--Memoreal Create Obituary Section-->
+    <string name="step1">Step 1 of 8: Memorial Creation</string>
+    <string name="oneTime">One-time Fee for a Lifetime Memorial</string>
+    <string name="memorialCreationFee">₱99</string>
+    <string name="memorialCreationFeeDec">99.00</string>
+    <string name="memorialCreation">Memorial Creation Fee</string>
+    <string name="includes">Includes:</string>
+    <string name="memorialCreation_1">* Basic Memorial Page</string>
+    <string name="memorialCreation_2">* Virtual Guestbook <i>(up to 100 entries)</i></string>
+    <string name="memorialCreation_3">Pay once and honor your loved one\'s memory forever. With our one-time fee, you gain access to a permanent online memorial that will be preserved indefinitely, ensuring your loved one\'s legacy lives on for generations.</string>
+    <string name="videoAI">Video AI</string>
+    <string name="videoAIText">Experience the magic of moving images. Our platform effortlessly converts your photos into captivating videos, adding depth and dimension to your memories.</string>
+    <string name="package1">10 CREDITS</string>
+    <string name="package1Price">99</string>
+    <string name="package1PriceDec">₱99</string>
+    <string name="package2">25 CREDITS</string>
+    <string name="package2Price">199</string>
+    <string name="package2PriceDec">₱199</string>
+    <string name="package3">75 CREDITS</string>
+    <string name="package3Price">399</string>
+    <string name="package3PriceDec">₱399</string>
+    <string name="package4">125 CREDITS</string>
+    <string name="package4Price">499</string>
+    <string name="package4PriceDec">₱499</string>
+    <!--Basic Plan-->
+    <!--<string name="basic"><b>Basic Plan</b></string>
+    <string name="basicFee">₱199</string>
+    <string name="basicFeeDec">199.00</string>
+    <string name="perMonth"><i>per month</i></string>
+    <string name="customizable">* Customizable Memorial Page</string>
+    <string name="basic_1">* Virtual Guestbook <i>(up to 250 entries)</i></string>
+    <string name="basic_2">* Virtual Candles <i>(up to 50)</i></string>
+    <string name="basic_3">* Virtual Flowers <i>(up to 50)</i></string>
+    <string name="basic_4">* Photo and Video Uploads <i>(up to 5gb)</i></string>
+    <string name="basic_5">* Chat Support</string>-->
+    <!--Premium Plan-->
+    <!--<string name="premium"><b>Premium Plan</b></string>
+    <string name="premiumFee">₱399</string>
+    <string name="premiumFeeDec">399.00</string>
+    <string name="premium_1">* Virtual Guestbook <i>(up to 500 entries)</i></string>
+    <string name="premium_2">* Virtual Candles <i>(up to 200)</i></string>
+    <string name="premium_3">* Virtual Flowers <i>(up to 200)</i></string>
+    <string name="premium_4">* Photo and Video Uploads <i>(up to 25gb)</i></string>
+    <string name="premium_5">* Chat and Voice Support</string>
+    <string name="arFeat">* Augmented Reality Features:</string>
+    <string name="premium_AR_1">- AR photo and video displays</string>
+    <string name="premium_AR_2">- AR walkthrough</string>-->
+    <!--Lifetime Plan-->
+    <!--<string name="lifetime"><b>Lifetime Plan</b></string>
+    <string name="lifetimeFee">₱999</string>
+    <string name="lifetimeFeeDec">999.00</string>
+    <string name="noRecurring">* No recurring costs</string>
+    <string name="lifetime_1">* Virtual Guestbook <i>(unlimited entries)</i></string>
+    <string name="lifetime_2">* Virtual Candles <i>(unlimited)</i></string>
+    <string name="lifetime_3">* Virtual Flowers <i>(unlimited)</i></string>
+    <string name="lifetime_4">* Photo and Video Uploads <i>(up to 100gb)</i></string>
+    <string name="lifetime_5">* Premium Support</string>
+    <string name="lifetime_AR_1">- Fully immersive AR memorial space</string>
+    <string name="lifetime_AR_2">- Personalized AR experiences <i>(e.g. interactive 3D albums, AR storytelling, etc.)</i></string>-->
+    <string name="proceed">Proceed to Payment</string>
+    <string name="step2">Step 2 of 8: Payment</string>
+    <string name="paymentType">Payment Type:</string>
+    <string name="paymentDetails">Payment Details</string>
+    <string name="cardNumber">Credit Card Number</string>
+    <string name="expiryDate">Expiry Date</string>
+    <string name="cvv">CVV</string>
+    <string name="walletType">Online Wallet Type</string>
+    <string name="mobileNum">Mobile Number</string>
+    <string name="mpin">MPIN</string>
+    <string name="refNum">Reference Number</string>
+    <string name="bankName">Bank Name</string>
+    <string name="nameOnCard">Name on Card</string>
+    <string name="discount1">Discount/Coupon</string>
+    <string name="discount2">Coupon / Redeem Code</string>
+    <string name="total">Total:</string>
+    <string name="paymentChannels">Pay through one of these channels below:</string>
+    <string name="gcash">GCASH</string>
+    <string name="paymaya">PAYMAYA</string>
+    <string name="payNow">Pay Now</string>
+    <string name="paymentSuccess"><b>Payment Successful!</b></string>
+    <string name="paymentSuccessMsg1">You have now successfully paid to the creation fee on your account.</string>
+    <string name="paymentSuccessMsg2">You have now successfully paid to the creation fee and subscribed to a plan on your account.</string>
+    <string name="proceed2"><b>Proceed</b></string>
+    <string name="step3">Step 3 of 8: Basic Information</string>
+    <string name="choosePic">Choose a Picture</string>
+    <string name="fullName">Full Name</string>
+    <string name="dateBirth">Date of Birth</string>
+    <string name="datePassing">Date of Passing</string>
+    <string name="biography">Biography</string>
+    <string name="next"><b>Next</b></string>
+    <string name="previous"><b>Previous</b></string>
+    <string name="step4">Step 4 of 8: Obituary Content</string>
+    <string name="obituaryText">Obituary Text</string>
+    <string name="keyEvents">Key Life Events</string>
+    <string name="achievements">Achievements</string>
+    <string name="addMedia">Add Photos or Videos</string>
+    <string name="familyInfo">Family Information</string>
+    <string name="mngFamily">Manage Family Members</string>
+    <string name="step5">Step 5 of 8: Funeral Details</string>
+    <string name="dateTime">Date and Time</string>
+    <string name="location">Location</string>
+    <string name="adtlInfo">Additional Information</string>
+    <string name="step6">Step 6 of 8: Guestbook Settings</string>
+    <string name="enaGuestbook">Enable Guestbook</string>
+    <string name="privacy">Privacy Settings</string>
+    <string name="step7">Step 7 of 8: Customization</string>
+    <string name="background">Background Theme</string>
+    <string name="selTheme">Select Theme</string>
+    <string name="picFrame">Picture Frame</string>
+    <string name="selPicFrame">Select Picture Frame</string>
+    <string name="bgMusic">Background Music</string>
+    <string name="selBGMusic">Select Background Music</string>
+    <string name="virtualTribute">Virtual Tribute</string>
+    <string name="virtualFlowers">Virtual Flower</string>
+    <string name="virtualCandles">Virtual Candle</string>
+    <string name="adtlSec">Additional Section</string>
+    <string name="favQuotes">Favorite Quote</string>
+    <string name="aiImage">A.I. Generative Image</string>
+    <string name="upload">Upload</string>
+    <string name="uploadItems">Upload Items</string>
+    <string-array name="privacy_spinner">
+        <item>Private</item>
+        <item>Public</item>
+    </string-array>
+    <string-array name="background_spinner">
+        <item>Pattern 1</item>
+        <item>Pattern 2</item>
+        <item>Pattern 3</item>
+        <item>Artistic 1</item>
+        <item>Artistic 2</item>
+        <item>Artistic 3</item>
+        <item>Heaven 1</item>
+        <item>Heaven 2</item>
+        <item>Heaven 3</item>
+    </string-array>
+    <string-array name="bg_music_spinner">
+        <item>Mindfulness Meditation</item>
+        <item>Amazing Grace Instrumental</item>
+        <item>Peaceful Prayer Ambience</item>
+        <item>Silent Prayer</item>
+        <item>Living on the Prayer</item>
+        <item>Emotional Soaking Prayer</item>
+    </string-array>
+    <string-array name="flowers_spinner">
+        <item>Rose</item>
+        <item>Lily</item>
+        <item>Carnation</item>
+        <item>Chrysanthemum</item>
+        <item>Iris</item>
+        <item>Orchid</item>
+    </string-array>
+    <string-array name="candles_spinner">
+        <item>Candle 1</item>
+        <item>Candle 2</item>
+        <item>Candle 3</item>
+        <item>Candle 4</item>
+        <item>Candle 5</item>
+        <item>Candle 6</item>
+        <item>Candle 7</item>
+        <item>Candle 8</item>
+    </string-array>
+    <string name="step8">Step 8 of 8: Review and Publish</string>
+    <string name="offerTributes">Offer Tributes:</string>
+    <!--Placeholder-->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="temp">temp</string>
+    <string name="zero">₱0.00</string>
+    <string name="noPack">No Package Selected</string>
+
+    <string name="lorem_ipsum">Lorem Ipsum</string>
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Top half colored -->
+    <path
+        android:pathData="M0,0 L0,35
+                          Q0,50 15,50
+                          L85,50
+                          Q100,50 100,35
+                          L100,0 Z"
+        android:fillColor="@color/layout_background"/> <!-- Replace with your desired color -->
+
+    <!-- Bottom half white -->
+    <path
+        android:pathData="M0,50 L100,50 L100,100 L0,100 Z"
+        android:fillColor="#FFFFFF"/>
+
+</vector>
