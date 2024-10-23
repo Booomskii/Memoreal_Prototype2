@@ -2,6 +2,7 @@ package com.example.memoreal_prototype
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -33,6 +34,8 @@ class CreateObituaryStep5 : Fragment() {
         val funeralDateTime = view.findViewById<EditText>(R.id.etFunDateTime)
         val funeralLocation = view.findViewById<EditText>(R.id.etFunLocation)
         val funeralAdtlInfo = view.findViewById<EditText>(R.id.etAdtlInfo)
+
+        Log.d("STEP 5 SF - Bundle:", this.arguments.toString())
 
         val mediaList = arguments?.getStringArrayList("mediaList")
         mediaList?.let {
@@ -69,13 +72,28 @@ class CreateObituaryStep5 : Fragment() {
                 drawableEnd?.let {
                     if (event.rawX >= (funeralDateTime.right - it.bounds.width())) {
                         val calendar = Calendar.getInstance()
+
+                        // Show DatePickerDialog
                         val datePickerDialog = DatePickerDialog(
                             requireContext(),
                             { _, year, month, dayOfMonth ->
-                                funeralDateTime.setText(String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year))
+                                // After selecting the date, show TimePickerDialog
+                                val timePickerDialog = TimePickerDialog(
+                                    requireContext(),
+                                    { _, hourOfDay, minute ->
+                                        // Format the date and time
+                                        funeralDateTime.setText(String.format("%02d/%02d/%04d %02d:%02d",
+                                            dayOfMonth, month + 1, year, hourOfDay, minute))
+                                    },
+                                    calendar.get(Calendar.HOUR_OF_DAY),
+                                    calendar.get(Calendar.MINUTE),
+                                    true // Use 24-hour format
+                                )
+                                timePickerDialog.show()
                             },
-                            calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(
-                                Calendar.DAY_OF_MONTH)
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
                         )
                         datePickerDialog.show()
                         return@setOnTouchListener true
@@ -100,11 +118,13 @@ class CreateObituaryStep5 : Fragment() {
                 putString("funeralAdtlInfo", funeralAdtlInfo.text.toString())
             }
 
-            val createObituaryStep5 = CreateObituaryStep5()
-            createObituaryStep5.arguments = bundle
+            val createObituaryStep6 = CreateObituaryStep6()
+            val existingBundle = this.arguments
+            existingBundle?.let { bundle.putAll(it) }
+            createObituaryStep6.arguments = bundle
 
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, CreateObituaryStep6())
+                .replace(R.id.frame_layout, createObituaryStep6)
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .addToBackStack("CreateObituaryStep4")
                 .commit()

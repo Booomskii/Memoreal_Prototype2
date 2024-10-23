@@ -33,14 +33,12 @@ class CreateObituaryStep3 : Fragment() {
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             uploadImg.setImageURI(uri)
-            imageUri = uri
-
-            // To store the image locally
-            saveImageToInternalStorage(uri)
+            imageUri = uri // Keep the URI
         } else {
             Toast.makeText(requireContext(), "No image selected", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -55,6 +53,8 @@ class CreateObituaryStep3 : Fragment() {
         val dateBirthET = view.findViewById<EditText>(R.id.etDateBirth)
         val datePassingET = view.findViewById<EditText>(R.id.etDatePassing)
         val biographyET = view.findViewById<EditText>(R.id.etBiography)
+
+        Log.d("STEP 3 SF - Bundle:", this.arguments.toString())
 
         uploadImg = view.findViewById(R.id.ivUploadPic)
         uploadImg.setOnClickListener {
@@ -137,6 +137,8 @@ class CreateObituaryStep3 : Fragment() {
                         putString("image", imageUri.toString()) // Image URI stored properly
                     }
                     val createObituaryStep4 = CreateObituaryStep4()
+                    val existingBundle = this.arguments
+                    existingBundle?.let { bundle.putAll(it) }
                     createObituaryStep4.arguments = bundle
 
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -195,29 +197,5 @@ class CreateObituaryStep3 : Fragment() {
 
     private fun dateValidator(dateBirth: Date, datePassing: Date): Boolean {
         return !dateBirth.after(Date()) && !datePassing.before(dateBirth)
-    }
-
-    private fun saveImageToInternalStorage(uri: Uri): String? {
-        return try {
-            val inputStream = requireContext().contentResolver.openInputStream(uri)
-            val fileName = "image_${System.currentTimeMillis()}.jpg"
-            val file = File(requireContext().filesDir, fileName)
-            val outputStream = FileOutputStream(file)
-
-            inputStream?.copyTo(outputStream)
-
-            inputStream?.close()
-            outputStream.close()
-
-            // Save the file name to SharedPreferences
-            val sharedPreferences = requireContext().getSharedPreferences("obituaryImage", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("savedImageFileName", fileName).apply()
-
-            fileName // Return file name
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
-            null
-        }
     }
 }

@@ -34,6 +34,10 @@ class CreateObituaryStep7 : Fragment() {
         val vcandleSpinner = view.findViewById<Spinner>(R.id.spinnerVCandles)
         val favQuoteET = view.findViewById<EditText>(R.id.etFavQuote)
 
+        val sharedPref = requireActivity().getSharedPreferences("ObituaryPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+
+
         val frameItems = listOf(
             Pair(R.drawable.classic1_option, "Classic 1"),
             Pair(R.drawable.classic2_option, "Classic 2"),
@@ -109,7 +113,53 @@ class CreateObituaryStep7 : Fragment() {
             Log.d("privacyType", it.toString()) // Log the family names
         } ?: Log.d("privacyType", "No privacyType received")
 
+        val savedBackgroundTheme = sharedPref.getString("backgroundTheme", null)
+        val savedPictureFrame = sharedPref.getInt("pictureFrame", -1)
+        val savedBgMusic = sharedPref.getString("bgMusic", null)
+        val savedVirtualFlower = sharedPref.getInt("virtualFlower", -1)
+        val savedVirtualCandle = sharedPref.getInt("virtualCandle", -1)
+        val savedFavQuote = sharedPref.getString("favQuote", "")
 
+        Log.d("STEP 7 SF - Background Theme:", savedBackgroundTheme ?: "No background theme found")
+        Log.d("STEP 7 SF - Picture Frame:", (savedPictureFrame ?: 0).toString())
+        Log.d("STEP 7 SF - Background Music:", savedBgMusic ?: "No background music found")
+        Log.d("STEP 7 SF - Virtual Flower:", (savedVirtualFlower ?: 0).toString())
+        Log.d("STEP 7 SF - Virtual Candle:", (savedVirtualCandle ?: 0).toString())
+        Log.d("STEP 7 SF - Favorite Quote:", savedFavQuote!!)
+        Log.d("STEP 7 SF - Bundle:", this.arguments.toString())
+
+        savedBackgroundTheme?.let {
+            val position = adapter2.getPosition(it)
+            backgroundSpinner.setSelection(position)
+        }
+
+        savedPictureFrame?.let {
+            val position = frameItems.indexOfFirst { pair -> pair.first == it }
+            if (position != -1) {
+                frameSpinner.setSelection(position)
+            }
+        }
+
+        savedBgMusic?.let {
+            val position = adapter3.getPosition(it)
+            bgMusicSpinner.setSelection(position)
+        }
+
+        savedVirtualFlower?.let {
+            val position = flowerItems.indexOfFirst { pair -> pair.first == it }
+            if (position != -1) {
+                vflowerSpinner.setSelection(position)
+            }
+        }
+
+        savedVirtualCandle?.let {
+            val position = candleItems.indexOfFirst { pair -> pair.first == it }
+            if (position != -1) {
+                vcandleSpinner.setSelection(position)
+            }
+        }
+
+        favQuoteET.setText(savedFavQuote)
 
         backButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -119,18 +169,35 @@ class CreateObituaryStep7 : Fragment() {
         }
 
         nextButton.setOnClickListener {
-            val bundle = Bundle().apply{
-                putString("backgroundTheme", backgroundSpinner.selectedItem.toString())
-                putString("pictureFrame", frameSpinner.selectedItem.toString())
-                putString("bgMusic", bgMusicSpinner.selectedItem.toString())
-                putString("virtualFlower", vflowerSpinner.selectedItem.toString())
-                putString("virtualCandle", vcandleSpinner.selectedItem.toString())
-                putString("favQuote", favQuoteET.text.toString())
+            val backgroundTheme = backgroundSpinner.selectedItem.toString()
+            val pictureFrame = frameSpinner.selectedItem.toString()
+            val bgMusic = bgMusicSpinner.selectedItem.toString()
+            val virtualFlower = vflowerSpinner.selectedItem.toString()
+            val virtualCandle = vcandleSpinner.selectedItem.toString()
+            val favQuote = favQuoteET.text.toString()
+
+            editor.putString("backgroundTheme", backgroundTheme)
+            editor.putInt("pictureFrame", frameItems[frameSpinner.selectedItemPosition].first)
+            editor.putString("bgMusic", bgMusic)
+            editor.putInt("virtualFlower", flowerItems[vflowerSpinner.selectedItemPosition].first)
+            editor.putInt("virtualCandle", candleItems[vcandleSpinner.selectedItemPosition].first)
+            editor.putString("favQuote", favQuote)
+            editor.apply()
+
+            val bundle = Bundle().apply {
+                putString("backgroundTheme", backgroundTheme)
+                putString("pictureFrame", pictureFrame)
+                putString("bgMusic", bgMusic)
+                putString("virtualFlower", virtualFlower)
+                putString("virtualCandle", virtualCandle)
+                putString("favQuote", favQuote)
             }
 
             Log.d("STEP7", bundle.toString())
 
             val createObituaryStep8 = CreateObituaryStep8()
+            val existingBundle = this.arguments
+            existingBundle?.let { bundle.putAll(it) }
             createObituaryStep8.arguments = bundle
 
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -142,7 +209,7 @@ class CreateObituaryStep7 : Fragment() {
 
         prevButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, CreateObituaryStep7())
+                .replace(R.id.frame_layout, CreateObituaryStep6())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .commit()
         }

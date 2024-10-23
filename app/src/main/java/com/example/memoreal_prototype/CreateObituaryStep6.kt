@@ -28,8 +28,10 @@ class CreateObituaryStep6 : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("GuestbookSwitchState",
             Context
                 .MODE_PRIVATE)
-        val switchState = sharedPreferences.getBoolean("switch_state", false) // Default to false if not found
-        guestBookSwitch.isChecked = switchState // Set the switch state based on the stored value
+        val switchState = sharedPreferences.getBoolean("switch_state", false)
+        guestBookSwitch.isChecked = switchState
+
+        Log.d("STEP 6 SF - Bundle:", this.arguments.toString())
 
         guestBookSwitch.setOnCheckedChangeListener { _, isChecked ->
             val sharedPreferences = requireContext().getSharedPreferences("GuestbookSwitchState", Context
@@ -80,6 +82,8 @@ class CreateObituaryStep6 : Fragment() {
             }
 
             val createObituaryStep7 = CreateObituaryStep7()
+            val existingBundle = this.arguments
+            existingBundle?.let { bundle.putAll(it) }
             createObituaryStep7.arguments = bundle
 
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()

@@ -48,8 +48,11 @@ class CreateObituaryStep2_2 : Fragment() {
         }
 
         proceedButton.setOnClickListener {
+            val existingBundle = this.arguments
+            val createObituaryStep3 = CreateObituaryStep3()
+            createObituaryStep3.arguments = existingBundle
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, CreateObituaryStep3())
+                .replace(R.id.frame_layout, createObituaryStep3)
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .addToBackStack("CreateObituaryStep2_2")
                 .commit()

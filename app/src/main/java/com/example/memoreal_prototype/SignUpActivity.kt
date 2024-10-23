@@ -59,16 +59,6 @@ class SignUpActivity : AppCompatActivity() {
             val pword = password.text.toString()
             val email = emailAdd.text.toString()
             val conpword = conpassword.text.toString()
-            /*
-            concise alternative this one
-            viewModel.insertUser(
-                User(
-                    0,
-                    username.text.toString(),
-                    password.text.toString(),
-                    emailAdd.text.toString(),
-                )
-            )*/
             if (inputValidator(email, uname, pword, conpword, agree)) {
                 val user = com.example.memoreal_prototype.models.User(
                     0, null, null, null, uname, null, email,

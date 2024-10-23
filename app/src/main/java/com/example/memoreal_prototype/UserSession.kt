@@ -9,17 +9,23 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import okhttp3.OkHttpClient
 import java.io.File
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.util.Collections
 
 abstract class UserSession: AppCompatActivity() {
     protected lateinit var sharedPreferences: SharedPreferences
 
     companion object {
         val client = OkHttpClient()
-        val baseUrl = "http://192.168.1.2:4848/"
+        var baseUrl = "http://192.168.1.6:4848/"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /*val ipv4Address = getDeviceLocalIpAddress()
+        baseUrl = "http://$ipv4Address:4848/"*/
 
         val masterKey = MasterKey.Builder(this)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -52,6 +58,26 @@ abstract class UserSession: AppCompatActivity() {
             finish()
         }
     }
+
+    /*private fun getDeviceLocalIpAddress(): String {
+        try {
+            val interfaces: List<NetworkInterface> = Collections.list(NetworkInterface.getNetworkInterfaces())
+            for (networkInterface in interfaces) {
+                val addresses: List<InetAddress> = Collections.list(networkInterface.inetAddresses)
+                for (address in addresses) {
+                    if (!address.isLoopbackAddress && address is InetAddress) {
+                        val ipAddress = address.hostAddress
+                        if (ipAddress.indexOf(':') == -1) { // Filter out IPv6 addresses
+                            return ipAddress
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e("UserSession", "Failed to get IP address: ${ex.message}")
+        }
+        return "192.168.1.2" // Fallback to a default IP if none is found
+    }*/
 
     fun logOut() {
         try {

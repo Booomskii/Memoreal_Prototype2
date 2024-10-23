@@ -79,6 +79,8 @@ class CreateObituaryStep2 : Fragment() {
 
         payNow.setOnClickListener {
             val createObituaryStep22 = CreateObituaryStep2_2()
+            val existingBundle = this.arguments
+            existingBundle?.let { bundle.putAll(it) }
             createObituaryStep22.arguments = bundle
 
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()

@@ -195,6 +195,7 @@
     </string-array>
     <string name="step8">Step 8 of 8: Review and Publish</string>
     <string name="offerTributes">Offer Tributes:</string>
+    <string name="publish">Publish</string>
     <!--Placeholder-->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temp">temp</string>

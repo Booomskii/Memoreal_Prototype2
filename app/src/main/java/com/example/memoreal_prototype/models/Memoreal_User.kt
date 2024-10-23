@@ -16,26 +16,78 @@ data class User(
 )
 
 data class Obituary(
-    var obituaryID:Int,
-    var userID:Int,
-    var biography: Text,
-    var obituaryName:String,
-    var dateOfBirth:String,
-    var dateOfDeath:String,
-    var keyEvents:String,
-    var picture:String? = null,
-    var achievements:String? = null,
-    var favoriteQuotes:String? = null,
-    var creationDate: Long,
-    var lastModified: Long
+    var OBITUARYID:Int,
+    var USERID:Int,
+    var GALLERYID:Int,
+    var OBITCUSTID:Int,
+    var FAMILYID:Int,
+    var BIOGRAPHY: Text,
+    var OBITUARYNAME:String,
+    var OBITUARYPHOTO:String,
+    var DATEOFBIRTH:String,
+    var DATEOFDEATH:String,
+    var OBITUARYTEXT:String? = null,
+    var KEYEVENTS:String? = null,
+    var FUNDATETIME:String? = null,
+    var FUNLOCATION:String? = null,
+    var ADTLINFO:String? = null,
+    var PRIVACY:String,
+    var ENAGUESTBOOK:Boolean,
+    var FAVORITEQUOTES:String? = null,
+    var CREATIONDATE: String,
+    var LASTMODIFIED: String
+)
+
+data class Obituary_Customization(
+    var OBITCUSTID:Int,
+    var BGTHEME:String,
+    var PICFRAME:String,
+    var BGMUSIC:String,
+    var VFLOWER:String,
+    var VCANDLE:String,
+)
+
+data class Family(
+    var FAMILYID:Int,
+    var DATECREATED:String
+)
+
+data class FamilyMembers(
+    var MEMBERSID:Int,
+    var FAMILYID:Int,
+    var MEMBERNAME:String? = null,
+    var RELATIONSHIP:String? = null
+)
+
+data class Gallery(
+    var GALLERYID:Int,
+    var GALLERYMEDIAID:Int,
+    var GALLERYNAME:String,
+    var CREATIONDATE: String,
+    var MODIFIEDDATE: String
+)
+
+data class GalleryMedia(
+    var GALLERYMEDIAID:Int,
+    var MEDIATYPE:String,
+    var FILENAME: String,
+    var UPLOADDATE: String
 )
 
 data class Payment(
-    var paymentID:Int,
-    var userID:Int,
-    var obituaryID: Int,
-    var amount: Double,
-    var paymentDate: String,
-    var paymentMethod: String,
-    var paymentStatus: String
+    var PAYMENTID:Int,
+    var USERID:Int,
+    var OBITUARYID: Int,
+    var AMOUNT: Double,
+    var PAYMENTDATE: String,
+    var PAYMENTMETHOD: String,
+    var PAYMENTSTATUS: String
+)
+
+data class Guestbook(
+    var GUESTBOOKID:Int,
+    var USERID:Int,
+    var GUESTNAME:String,
+    var MESSAGE:String? = null,
+    var POSTINGDATE:String
 )
