@@ -62,7 +62,7 @@ class SignUpActivity : AppCompatActivity() {
             if (inputValidator(email, uname, pword, conpword, agree)) {
                 val user = com.example.memoreal_prototype.models.User(
                     0, null, null, null, uname, null, email,
-                    null, null, "" // Leave hashedPassword empty since it's handled on the server
+                    null, null, ""
                 )
 
                 checkUserAvailability(uname, email) { isAvailable ->
@@ -75,13 +75,15 @@ class SignUpActivity : AppCompatActivity() {
                             ).show()
                         }
                     } else {
-                        registerUser(user, pword)
-                        clearInput()
-                        val intent = Intent(applicationContext, SignUpActivity2::class.java)
-                        intent.putExtra("username", uname)
-                        intent.putExtra("email", email)
-                        intent.putExtra("password", pword)
-                        startActivity(intent)
+                        // Call registerUser and navigate only after successful registration
+                        registerUser(user, pword) {
+                            clearInput()
+                            val intent = Intent(applicationContext, SignUpActivity2::class.java)
+                            intent.putExtra("username", uname)
+                            intent.putExtra("email", email)
+                            intent.putExtra("password", pword)
+                            startActivity(intent)
+                        }
                     }
                 }
             }
@@ -190,24 +192,36 @@ class SignUpActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
-                callback(false)
+                runOnUiThread {
+                    callback(false)
+                }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string()
                 Log.d("CheckUserAvailability", "Response Code: ${response.code}")
                 Log.d("CheckUserAvailability", "Response Body: $responseBody")
+
                 if (response.isSuccessful) {
+                    runOnUiThread {
+                        // If the user is available, call callback with true
+                        callback(true)
+                    }
                 } else if (response.code == 409) {
-                    callback(false)
+                    // If conflict (user exists), call callback with false
+                    runOnUiThread {
+                        callback(false)
+                    }
                 } else {
-                    callback(false)
+                    runOnUiThread {
+                        callback(false)
+                    }
                 }
             }
         })
     }
 
-    private fun registerUser(user: com.example.memoreal_prototype.models.User, password: String) {
+    private fun registerUser(user: com.example.memoreal_prototype.models.User, password: String, onSuccess: () -> Unit) {
         val url = baseUrl + "api/addUser"
 
         val json = JSONObject().apply {
@@ -241,12 +255,12 @@ class SignUpActivity : AppCompatActivity() {
                     // Show success message
                     runOnUiThread {
                         Toast.makeText(applicationContext, "User registered successfully", Toast.LENGTH_LONG).show()
+                        onSuccess() // Call the success callback
                     }
                 } else {
                     // Parse the response to get the error message
                     val errorBody = response.body?.string()
                     val errorMessage = try {
-                        // Try to extract the "message" from the JSON response
                         val jsonError = JSONObject(errorBody ?: "")
                         jsonError.getString("message")
                     } catch (e: Exception) {

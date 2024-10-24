@@ -1,5 +1,6 @@
 package com.example.memoreal_prototype
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -27,6 +28,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.IOException
+import org.json.JSONException
 import org.json.JSONObject
 
 
@@ -160,24 +162,67 @@ class MainActivity : AppCompatActivity() {
                 val responseBody = response.body?.string()
                 Log.d("Login", "Response Code: ${response.code}")
                 Log.d("Login", "Response Body: $responseBody")
+
                 if (response.isSuccessful) {
-                    val jsonResponse = JSONObject(responseBody ?: "{}")
-                    if (jsonResponse.has("accessToken")) {
-                        val accessToken = jsonResponse.getString("accessToken")
-                        saveToken(accessToken)
-                        callback(true)
-                    } else {
-                        Log.e("Login", "Access token not found in response")
+                    try {
+                        val jsonResponse = JSONObject(responseBody ?: "{}")
+                        if (jsonResponse.has("accessToken") && jsonResponse.has("userId")) {
+                            val accessToken = jsonResponse.getString("accessToken")
+                            val userId = jsonResponse.getInt("userId") // Assuming userId is returned as an integer
+
+                            saveToken(accessToken, userId)
+                            saveUserId(userId) // Save the user ID
+                            callback(true)
+                        } else {
+                            Log.e("Login", "Access token or user ID not found in response")
+                            callback(false)
+                        }
+                    } catch (e: JSONException) {
+                        Log.e("Login", "JSON parsing error: ${e.message}")
                         callback(false)
                     }
                 } else if (response.code == 401) {
-                    callback(false)
+                    callback(false) // Invalid credentials
                 } else {
-                    callback(false)
+                    callback(false) // Other error
                 }
             }
         })
     }
+
+    // Save the access token in SharedPreferences
+    private fun saveToken(token: String, userId: Int) {
+        val masterKey = MasterKey.Builder(this)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        // Initialize class-level sharedPreferences
+        sharedPreferences = EncryptedSharedPreferences.create(
+            this,
+            "userSession",  // File name
+            masterKey,      // Master key for encryption
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        val editor = sharedPreferences.edit()
+        editor.putString("accessToken", token)
+        editor.putInt("userId", userId) // Save userId in shared preferences
+        editor.apply()
+
+        // Log the stored token and userId to ensure they were saved
+        val storedToken = sharedPreferences.getString("accessToken", null)
+        val storedUserId = sharedPreferences.getInt("userId", -1) // Default to -1 if not found
+        Log.d("StoredToken", "Stored Access Token: $storedToken")
+        Log.d("StoredUserId", "Stored User ID: $storedUserId")
+    }
+
+
+    private fun saveUserId(userId: Int) {
+        val sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putInt("USER_ID", userId).apply()
+    }
+
 
     private fun loginSuccess(){
         val masterKey = MasterKey.Builder(this)
@@ -203,29 +248,6 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
-    }
-
-    private fun saveToken(token: String) {
-        val masterKey = MasterKey.Builder(this)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
-
-        // Initialize class-level sharedPreferences
-        sharedPreferences = EncryptedSharedPreferences.create(
-            this,
-            "userSession",  // File name
-            masterKey,      // Master key for encryption
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-
-        val editor = sharedPreferences.edit()
-        editor.putString("accessToken", token)
-        editor.apply()
-
-        // Log the stored token to ensure it was saved
-        val storedToken = sharedPreferences.getString("accessToken", null)
-        Log.d("StoredToken", "Stored Access Token: $storedToken")
     }
 
 }

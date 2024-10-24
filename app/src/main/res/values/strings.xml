@@ -196,6 +196,12 @@
     <string name="step8">Step 8 of 8: Review and Publish</string>
     <string name="offerTributes">Offer Tributes:</string>
     <string name="publish">Publish</string>
+    <string name="myObit">My Obituaries</string>
+    <!--Memoreal My Obituaries Section-->
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <!--Memoreal Profile Section-->
+    <string name="myProfile">My Profile</string>
     <!--Placeholder-->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temp">temp</string>

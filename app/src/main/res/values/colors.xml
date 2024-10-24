@@ -20,4 +20,6 @@
     <color name="green">#00FF00</color>
     <color name="lightbrown">#FFE4C4</color>
     <color name="yellow">#F7EA5F</color>
+    <!--My Obituaries Colors-->
+    <color name="red">#FF0000</color>
 </resources>

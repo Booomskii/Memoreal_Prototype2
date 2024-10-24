@@ -21,7 +21,7 @@ data class Obituary(
     var GALLERYID:Int,
     var OBITCUSTID:Int,
     var FAMILYID:Int,
-    var BIOGRAPHY: Text,
+    var BIOGRAPHY: String,
     var OBITUARYNAME:String,
     var OBITUARYPHOTO:String,
     var DATEOFBIRTH:String,
@@ -33,7 +33,7 @@ data class Obituary(
     var ADTLINFO:String? = null,
     var PRIVACY:String,
     var ENAGUESTBOOK:Boolean,
-    var FAVORITEQUOTES:String? = null,
+    var FAVORITEQUOTE:String? = null,
     var CREATIONDATE: String,
     var LASTMODIFIED: String
 )
@@ -62,13 +62,13 @@ data class FamilyMembers(
 data class Gallery(
     var GALLERYID:Int,
     var GALLERYMEDIAID:Int,
-    var GALLERYNAME:String,
     var CREATIONDATE: String,
     var MODIFIEDDATE: String
 )
 
 data class GalleryMedia(
     var GALLERYMEDIAID:Int,
+    var GALLERYID:Int,
     var MEDIATYPE:String,
     var FILENAME: String,
     var UPLOADDATE: String

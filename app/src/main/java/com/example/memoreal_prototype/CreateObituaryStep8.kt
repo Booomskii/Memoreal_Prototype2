@@ -10,11 +10,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.MimeTypeMap
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.util.TypedValueCompat.dpToPx
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -22,9 +25,12 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
+import org.w3c.dom.Text
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class CreateObituaryStep8 : Fragment() {
     val client = UserSession.client
@@ -32,6 +38,7 @@ class CreateObituaryStep8 : Fragment() {
 
     private var obitCustId = 0
     private var familyId = 0
+    private var galleryId = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,24 +66,6 @@ class CreateObituaryStep8 : Fragment() {
         val vcandle = arguments?.getString("virtualCandle")
 
         val selectedPackage = arguments?.getString("selectedPackage") ?: "Default Package"
-        val obituaryPhoto = arguments?.getString("image") ?: "default_image_path"
-        val dateOfBirth = arguments?.getString("dateBirth") ?: "01-01-1900"
-        val dateOfDeath = arguments?.getString("datePassing") ?: "01-01-1900"
-        val obituaryName = arguments?.getString("fullName") ?: "Unknown Name"
-        val biography = arguments?.getString("biography") ?: "No biography available."
-        val obituaryText = arguments?.getString("obituaryText") ?: "No obituary text provided."
-        val keyEvents = arguments?.getString("keyEvents") ?: "No key life events"
-        val mediaList = arguments?.getStringArrayList("mediaList") ?: arrayListOf()
-        val funDateTime = arguments?.getString("funeralDateTime") ?: "01-01-1900 00:00"
-        val funLocation = arguments?.getString("funeralLocation") ?: "Unknown Location"
-        val adtlInfo = arguments?.getString("funeralAdtlInfo") ?: "No additional information."
-        val privacy = arguments?.getString("privacyType") ?: "Public"
-        val enaGuestbook = arguments?.getBoolean("guestBookSwitchState") ?: "false"
-        val favoriteQuote = arguments?.getString("favQuote") ?: "No favorite quote."
-
-        /*val family = com.example.memoreal_prototype.models.Family(
-            0, memberName!!, relationship!!
-        )*/
 
         obituaryImage.setImageURI(imageUri)
 
@@ -219,6 +208,8 @@ class CreateObituaryStep8 : Fragment() {
                     registerObituaryCustomization(obituary_cust)
                     addEachFamilyMember()
 
+                    createGalleryAndMedia()
+
                     Toast.makeText(requireContext(),"Obituary created successfully", Toast.LENGTH_SHORT).show()
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
                         .replace(R.id.frame_layout, HomeFragment())
@@ -326,30 +317,34 @@ class CreateObituaryStep8 : Fragment() {
 
         if (memberName.size == relationship.size) {
             // First, create a family entry
-            val familyId = addFamily()
+            addFamily { familyId ->
+                if (familyId != 0) {
+                    // Now, add each family member with the new family ID
+                    for (i in memberName.indices) {
+                        val name = memberName[i]
+                        val relation = relationship[i]
 
-            // Now, add each family member with the new family ID
-            for (i in memberName.indices) {
-                val name = memberName[i]
-                val relation = relationship[i]
-
-                val familyMember = com.example.memoreal_prototype.models.FamilyMembers(
-                    0, // This will be handled by the database
-                    familyId,
-                    name,
-                    relation
-                )
-                registerFamilyMember(familyMember)
+                        val familyMember = com.example.memoreal_prototype.models.FamilyMembers(
+                            0, // This will be handled by the database
+                            familyId,
+                            name,
+                            relation
+                        )
+                        registerFamilyMember(familyMember)
+                    }
+                } else {
+                    Log.e("Add Family", "Failed to create family, skipping member addition.")
+                }
             }
         } else {
             Log.e("Bundle Error", "The familyNames and relationships lists have different sizes!")
         }
     }
 
-    private fun addFamily(): Int {
+
+    private fun addFamily(callback: (Int) -> Unit) {
         val url = baseUrl + "api/addFamily"
-        val requestBody = JSONObject().apply {
-        }.toString().toRequestBody("application/json".toMediaTypeOrNull())
+        val requestBody = JSONObject().toString().toRequestBody("application/json".toMediaTypeOrNull())
 
         val request = Request.Builder()
             .url(url)
@@ -359,6 +354,7 @@ class CreateObituaryStep8 : Fragment() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("Add Family", "Request failed: ${e.message}")
+                callback(0) // Pass 0 to callback if the request fails
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -367,13 +363,13 @@ class CreateObituaryStep8 : Fragment() {
                     val jsonResponse = JSONObject(responseBody)
                     familyId = jsonResponse.getInt("FAMILYID")
                     Log.d("Add Family", "Family created successfully with ID: $familyId")
+                    callback(familyId) // Pass the familyId to the callback
                 } else {
                     Log.e("Add Family", "Failed to create family: ${response.message}")
+                    callback(0) // Pass 0 if the family creation fails
                 }
             }
         })
-
-        return familyId
     }
 
     private fun registerFamilyMember(familyMember: com.example.memoreal_prototype.models.FamilyMembers) {
@@ -406,12 +402,88 @@ class CreateObituaryStep8 : Fragment() {
         })
     }
 
+    private fun createGalleryAndMedia() {
+        val mediaList = arguments?.getStringArrayList("mediaList") ?: arrayListOf()
 
-    private fun publishObituary(obituary: com.example.memoreal_prototype.models.Obituary) {
-        val url = baseUrl + "api/addObituary"
+        // Step 2: Create the gallery and media only if media exists
+        if (mediaList.isNotEmpty()) {
+            addGallery { createdGalleryId ->  // Pass a callback to handle the created gallery ID
+                if (createdGalleryId != 0) { // Check if the gallery was created successfully
+                    // Step 3: After the gallery is created, proceed to add the media
+                    mediaList.forEach { mediaString ->
+                        val mediaUri = Uri.parse(mediaString)
+                        val mimeType = requireContext().contentResolver.getType(mediaUri)
+
+                        mimeType?.let {
+                            val fileType = when {
+                                mimeType.startsWith("image/") -> "Image"
+                                mimeType.startsWith("video/") -> "Video"
+                                else -> ""
+                            }
+
+                            if (fileType.isNotEmpty()) {
+                                val galleryMedia = com.example.memoreal_prototype.models.GalleryMedia(
+                                    0,  // Gallery Media ID (auto-incremented)
+                                    createdGalleryId,  // Use the newly created GALLERYID
+                                    fileType,  // File type (Image or Video)
+                                    mediaString,  // File name or URI
+                                    ""  // This will be handled by the server (upload date)
+                                )
+                                registerMedia(galleryMedia)
+                            } else {
+                                Log.e("MediaType", "Unsupported media type: $mimeType")
+                            }
+                        } ?: Log.e("MediaType", "Unable to determine MIME type for: $mediaUri")
+                    }
+                    // Step 4: Publish the obituary after gallery and media are added
+                    publishObituary()
+                } else {
+                    Log.e("Gallery Error", "Failed to create gallery. Skipping media addition.")
+                }
+            }
+        } else {
+            Log.e("Bundle Error", "Media List is null or empty. Skipping gallery media addition.")
+        }
+    }
+
+    private fun addGallery(callback: (Int) -> Unit) {
+        val url = baseUrl + "api/addGallery"
+        val requestBody = JSONObject().toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Add Gallery", "Request failed: ${e.message}")
+                callback(0) // Pass 0 to callback if the request fails
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = JSONObject(responseBody)
+                    galleryId = jsonResponse.getInt("GALLERYID")
+                    Log.d("Add Gallery", "Gallery created successfully with ID: $galleryId")
+                    callback(galleryId)
+                } else {
+                    Log.e("Add Gallery", "Failed to create gallery: ${response.message}")
+                    callback(0)
+                }
+            }
+        })
+    }
+
+    private fun registerMedia(galleryMedia: com.example.memoreal_prototype.models.GalleryMedia) {
+        val url = baseUrl + "api/addGalleryMedia"
 
         val json = JSONObject().apply {
-            /*put("USERID", obituaryCust.USERID)*/
+            put("GALLERYID", galleryMedia.GALLERYID)
+            put("MEDIATYPE", galleryMedia.MEDIATYPE)
+            put("FILENAME", galleryMedia.FILENAME)
+            put("UPLOADDATE", galleryMedia.UPLOADDATE)
         }.toString()
 
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
@@ -422,7 +494,110 @@ class CreateObituaryStep8 : Fragment() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("Register Obituary Customization", "Request failed: ${e.message}")
+                Log.e("Register Gallery Media", "Request failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.d("Register Gallery Media", "Gallery media registered successfully")
+                } else {
+                    Log.e("Register Gallery Media", "Failed to register gallery media: ${response
+                        .message}")
+                }
+            }
+        })
+    }
+
+    private fun publishObituary(){
+        val masterKey = MasterKey.Builder(requireContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        // Initialize EncryptedSharedPreferences
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            requireContext(),
+            "userSession",  // File name
+            masterKey,      // Master key for encryption
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        val userId = sharedPreferences.getInt("userId", -1)
+        val obituaryPhoto = arguments?.getString("image") ?: "default_image_path"
+        val dateOfBirth = arguments?.getString("dateBirth")?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
+        val dateOfDeath = arguments?.getString("datePassing")?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
+        val obituaryName = arguments?.getString("fullName") ?: "Unknown Name"
+        val biography = arguments?.getString("biography") ?: "No biography available."
+        val obituaryText = arguments?.getString("obituaryText") ?: "No obituary text provided."
+        val keyEvents = arguments?.getString("keyEvents") ?: "No key life events"
+        val funDateTime = arguments?.getString("funeralDateTime") ?: "01-01-1900 00:00"
+        val funLocation = arguments?.getString("funeralLocation") ?: "Unknown Location"
+        val adtlInfo = arguments?.getString("funeralAdtlInfo") ?: "No additional information."
+        val privacy = arguments?.getString("privacyType") ?: "Public"
+        val enaGuestbook = arguments?.getBoolean("guestBookSwitchState", false) ?: false
+        val favoriteQuote = arguments?.getString("favQuote") ?: "No favorite quote."
+        val formattedFuneralDateTime = formatFuneralDateTime(funDateTime)
+        val obituary = com.example.memoreal_prototype.models.Obituary(
+            0,
+            userId.toInt(),
+            galleryId.toInt(),
+            obitCustId.toInt(),
+            familyId.toInt(),
+            biography,
+            obituaryName,
+            obituaryPhoto,
+            dateOfBirth,
+            dateOfDeath,
+            obituaryText,
+            keyEvents,
+            formattedFuneralDateTime,
+            funLocation,
+            adtlInfo,
+            privacy,
+            enaGuestbook,
+            favoriteQuote,
+            "",
+            ""
+        )
+
+        registerObituary(obituary)
+    }
+
+
+    private fun registerObituary(obituary: com.example.memoreal_prototype.models.Obituary) {
+        val url = baseUrl + "api/addObituary"
+
+        val json = JSONObject().apply {
+            put("OBITUARYID", obituary.OBITUARYID)
+            put("USERID", obituary.USERID)
+            put("GALLERYID", obituary.GALLERYID)
+            put("OBITCUSTID", obituary.OBITCUSTID)
+            put("FAMILYID", obituary.FAMILYID)
+            put("BIOGRAPHY", obituary.BIOGRAPHY)
+            put("OBITUARYNAME", obituary.OBITUARYNAME)
+            put("OBITUARYPHOTO", obituary.OBITUARYPHOTO)
+            put("DATEOFBIRTH", obituary.DATEOFBIRTH)
+            put("DATEOFDEATH", obituary.DATEOFDEATH)
+            put("OBITUARYTEXT", obituary.OBITUARYTEXT)
+            put("KEYEVENTS", obituary.KEYEVENTS)
+            put("FUNDATETIME", obituary.FUNDATETIME)
+            put("FUNLOCATION", obituary.FUNLOCATION)
+            put("ADTLINFO", obituary.ADTLINFO)
+            put("PRIVACY", obituary.PRIVACY)
+            put("ENAGUESTBOOK", obituary.ENAGUESTBOOK)
+            put("FAVORITEQUOTE", obituary.FAVORITEQUOTE)
+            put("CREATIONDATE", obituary.CREATIONDATE)
+            put("LASTMODIFIED", obituary.LASTMODIFIED)
+        }.toString()
+
+        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Register Obituary", "Request failed: ${e.message}")
                 requireActivity().runOnUiThread {
                     Toast.makeText(requireContext(), "Registration failed: ${e.message}", Toast
                         .LENGTH_LONG).show()
@@ -431,24 +606,20 @@ class CreateObituaryStep8 : Fragment() {
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    // Show success message
                     requireActivity().runOnUiThread {
-                        Toast.makeText(requireContext(), "User registered successfully", Toast
+                        Toast.makeText(requireContext(), "Obituary registered successfully", Toast
                             .LENGTH_LONG)
                             .show()
                     }
                 } else {
-                    // Parse the response to get the error message
                     val errorBody = response.body?.string()
                     val errorMessage = try {
-                        // Try to extract the "message" from the JSON response
                         val jsonError = JSONObject(errorBody ?: "")
                         jsonError.getString("message")
                     } catch (e: Exception) {
                         "Registration failed: Unknown error"
                     }
 
-                    // Show the error message as a toast
                     requireActivity().runOnUiThread {
                         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                     }
@@ -457,4 +628,27 @@ class CreateObituaryStep8 : Fragment() {
         })
     }
 
+    fun formatFuneralDateTime(inputDateTime: String): String {
+        val inputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
+        return try {
+            val date = inputFormat.parse(inputDateTime)
+            if (date != null) {
+                outputFormat.format(date)
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
+    }
+
+    private fun formatDateToMSSQL(dateString: String): String {
+        val originalFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val targetFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = originalFormat.parse(dateString)
+        return targetFormat.format(date)
+    }
 }
