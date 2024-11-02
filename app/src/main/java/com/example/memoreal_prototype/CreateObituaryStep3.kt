@@ -24,11 +24,13 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import android.util.Log
+import androidx.fragment.app.activityViewModels
 
 class CreateObituaryStep3 : Fragment() {
 
     private lateinit var uploadImg: ImageView
     private var imageUri: Uri? = null
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
@@ -54,7 +56,28 @@ class CreateObituaryStep3 : Fragment() {
         val datePassingET = view.findViewById<EditText>(R.id.etDatePassing)
         val biographyET = view.findViewById<EditText>(R.id.etBiography)
 
-        Log.d("STEP 3 SF - Bundle:", this.arguments.toString())
+        sharedViewModel.fullName.observe(viewLifecycleOwner) { fullName ->
+            fullNameET.setText(fullName)
+        }
+
+        sharedViewModel.dateBirth.observe(viewLifecycleOwner) { dateBirth ->
+            dateBirthET.setText(dateBirth)
+        }
+
+        sharedViewModel.datePassing.observe(viewLifecycleOwner) { datePassing ->
+            datePassingET.setText(datePassing)
+        }
+
+        sharedViewModel.biography.observe(viewLifecycleOwner) { biography ->
+            biographyET.setText(biography)
+        }
+
+        sharedViewModel.image.observe(viewLifecycleOwner) { imageUriString ->
+            imageUriString?.let {
+                imageUri = Uri.parse(it)
+                uploadImg.setImageURI(imageUri)
+            }
+        }
 
         uploadImg = view.findViewById(R.id.ivUploadPic)
         uploadImg.setOnClickListener {
@@ -129,20 +152,14 @@ class CreateObituaryStep3 : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    val bundle = Bundle().apply {
-                        putString("fullName", fullName)
-                        putString("dateBirth", dateBirthStr)
-                        putString("datePassing", datePassingStr)
-                        putString("biography", biography)
-                        putString("image", imageUri.toString()) // Image URI stored properly
-                    }
-                    val createObituaryStep4 = CreateObituaryStep4()
-                    val existingBundle = this.arguments
-                    existingBundle?.let { bundle.putAll(it) }
-                    createObituaryStep4.arguments = bundle
+                    sharedViewModel.fullName.value = fullName
+                    sharedViewModel.dateBirth.value = dateBirthStr
+                    sharedViewModel.datePassing.value = datePassingStr
+                    sharedViewModel.biography.value = biography
+                    sharedViewModel.image.value = imageUri.toString()
 
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout, createObituaryStep4)
+                        .replace(R.id.frame_layout, CreateObituaryStep4())
                         .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                         .addToBackStack("CreateObituaryStep3")
                         .commit()

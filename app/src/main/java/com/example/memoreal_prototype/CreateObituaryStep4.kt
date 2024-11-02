@@ -20,7 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 class CreateObituaryStep4 : Fragment() {
 
-    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
+    private val sharedViewModel2: Step4SharedViewModel by activityViewModels()
     private lateinit var mediaAdapter: MediaAdapter
     private lateinit var recyclerView: RecyclerView
 
@@ -28,7 +29,7 @@ class CreateObituaryStep4 : Fragment() {
     private val pickMediaLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         uris.let {
             it.forEach { uri ->
-                sharedViewModel.addMedia(uri)
+                sharedViewModel2.addMedia(uri)
                 Log.d("Media Added", uri.toString()) // Log each added media URI
             }
             mediaAdapter.notifyDataSetChanged() // Refresh adapter
@@ -44,7 +45,7 @@ class CreateObituaryStep4 : Fragment() {
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.recyclerViewMedia) // Ensure this ID matches your layout
         mediaAdapter = MediaAdapter(
-            getMediaList = { sharedViewModel.mediaList }, // Function to get current media list
+            getMediaList = { sharedViewModel2.mediaList }, // Function to get current media list
             onDeleteClick = { uri -> deleteMedia(uri) }, // Handle media deletion
             onMediaClick = { uri -> viewMedia(uri) } // Handle media click to view
         )
@@ -58,10 +59,16 @@ class CreateObituaryStep4 : Fragment() {
         val prevButton = view.findViewById<Button>(R.id.btnPrev)
         val addFamily = view.findViewById<Button>(R.id.btnAddFamily)
         val addMedia = view.findViewById<ImageView>(R.id.btnAddMedia)
-        val obitText = view.findViewById<EditText>(R.id.etObituaryText)
-        val keyEvents = view.findViewById<EditText>(R.id.etKeyEvents)
+        val obitTextET = view.findViewById<EditText>(R.id.etObituaryText)
+        val keyEventsET = view.findViewById<EditText>(R.id.etKeyEvents)
 
-        Log.d("STEP 4 SF - Bundle:", this.arguments.toString())
+        sharedViewModel.obituaryText.observe(viewLifecycleOwner) { obituaryText ->
+            obitTextET.setText(obituaryText)
+        }
+
+        sharedViewModel.keyEvents.observe(viewLifecycleOwner) { keyEvents ->
+            keyEventsET.setText(keyEvents)
+        }
 
         // Back button functionality
         backButton.setOnClickListener {
@@ -82,8 +89,8 @@ class CreateObituaryStep4 : Fragment() {
 
         // Next button functionality
         nextButton.setOnClickListener {
-            Log.d("FamilyMembers", "Family members: ${sharedViewModel.getFamilyMembers()}")
-            val mediaUriStrings = sharedViewModel.mediaList.map { it.toString() }
+            Log.d("FamilyMembers", "Family members: ${sharedViewModel2.getFamilyMembers()}")
+            val mediaUriStrings = sharedViewModel2.mediaList.map { it.toString() }
 
             mediaUriStrings.forEachIndexed { index, uri ->
                 Log.d("Media List Item $index:", uri) // Log each item with its index
@@ -92,34 +99,20 @@ class CreateObituaryStep4 : Fragment() {
             // Convert family members (List<Pair<String, String>>) to two separate ArrayLists
             val familyNames = ArrayList<String>()
             val familyRelationships = ArrayList<String>()
-            sharedViewModel.getFamilyMembers().forEach { pair ->
+            sharedViewModel2.getFamilyMembers().forEach { pair ->
                 familyNames.add(pair.first)
                 familyRelationships.add(pair.second)
             }
 
-            // Create the bundle and pass the media and family data
-            val bundle = Bundle().apply {
-                putStringArrayList("mediaList", ArrayList(mediaUriStrings)) // Pass media as String URIs
-                putStringArrayList("familyNames", familyNames) // Pass family names
-                putStringArrayList("familyRelationships", familyRelationships) // Pass family relationships
-                putString("obituaryText", obitText.text.toString())
-                putString("keyEvents", keyEvents.text.toString())
-            }
-
-            Log.d("Family Names: ", "$familyNames")
-            Log.d("Family Relationships: ", "$familyRelationships")
-            Log.d("Obituary Text: ", "${obitText.text}")
-            Log.d("Key Events: ", "${keyEvents.text}")
-            Log.d("Key Events: ", "${keyEvents.text}")
-
-            val createObituaryStep5 = CreateObituaryStep5()
-            val existingBundle = this.arguments
-            existingBundle?.let { bundle.putAll(it) } // Merge existing arguments with the new bundle
-            createObituaryStep5.arguments = bundle // Set arguments for the next fragment
+            sharedViewModel.mediaList.value = ArrayList(mediaUriStrings)
+            sharedViewModel.familyNames.value = familyNames
+            sharedViewModel.familyRelationships.value = familyRelationships
+            sharedViewModel.obituaryText.value = obitTextET.text.toString()
+            sharedViewModel.keyEvents.value = keyEventsET.text.toString()
 
             // Navigate to the next step
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, createObituaryStep5)
+                .replace(R.id.frame_layout, CreateObituaryStep5())
                 .addToBackStack("CreateObituaryStep4") // Add to back stack for navigation
                 .commit()
         }
@@ -136,7 +129,7 @@ class CreateObituaryStep4 : Fragment() {
 
     // Function to delete media from the list
     private fun deleteMedia(uri: Uri) {
-        sharedViewModel.removeMedia(uri) // Remove from SharedViewModel's media list
+        sharedViewModel2.removeMedia(uri) // Remove from SharedViewModel's media list
         mediaAdapter.notifyDataSetChanged() // Refresh adapter to update RecyclerView
     }
 

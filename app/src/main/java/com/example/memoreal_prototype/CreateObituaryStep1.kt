@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -19,15 +20,9 @@ import okio.IOException
 import org.json.JSONObject
 
 class CreateObituaryStep1 : Fragment() {
-    private var isPlanSelected = false
-    private var selectedButton: Button? = null
-    private var bundle: Bundle? = null
-    val client = UserSession.client
-    val baseUrl = UserSession.baseUrl
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var selectedButton: Button? = null
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,12 +40,28 @@ class CreateObituaryStep1 : Fragment() {
 
         val buttons = listOf(button1, button2, button3, button4)
 
+        sharedViewModel.selectedButtonId.observe(viewLifecycleOwner) { selectedId ->
+            // Reset all buttons to their default style
+            buttons.forEach { button ->
+                button.setBackgroundColor(resources.getColor(R.color.memo_orange)) // Default color
+                button.setTextColor(resources.getColor(R.color.black))
+            }
+
+            // Highlight the previously selected button
+            buttons.find { it.id == selectedId }?.apply {
+                setBackgroundColor(resources.getColor(R.color.memo_light_orange)) // Highlight color
+                setTextColor(resources.getColor(R.color.white))
+                selectedButton = this // Update selectedButton reference
+            }
+        }
+
         // Set click listeners for all buttons
-        for (button in buttons) {
+        buttons.forEach { button ->
             button.setOnClickListener {
                 onPackageSelected(button)
             }
         }
+
 
         backButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -60,11 +71,8 @@ class CreateObituaryStep1 : Fragment() {
         }
 
         proceed.setOnClickListener {
-            val createObituaryStep2 = CreateObituaryStep2()
-            createObituaryStep2.arguments = bundle
-
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, createObituaryStep2)
+                .replace(R.id.frame_layout, CreateObituaryStep2())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .addToBackStack("CreateObituaryStep1")
                 .commit()
@@ -97,11 +105,8 @@ class CreateObituaryStep1 : Fragment() {
             R.id.btnPck4 -> getString(R.string.package4)
             else -> ""
         }
-
-        // Prepare the bundle with the selected value
-        bundle = Bundle().apply { // Update the class-level bundle
-            putBoolean("isRadioButton1Checked", true)
-            putString("selectedPackage", selectedPackage) // Put selected package value in the bundle
-        }
+        sharedViewModel.memorialCreationFee.value = true
+        sharedViewModel.selectedPackage.value = selectedPackage
+        sharedViewModel.selectedButtonId.value = clickedButton.id
     }
 }

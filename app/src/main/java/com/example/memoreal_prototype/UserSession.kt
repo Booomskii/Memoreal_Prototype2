@@ -18,7 +18,8 @@ abstract class UserSession: AppCompatActivity() {
 
     companion object {
         val client = OkHttpClient()
-        var baseUrl = "http://192.168.1.7:4848/"
+        /*var baseUrl = "http://192.168.1.7:4848/"*/
+        var baseUrl = "http://192.168.156.252:4848/"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class SharedViewModel : ViewModel() {
+class Step4SharedViewModel : ViewModel() {
     private val _familyMembers = MutableLiveData<MutableList<Pair<String, String>>>(mutableListOf())
     private val _mediaList = mutableListOf<Uri>()
     val familyMembers: LiveData<MutableList<Pair<String, String>>> = _familyMembers

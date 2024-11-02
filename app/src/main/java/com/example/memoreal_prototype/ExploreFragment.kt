@@ -1,59 +1,157 @@
 package com.example.memoreal_prototype
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.memoreal_prototype.models.Obituary
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONArray
+import java.io.IOException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ExploreFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ExploreFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val client = UserSession.client
+    private val baseUrl = UserSession.baseUrl
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var obituaryAdapter: ObituaryAdapter
+    private lateinit var searchInput: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_explore, container, false)
+        val view = inflater.inflate(R.layout.fragment_explore, container, false)
+        setupToolbar(view)
+        recyclerView = view.findViewById(R.id.recyclerView)
+
+        // Initialize RecyclerView with an empty list to start
+        setupRecyclerView(emptyList())
+        fetchObituaries()
+
+        // Initialize the search input
+        searchInput = view.findViewById(R.id.searchInput)
+        setupSearchListener()
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Explore.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ExploreFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun setupToolbar(view: View) {
+        val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
+
+        backButton.setOnClickListener {
+            (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+                .replace(R.id.frame_layout, HomeFragment())
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_out_left,
+                    R.anim.slide_out_right
+                )
+                .commit()
+        }
+    }
+
+    private fun setupRecyclerView(obituaries: List<Obituary>) {
+        obituaryAdapter = ObituaryAdapter(obituaries)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = obituaryAdapter
+    }
+
+    private fun fetchObituaries() {
+        val url = "$baseUrl"+"api/allObit"
+        Log.d("API", "Requesting URL: $url")
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Fetch Obituaries", "Failed to fetch obituaries: ${e.message}")
+                requireActivity().runOnUiThread {
+                    Toast.makeText(context, "Failed to fetch obituaries", Toast.LENGTH_SHORT).show()
                 }
             }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    response.body?.string()?.let { responseBody ->
+                        val obituaries = parseObituaries(responseBody)
+                        requireActivity().runOnUiThread {
+                            obituaryAdapter.updateObituaries(obituaries)
+                        }
+                    } ?: run {
+                        Log.e("Fetch Obituaries", "Response body is null.")
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(context, "Error: Empty response from server", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Log.e("Fetch Obituaries", "Error: ${response.code} - ${response.message}")
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(context, "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun parseObituaries(json: String): List<Obituary> {
+        val jsonArray = JSONArray(json)
+        val obituaries = mutableListOf<Obituary>()
+
+        for (i in 0 until jsonArray.length()) {
+            val jsonObject = jsonArray.getJSONObject(i)
+            obituaries.add(Obituary(
+                jsonObject.getInt("OBITUARYID"),
+                jsonObject.getInt("USERID"),
+                jsonObject.getInt("GALLERYID"),
+                jsonObject.getInt("FAMILYID"),
+                jsonObject.getInt("OBITCUSTID"),
+                jsonObject.optString("BIOGRAPHY"),
+                jsonObject.getString("OBITUARYNAME"),
+                jsonObject.getString("OBITUARY_PHOTO"),
+                jsonObject.getString("DATEOFBIRTH"),
+                jsonObject.getString("DATEOFDEATH"),
+                jsonObject.getString("KEYEVENTS"),
+                jsonObject.getString("OBITUARYTEXT"),
+                jsonObject.optString("FUN_DATETIME"),
+                jsonObject.optString("FUN_LOCATION"),
+                jsonObject.optString("ADTLINFO"),
+                jsonObject.optString("FAVORITEQUOTE"),
+                jsonObject.getBoolean("ENAGUESTBOOK"),
+                jsonObject.getString("PRIVACY"),
+                jsonObject.getString("CREATIONDATE"),
+                jsonObject.getString("LASTMODIFIED")
+            ))
+        }
+        return obituaries
+    }
+
+    private fun setupSearchListener() {
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                obituaryAdapter.filter(s.toString()) // Call the filter method
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 }

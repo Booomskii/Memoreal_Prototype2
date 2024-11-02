@@ -9,14 +9,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 
 class CreateObituaryStep2 : Fragment() {
 
     private var isRadioButton1Checked: Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,15 +32,8 @@ class CreateObituaryStep2 : Fragment() {
         creationFee = getString(R.string.memorialCreationFeeDec).toFloat()
         val formattedCreationFee = "₱${"%.2f".format(creationFee)}"
         var packFee = 0.0f
-        val bundle = Bundle()
 
-        arguments?.let {
-            isRadioButton1Checked = it.getBoolean("isRadioButton1Checked", false)
-            // Log the received values
-            Log.d("NextFragment", "RadioButton1: $isRadioButton1Checked")
-        }
-
-        val selectedPackage = arguments?.getString("selectedPackage")
+        val selectedPackage = sharedViewModel.selectedPackage.value
         Log.d("CreateObituaryStep2", "Package: $selectedPackage")
 
         if (selectedPackage == "10 CREDITS") {
@@ -78,13 +69,8 @@ class CreateObituaryStep2 : Fragment() {
         }
 
         payNow.setOnClickListener {
-            val createObituaryStep22 = CreateObituaryStep2_2()
-            val existingBundle = this.arguments
-            existingBundle?.let { bundle.putAll(it) }
-            createObituaryStep22.arguments = bundle
-
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, createObituaryStep22)
+                .replace(R.id.frame_layout, CreateObituaryStep2_2())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .addToBackStack("CreateObituaryStep2")
                 .commit()

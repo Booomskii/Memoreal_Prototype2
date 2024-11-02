@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.memoreal_prototype.models.Obituary
 
 class ObituaryAdapter(
-    private var obituaries: List<Obituary>,
-    private val onDeleteClick: (Int) -> Unit
+    private var originalObituaries: List<Obituary>,
+    private val onDeleteClick: (Int) -> Unit = { }
 ) : RecyclerView.Adapter<ObituaryAdapter.ObituaryViewHolder>() {
+
+    private var obituaries: List<Obituary> = originalObituaries
 
     class ObituaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val obituaryPhoto: ImageView = itemView.findViewById(R.id.obituaryPhoto)
@@ -55,6 +57,9 @@ class ObituaryAdapter(
         holder.createDate.text = obituary.CREATIONDATE
         holder.lastModified.text = obituary.LASTMODIFIED
 
+        // Set delete button visibility based on usage context
+        holder.deleteButton.visibility = if (onDeleteClick != {}) View.VISIBLE else View.GONE
+
         holder.deleteButton.setOnClickListener {
             onDeleteClick(obituary.OBITUARYID)
         }
@@ -63,7 +68,20 @@ class ObituaryAdapter(
     override fun getItemCount(): Int = obituaries.size
 
     fun updateObituaries(newObituaries: List<Obituary>) {
+        originalObituaries = newObituaries
         obituaries = newObituaries
+        notifyDataSetChanged()
+    }
+
+    fun filter(query: String) {
+        obituaries = if (query.isEmpty()) {
+            originalObituaries
+        } else {
+            originalObituaries.filter { obituary ->
+                obituary.OBITUARYNAME.contains(query, ignoreCase = true) ||
+                        obituary.BIOGRAPHY.contains(query, ignoreCase = true)
+            }
+        }
         notifyDataSetChanged()
     }
 }

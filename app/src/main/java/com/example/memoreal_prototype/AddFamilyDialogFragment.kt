@@ -18,7 +18,7 @@ import androidx.fragment.app.activityViewModels
 
 class AddFamilyDialogFragment : DialogFragment() {
 
-    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val sharedViewModel: Step4SharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

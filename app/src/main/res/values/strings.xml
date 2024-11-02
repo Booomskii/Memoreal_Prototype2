@@ -202,6 +202,9 @@
     <string name="delete">Delete</string>
     <!--Memoreal Profile Section-->
     <string name="myProfile">My Profile</string>
+    <!--Memoreal Explore Section-->
+    <string name="explore">Explore</string>
+    <string name="searchObit">Search Obituaries</string>
     <!--Placeholder-->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temp">temp</string>
