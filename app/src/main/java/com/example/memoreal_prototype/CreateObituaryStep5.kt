@@ -99,7 +99,7 @@ class CreateObituaryStep5 : Fragment() {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.frame_layout, CreateObituaryStep6())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .addToBackStack("CreateObituaryStep4")
+                .addToBackStack("CreateObituaryStep5")
                 .commit()
         }
 

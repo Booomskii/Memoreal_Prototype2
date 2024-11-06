@@ -1,19 +1,25 @@
 package com.example.memoreal_prototype
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.fragment.app.activityViewModels
 
 class CreateObituaryStep6 : Fragment() {
+
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -25,13 +31,13 @@ class CreateObituaryStep6 : Fragment() {
         val guestBookSwitch = view.findViewById<SwitchCompat>(R.id.switchGuestbook)
         val privacySpinner = view.findViewById<Spinner>(R.id.spinnerPrivacy)
 
-        val sharedPreferences = requireContext().getSharedPreferences("GuestbookSwitchState",
-            Context
-                .MODE_PRIVATE)
-        val switchState = sharedPreferences.getBoolean("switch_state", false)
-        guestBookSwitch.isChecked = switchState
+        sharedViewModel.guestBook.observe(viewLifecycleOwner) { isChecked ->
+            guestBookSwitch.isChecked = isChecked ?: false
+        }
 
-        Log.d("STEP 6 SF - Bundle:", this.arguments.toString())
+        guestBookSwitch.setOnCheckedChangeListener { _, isChecked ->
+            sharedViewModel.guestBook.value = isChecked
+        }
 
         guestBookSwitch.setOnCheckedChangeListener { _, isChecked ->
             val sharedPreferences = requireContext().getSharedPreferences("GuestbookSwitchState", Context
@@ -51,22 +57,22 @@ class CreateObituaryStep6 : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         privacySpinner.adapter = adapter
 
-        val funeralDateTime = arguments?.getString("funeralDateTime")
-        funeralDateTime?.let {
-            Log.d("funeralDateTime", it.toString()) // Log the media URIs
-        } ?: Log.d("funeralDateTime", "No funeralDateTime received")
+        sharedViewModel.privacy.observe(viewLifecycleOwner) { privacy ->
+            val position = adapter.getPosition(privacy)
+            if (position >= 0) privacySpinner.setSelection(position)
+        }
 
-        // Retrieve family names
-        val funeralLocation = arguments?.getString("funeralLocation")
-        funeralLocation?.let {
-            Log.d("funeralLocation", it.toString()) // Log the family names
-        } ?: Log.d("funeralLocation", "No funeralLocation received")
+        // Save selected privacy option to ViewModel
+        privacySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                (view as? TextView)?.setTextColor(Color.BLACK)
+                sharedViewModel.privacy.value = privacySpinner.selectedItem.toString()
+            }
 
-        // Retrieve family relationships
-        val funeralAdtlInfo = arguments?.getString("funeralAdtlInfo")
-        funeralAdtlInfo?.let {
-            Log.d("funeralAdtlInfo", it.toString()) // Log the family relationships
-        } ?: Log.d("funeralAdtlInfo", "No funeralAdtlInfo received")
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing if no item is selected
+            }
+        }
 
         backButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -76,20 +82,13 @@ class CreateObituaryStep6 : Fragment() {
         }
 
         nextButton.setOnClickListener {
-            val bundle = Bundle().apply{
-                putBoolean("guestBookSwitchState", guestBookSwitch.isChecked)
-                putString("privacyType", privacySpinner.selectedItem.toString())
-            }
-
-            val createObituaryStep7 = CreateObituaryStep7()
-            val existingBundle = this.arguments
-            existingBundle?.let { bundle.putAll(it) }
-            createObituaryStep7.arguments = bundle
+            sharedViewModel.guestBook.value = guestBookSwitch.isChecked
+            sharedViewModel.privacy.value = privacySpinner.selectedItem.toString()
 
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, createObituaryStep7)
+                .replace(R.id.frame_layout, CreateObituaryStep7())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .addToBackStack("CreateObituaryStep5")
+                .addToBackStack("CreateObituaryStep6")
                 .commit()
         }
 

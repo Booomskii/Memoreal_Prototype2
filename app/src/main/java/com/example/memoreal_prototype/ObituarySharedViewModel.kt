@@ -27,6 +27,8 @@ class ObituarySharedViewModel: ViewModel() {
     val funeralLocation = MutableLiveData<String>()
     val funeralAdtlInfo = MutableLiveData<String>()
     /*Create Obituary Step 6*/
+    val guestBook = MutableLiveData<Boolean>()
+    val privacy = MutableLiveData<String>()
     /*Create Obituary Step 7*/
     /*Create Obituary Step 8*/
 }
