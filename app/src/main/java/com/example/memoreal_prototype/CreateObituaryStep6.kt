@@ -31,6 +31,8 @@ class CreateObituaryStep6 : Fragment() {
         val guestBookSwitch = view.findViewById<SwitchCompat>(R.id.switchGuestbook)
         val privacySpinner = view.findViewById<Spinner>(R.id.spinnerPrivacy)
 
+        Log.d("Funeral Date Time:", sharedViewModel.funeralDateTime.value!!)
+
         sharedViewModel.guestBook.observe(viewLifecycleOwner) { isChecked ->
             guestBookSwitch.isChecked = isChecked ?: false
         }

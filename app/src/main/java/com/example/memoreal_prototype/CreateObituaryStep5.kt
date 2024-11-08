@@ -14,7 +14,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.fragment.app.activityViewModels
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class CreateObituaryStep5 : Fragment() {
 
@@ -61,9 +63,13 @@ class CreateObituaryStep5 : Fragment() {
                                 val timePickerDialog = TimePickerDialog(
                                     requireContext(),
                                     { _, hourOfDay, minute ->
-                                        // Format the date and time
-                                        funeralDateTimeET.setText(String.format("%02d/%02d/%04d %02d:%02d",
-                                            dayOfMonth, month + 1, year, hourOfDay, minute))
+                                        // Format the date and time for MSSQL format (yyyy-MM-dd HH:mm:ss)
+                                        val calendar = Calendar.getInstance().apply {
+                                            set(year, month, dayOfMonth, hourOfDay, minute)
+                                        }
+                                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                        val formattedDate = dateFormat.format(calendar.time)
+                                        funeralDateTimeET.setText(formattedDate)
                                     },
                                     calendar.get(Calendar.HOUR_OF_DAY),
                                     calendar.get(Calendar.MINUTE),

@@ -15,8 +15,11 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 
 class CreateObituaryStep7 : Fragment() {
+
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,9 +36,6 @@ class CreateObituaryStep7 : Fragment() {
         val vflowerSpinner = view.findViewById<Spinner>(R.id.spinnerVFlowers)
         val vcandleSpinner = view.findViewById<Spinner>(R.id.spinnerVCandles)
         val favQuoteET = view.findViewById<EditText>(R.id.etFavQuote)
-
-        val sharedPref = requireActivity().getSharedPreferences("ObituaryPrefs", Context.MODE_PRIVATE)
-        val editor = sharedPref.edit()
 
 
         val frameItems = listOf(
@@ -102,64 +102,76 @@ class CreateObituaryStep7 : Fragment() {
         val adapter5 = ImageSpinnerAdapter3(requireContext(), candleItems)
         vcandleSpinner.adapter = adapter5
 
-        val guestBookSwitchState = arguments?.getString("guestBookSwitchState")
-        guestBookSwitchState?.let {
-            Log.d("guestBookSwitchState", it.toString()) // Log the media URIs
-        } ?: Log.d("guestBookSwitchState", "No guestBookSwitchState received")
-
-        // Retrieve family names
-        val privacyType = arguments?.getString("privacyType")
-        privacyType?.let {
-            Log.d("privacyType", it.toString()) // Log the family names
-        } ?: Log.d("privacyType", "No privacyType received")
-
-        val savedBackgroundTheme = sharedPref.getString("backgroundTheme", null)
-        val savedPictureFrame = sharedPref.getInt("pictureFrame", -1)
-        val savedBgMusic = sharedPref.getString("bgMusic", null)
-        val savedVirtualFlower = sharedPref.getInt("virtualFlower", -1)
-        val savedVirtualCandle = sharedPref.getInt("virtualCandle", -1)
-        val savedFavQuote = sharedPref.getString("favQuote", "")
-
-        Log.d("STEP 7 SF - Background Theme:", savedBackgroundTheme ?: "No background theme found")
-        Log.d("STEP 7 SF - Picture Frame:", (savedPictureFrame ?: 0).toString())
-        Log.d("STEP 7 SF - Background Music:", savedBgMusic ?: "No background music found")
-        Log.d("STEP 7 SF - Virtual Flower:", (savedVirtualFlower ?: 0).toString())
-        Log.d("STEP 7 SF - Virtual Candle:", (savedVirtualCandle ?: 0).toString())
-        Log.d("STEP 7 SF - Favorite Quote:", savedFavQuote!!)
-        Log.d("STEP 7 SF - Bundle:", this.arguments.toString())
-
-        savedBackgroundTheme?.let {
-            val position = adapter2.getPosition(it)
-            backgroundSpinner.setSelection(position)
-        }
-
-        savedPictureFrame?.let {
-            val position = frameItems.indexOfFirst { pair -> pair.first == it }
-            if (position != -1) {
-                frameSpinner.setSelection(position)
+        backgroundSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedTheme = backgroundSpinner.selectedItem.toString()
+                sharedViewModel.backgroundTheme.value = selectedTheme
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        savedBgMusic?.let {
-            val position = adapter3.getPosition(it)
-            bgMusicSpinner.setSelection(position)
-        }
-
-        savedVirtualFlower?.let {
-            val position = flowerItems.indexOfFirst { pair -> pair.first == it }
-            if (position != -1) {
-                vflowerSpinner.setSelection(position)
+        vcandleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = vcandleSpinner.selectedItem as Pair<Int, String>
+                sharedViewModel.virtualCandle.value = selectedItem
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        savedVirtualCandle?.let {
-            val position = candleItems.indexOfFirst { pair -> pair.first == it }
-            if (position != -1) {
+        vflowerSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = vflowerSpinner.selectedItem as Pair<Int, String>
+                sharedViewModel.virtualFlower.value = selectedItem
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        frameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = frameSpinner.selectedItem as Pair<Int, String>
+                sharedViewModel.pictureFrame.value = selectedItem
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        // Observe and set the selected values
+        sharedViewModel.virtualCandle.observe(viewLifecycleOwner) { selectedPair ->
+            selectedPair?.let {
+                val position = adapter5.getPosition(it)
                 vcandleSpinner.setSelection(position)
             }
         }
 
-        favQuoteET.setText(savedFavQuote)
+        sharedViewModel.virtualFlower.observe(viewLifecycleOwner) { selectedPair ->
+            selectedPair?.let {
+                val position = adapter4.getPosition(it)
+                vflowerSpinner.setSelection(position)
+            }
+        }
+
+        sharedViewModel.pictureFrame.observe(viewLifecycleOwner) { selectedPair ->
+            selectedPair?.let {
+                val position = adapter.getPosition(it)
+                frameSpinner.setSelection(position)
+            }
+        }
+
+
+        // Observe the selected background theme and set the spinner's selection based on it
+        sharedViewModel.backgroundTheme.observe(viewLifecycleOwner) { selectedTheme ->
+            val position = adapter2.getPosition(selectedTheme)  // Find position of theme in adapter
+            if (position >= 0) {
+                backgroundSpinner.setSelection(position)
+            }
+        }
+
+        sharedViewModel.favQuote.observe(viewLifecycleOwner) { favQuote ->
+            favQuoteET.setText(favQuote)
+        }
 
         backButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -170,38 +182,28 @@ class CreateObituaryStep7 : Fragment() {
 
         nextButton.setOnClickListener {
             val backgroundTheme = backgroundSpinner.selectedItem.toString()
-            val pictureFrame = frameSpinner.selectedItem.toString()
+            val pictureFrame = frameSpinner.selectedItem as? Pair<Int, String>
             val bgMusic = bgMusicSpinner.selectedItem.toString()
-            val virtualFlower = vflowerSpinner.selectedItem.toString()
-            val virtualCandle = vcandleSpinner.selectedItem.toString()
+            val virtualFlower = vflowerSpinner.selectedItem as? Pair<Int, String>
+            val virtualCandle = vcandleSpinner.selectedItem as? Pair<Int, String>
             val favQuote = favQuoteET.text.toString()
 
-            editor.putString("backgroundTheme", backgroundTheme)
-            editor.putInt("pictureFrame", frameItems[frameSpinner.selectedItemPosition].first)
-            editor.putString("bgMusic", bgMusic)
-            editor.putInt("virtualFlower", flowerItems[vflowerSpinner.selectedItemPosition].first)
-            editor.putInt("virtualCandle", candleItems[vcandleSpinner.selectedItemPosition].first)
-            editor.putString("favQuote", favQuote)
-            editor.apply()
+            sharedViewModel.backgroundTheme.value = backgroundTheme
+            sharedViewModel.pictureFrame.value = pictureFrame
+            sharedViewModel.bgMusic.value = bgMusic
+            sharedViewModel.virtualFlower.value = virtualFlower
+            sharedViewModel.virtualCandle.value = virtualCandle
+            sharedViewModel.favQuote.value = favQuote
 
-            val bundle = Bundle().apply {
-                putString("backgroundTheme", backgroundTheme)
-                putString("pictureFrame", pictureFrame)
-                putString("bgMusic", bgMusic)
-                putString("virtualFlower", virtualFlower)
-                putString("virtualCandle", virtualCandle)
-                putString("favQuote", favQuote)
-            }
-
-            Log.d("STEP7", bundle.toString())
-
-            val createObituaryStep8 = CreateObituaryStep8()
-            val existingBundle = this.arguments
-            existingBundle?.let { bundle.putAll(it) }
-            createObituaryStep8.arguments = bundle
+            Log.d("STEP 7:", sharedViewModel.backgroundTheme.value!!)
+            Log.d("STEP 7:", sharedViewModel.pictureFrame.value!!.toString())
+            Log.d("STEP 7:", sharedViewModel.bgMusic.value!!)
+            Log.d("STEP 7:", sharedViewModel.virtualFlower.value!!.toString())
+            Log.d("STEP 7:", sharedViewModel.virtualCandle.value!!.toString())
+            Log.d("STEP 7:", sharedViewModel.favQuote.value!!)
 
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, createObituaryStep8)
+                .replace(R.id.frame_layout, CreateObituaryStep8())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .addToBackStack("CreateObituaryStep7")
                 .commit()
@@ -214,57 +216,25 @@ class CreateObituaryStep7 : Fragment() {
                 .commit()
         }
 
-        backgroundSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                (view as? TextView)?.setTextColor(Color.BLACK)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No action needed here
-            }
-        }
-
-        frameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                (view as? TextView)?.setTextColor(Color.BLACK)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No action needed here
-            }
-        }
-
-        bgMusicSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                (view as? TextView)?.setTextColor(Color.BLACK)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No action needed here
-            }
-        }
-
-        vflowerSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                (view as? TextView)?.setTextColor(Color.BLACK)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No action needed here
-            }
-        }
-
-        vcandleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                (view as? TextView)?.setTextColor(Color.BLACK)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No action needed here
-            }
-        }
+        setSpinnerTextColor(backgroundSpinner)
+        setSpinnerTextColor(frameSpinner)
+        setSpinnerTextColor(bgMusicSpinner)
+        setSpinnerTextColor(vflowerSpinner)
+        setSpinnerTextColor(vcandleSpinner)
 
         return view
+    }
+
+    private fun setSpinnerTextColor(spinner: Spinner) {
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                (view as? TextView)?.setTextColor(Color.BLACK)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // No action needed here
+            }
+        }
     }
 
     private class ImageSpinnerAdapter(

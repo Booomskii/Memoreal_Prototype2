@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.util.TypedValueCompat.dpToPx
+import androidx.fragment.app.activityViewModels
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import okhttp3.Call
@@ -33,12 +34,16 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class CreateObituaryStep8 : Fragment() {
+
     val client = UserSession.client
     val baseUrl = UserSession.baseUrl
 
     private var obitCustId = 0
     private var familyId = 0
     private var galleryId = 0
+    private var userId = 0
+
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,41 +61,45 @@ class CreateObituaryStep8 : Fragment() {
         var frameName = ""
         var flowerName = ""
         var candleName = ""
-        val imageUriStr = arguments?.getString("image")
+        val imageUriStr = sharedViewModel.image.value
         val imageUri = Uri.parse(imageUriStr)
 
-        val bgTheme = arguments?.getString("backgroundTheme")
-        val picFrame = arguments?.getString("pictureFrame")
-        val bgMusic = arguments?.getString("bgMusic")
-        val vflower = arguments?.getString("virtualFlower")
-        val vcandle = arguments?.getString("virtualCandle")
+        val bgTheme = sharedViewModel.backgroundTheme.value
+        val picFrame = sharedViewModel.pictureFrame.value
+        val bgMusic = sharedViewModel.bgMusic.value
+        val vflower = sharedViewModel.virtualFlower.value
+        val vcandle = sharedViewModel.virtualCandle.value
 
-        val selectedPackage = arguments?.getString("selectedPackage") ?: "Default Package"
+        Log.d("Obituary", "Obituary Photo: ${sharedViewModel.image.value ?: "default_image_path"}")
+        Log.d("Obituary", "Date of Birth: ${sharedViewModel.dateBirth.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"}")
+        Log.d("Obituary", "Date of Death: ${sharedViewModel.datePassing.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"}")
+        Log.d("Obituary", "Obituary Name: ${sharedViewModel.fullName.value ?: "Unknown Name"}")
+        Log.d("Obituary", "Biography: ${sharedViewModel.biography.value ?: "No biography available."}")
+        Log.d("Obituary", "Obituary Text: ${sharedViewModel.obituaryText.value ?: "No obituary text provided."}")
+        Log.d("Obituary", "Key Events: ${sharedViewModel.keyEvents.value ?: "No key life events"}")
+        Log.d("Obituary", "Funeral DateTime: ${sharedViewModel.funeralDateTime.value ?: "2024-01-01 00:00:00"}")
+        Log.d("Obituary", "Funeral Location: ${sharedViewModel.funeralLocation.value ?: "Unknown Location"}")
+        Log.d("Obituary", "Additional Info: ${sharedViewModel.funeralAdtlInfo.value ?: "No additional information."}")
+        Log.d("Obituary", "Privacy: ${sharedViewModel.privacy.value ?: "Public"}")
+        Log.d("Obituary", "Guestbook Enabled: ${sharedViewModel.guestBook.value ?: false}")
+        Log.d("Obituary", "Favorite Quote: ${sharedViewModel.favQuote.value ?: "No favorite quote."}")
+
 
         obituaryImage.setImageURI(imageUri)
 
         picFrame?.let {
-            val frameParts = it.trim('(', ')').split(", ")
-            if (frameParts.size == 2) {
-                val frameId = frameParts[0]
-                frameName = frameParts[1]
-            }
+            val frameId = it.first
+            frameName = it.second
         }
 
         vflower?.let {
-            val flowerParts = it.trim('(', ')').split(", ")
-            if (flowerParts.size == 2) {
-                val flowerId = flowerParts[0]
-                flowerName = flowerParts[1]
-            }
+            val flowerId = it.first
+            flowerName = it.second
         }
 
         vcandle?.let {
-            val candleParts = it.trim('(', ')').split(", ")
-            if (candleParts.size == 2) {
-                val candleId = candleParts[0]
-                candleName = candleParts[1]
-            }
+            val candleId = it.first
+            candleName = it.second
         }
 
         val obituary_cust = com.example.memoreal_prototype.models.Obituary_Customization(
@@ -182,7 +191,7 @@ class CreateObituaryStep8 : Fragment() {
                 .setTitle("Logout")
                 .setMessage("Are you sure you want to publish this Obituary?")
                 .setPositiveButton("Yes") { _, _ ->
-                    val imageUriString = arguments?.getString("image")
+                    val imageUriString = sharedViewModel.image.value
                     if (imageUriString != null) {
                         val imageUri = Uri.parse(imageUriString)
                         val savedFileName = saveImageToInternalStorage(imageUri)
@@ -194,7 +203,7 @@ class CreateObituaryStep8 : Fragment() {
                     } else {
                         Log.e("SaveImage", "Image Uri is null.")
                     }
-                    val mediaList = arguments?.getStringArrayList("mediaList")
+                    val mediaList = sharedViewModel.mediaList.value
                     mediaList?.forEach { mediaUriString ->
                         val mediaUri = Uri.parse(mediaUriString)
                         val savedFileName = saveImageToInternalStorage(mediaUri)
@@ -207,8 +216,8 @@ class CreateObituaryStep8 : Fragment() {
 
                     registerObituaryCustomization(obituary_cust)
                     addEachFamilyMember()
-
                     createGalleryAndMedia()
+                    sharedViewModel.clearData()
 
                     Toast.makeText(requireContext(),"Obituary created successfully", Toast.LENGTH_SHORT).show()
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -307,8 +316,8 @@ class CreateObituaryStep8 : Fragment() {
     }
 
     private fun addEachFamilyMember() {
-        val memberName = arguments?.getStringArrayList("familyNames") ?: arrayListOf()
-        val relationship = arguments?.getStringArrayList("familyRelationships") ?: arrayListOf()
+        val memberName = sharedViewModel.familyNames.value ?: arrayListOf()
+        val relationship = sharedViewModel.familyRelationships.value ?: arrayListOf()
 
         if (memberName.isEmpty() || relationship.isEmpty()) {
             Log.e("Bundle Error", "Both memberNames and relationships are null or empty. Skipping family member addition.")
@@ -403,7 +412,7 @@ class CreateObituaryStep8 : Fragment() {
     }
 
     private fun createGalleryAndMedia() {
-        val mediaList = arguments?.getStringArrayList("mediaList") ?: arrayListOf()
+        val mediaList = sharedViewModel.mediaList.value ?: arrayListOf()
 
         // Step 2: Create the gallery and media only if media exists
         if (mediaList.isNotEmpty()) {
@@ -508,7 +517,7 @@ class CreateObituaryStep8 : Fragment() {
         })
     }
 
-    private fun publishObituary(){
+    private fun getUserId(){
         val masterKey = MasterKey.Builder(requireContext())
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
@@ -521,21 +530,25 @@ class CreateObituaryStep8 : Fragment() {
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
-        val userId = sharedPreferences.getInt("userId", -1)
-        val obituaryPhoto = arguments?.getString("image") ?: "default_image_path"
-        val dateOfBirth = arguments?.getString("dateBirth")?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
-        val dateOfDeath = arguments?.getString("datePassing")?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
-        val obituaryName = arguments?.getString("fullName") ?: "Unknown Name"
-        val biography = arguments?.getString("biography") ?: "No biography available."
-        val obituaryText = arguments?.getString("obituaryText") ?: "No obituary text provided."
-        val keyEvents = arguments?.getString("keyEvents") ?: "No key life events"
-        val funDateTime = arguments?.getString("funeralDateTime") ?: "01-01-1900 00:00"
-        val funLocation = arguments?.getString("funeralLocation") ?: "Unknown Location"
-        val adtlInfo = arguments?.getString("funeralAdtlInfo") ?: "No additional information."
-        val privacy = arguments?.getString("privacyType") ?: "Public"
-        val enaGuestbook = arguments?.getBoolean("guestBookSwitchState", false) ?: false
-        val favoriteQuote = arguments?.getString("favQuote") ?: "No favorite quote."
-        val formattedFuneralDateTime = formatFuneralDateTime(funDateTime)
+        userId = sharedPreferences.getInt("userId", -1)
+    }
+
+    private fun publishObituary(){
+        getUserId()
+        val obituaryPhoto = sharedViewModel.image.value ?: "default_image_path"
+        val dateOfBirth = sharedViewModel.dateBirth.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
+        val dateOfDeath = sharedViewModel.datePassing.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
+        val obituaryName = sharedViewModel.fullName.value ?: "Unknown Name"
+        val biography = sharedViewModel.biography.value ?: "No biography available."
+        val obituaryText = sharedViewModel.obituaryText.value ?: "No obituary text provided."
+        val keyEvents = sharedViewModel.keyEvents.value ?: "No key life events"
+        val funDateTime = sharedViewModel.funeralDateTime.value ?: "2024-01-01 00:00:00"
+        val funLocation = sharedViewModel.funeralLocation.value ?: "Unknown Location"
+        val adtlInfo = sharedViewModel.funeralAdtlInfo.value ?: "No additional information."
+        val privacy = sharedViewModel.privacy.value ?: "Public"
+        val enaGuestbook = sharedViewModel.guestBook.value ?: false
+        val favoriteQuote = sharedViewModel.favQuote.value ?: "No favorite quote."
+        /*val formattedFuneralDateTime = formatFuneralDateTime(funDateTime)*/
         val obituary = com.example.memoreal_prototype.models.Obituary(
             0,
             userId.toInt(),
@@ -549,7 +562,8 @@ class CreateObituaryStep8 : Fragment() {
             dateOfDeath,
             obituaryText,
             keyEvents,
-            formattedFuneralDateTime,
+            /*formattedFuneralDateTime,*/
+            funDateTime,
             funLocation,
             adtlInfo,
             privacy,
@@ -561,7 +575,6 @@ class CreateObituaryStep8 : Fragment() {
 
         registerObituary(obituary)
     }
-
 
     private fun registerObituary(obituary: com.example.memoreal_prototype.models.Obituary) {
         val url = baseUrl + "api/addObituary"

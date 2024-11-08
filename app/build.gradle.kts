@@ -59,6 +59,7 @@ dependencies {
     implementation("com.google.auto.value:auto-value:1.6.3")
     implementation("com.google.auto.value:auto-value-annotations:1.6.3")
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("com.github.yalantis:ucrop:2.2.8")
 
 
     val room_version = "2.6.1"

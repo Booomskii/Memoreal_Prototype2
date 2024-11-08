@@ -3,6 +3,7 @@ package com.example.memoreal_prototype
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -24,7 +25,9 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import com.yalantis.ucrop.UCrop
 
 class CreateObituaryStep3 : Fragment() {
 
@@ -34,12 +37,29 @@ class CreateObituaryStep3 : Fragment() {
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
-            uploadImg.setImageURI(uri)
-            imageUri = uri // Keep the URI
+            imageUri = null  // Reset previous image URI
+            startCrop(uri)    // Start the crop activity
         } else {
             Toast.makeText(requireContext(), "No image selected", Toast.LENGTH_SHORT).show()
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == AppCompatActivity.RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            val resultUri = UCrop.getOutput(data!!)
+            if (resultUri != null) {
+                uploadImg.setImageURI(null)  // Clear previous image first
+                uploadImg.setImageURI(resultUri)  // Set the new cropped image
+                imageUri = resultUri            // Update stored image URI
+                sharedViewModel.image.value = resultUri.toString()  // Update the ViewModel immediately
+            }
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            val cropError = UCrop.getError(data!!)
+            Toast.makeText(requireContext(), "Crop error: ${cropError?.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -214,5 +234,13 @@ class CreateObituaryStep3 : Fragment() {
 
     private fun dateValidator(dateBirth: Date, datePassing: Date): Boolean {
         return !dateBirth.after(Date()) && !datePassing.before(dateBirth)
+    }
+
+    private fun startCrop(uri: Uri) {
+        val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
+        UCrop.of(uri, destinationUri)
+            .withAspectRatio(9f, 16f) // Portrait aspect ratio
+            .withMaxResultSize(1080, 1920) // Set maximum result size as needed
+            .start(requireContext(), this)
     }
 }
