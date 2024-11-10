@@ -60,6 +60,8 @@ dependencies {
     implementation("com.google.auto.value:auto-value-annotations:1.6.3")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("com.github.yalantis:ucrop:2.2.8")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
 
 
     val room_version = "2.6.1"

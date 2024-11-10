@@ -37,7 +37,7 @@ class HomeFragment : Fragment() {
         )
 
         val btnCreateObituary = view.findViewById<Button>(R.id.btnCreateObituary)
-        val btnBrowse = view.findViewById<Button>(R.id.buttonBrowse)
+        /*val btnBrowse = view.findViewById<Button>(R.id.buttonBrowse)*/
         val username = view.findViewById<TextView>(R.id.tvUsername)
 
         btnCreateObituary.setOnClickListener {

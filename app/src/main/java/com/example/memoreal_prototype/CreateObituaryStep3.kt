@@ -60,8 +60,6 @@ class CreateObituaryStep3 : Fragment() {
         }
     }
 
-
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

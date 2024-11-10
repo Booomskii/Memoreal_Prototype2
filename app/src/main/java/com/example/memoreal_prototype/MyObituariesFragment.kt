@@ -18,12 +18,15 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.memoreal_prototype.models.Obituary
 
 class MyObituariesFragment : Fragment() {
 
     private val client = UserSession.client
     private val baseUrl = UserSession.baseUrl
+    private var userId = 0
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var obituaryAdapter: ObituaryAdapter
@@ -39,7 +42,7 @@ class MyObituariesFragment : Fragment() {
         // Initialize with an empty list
         setupRecyclerView(emptyList())
 
-        fetchObituaries()
+        fetchObituariesByUser()
 
         return view
     }
@@ -56,8 +59,9 @@ class MyObituariesFragment : Fragment() {
         }
     }
 
-    private fun fetchObituaries() {
-        val url = "$baseUrl"+"api/allObit"
+    private fun fetchObituariesByUser() {
+        getUserId()
+        val url = "$baseUrl"+"api/allObitByUser/"+"$userId"
         Log.d("API", "Requesting URL: $url")
         val request = Request.Builder()
             .url(url)
@@ -93,6 +97,22 @@ class MyObituariesFragment : Fragment() {
                 }
             }
         })
+    }
+
+    private fun getUserId(){
+        val masterKey = MasterKey.Builder(requireContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        // Initialize EncryptedSharedPreferences
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            requireContext(),
+            "userSession",  // File name
+            masterKey,      // Master key for encryption
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        userId = sharedPreferences.getInt("userId", -1)
     }
 
     private fun parseObituaries(json: String): List<Obituary> {
@@ -165,7 +185,7 @@ class MyObituariesFragment : Fragment() {
                     requireActivity().runOnUiThread {
                         Toast.makeText(context, "Obituary deleted successfully", Toast.LENGTH_SHORT).show()
                         // Refresh the list of obituaries
-                        fetchObituaries()
+                        fetchObituariesByUser()
                     }
                 } else {
                     Log.e("Delete Obituary", "Error: ${response.code} - ${response.message}")

@@ -39,29 +39,36 @@ class ObituarySharedViewModel: ViewModel() {
     /*Create Obituary Step 8*/
 
     fun clearData() {
-        memorialCreationFee.value = null
-        selectedPackage.value = null
-        selectedButtonId.value = null
-        fullName.value = null
-        dateBirth.value = null
-        datePassing.value = null
-        biography.value = null
-        image.value = null
-        mediaList.value = ArrayList() // Reset to empty ArrayList
-        familyNames.value = ArrayList() // Reset to empty ArrayList
-        familyRelationships.value = ArrayList() // Reset to empty ArrayList
-        obituaryText.value = null
-        keyEvents.value = null
-        funeralDateTime.value = null
-        funeralLocation.value = null
-        funeralAdtlInfo.value = null
-        guestBook.value = null
-        privacy.value = null
-        backgroundTheme.value = null
-        pictureFrame.value = null
-        bgMusic.value = null
-        virtualCandle.value = null
-        virtualFlower.value = null
-        favQuote.value = null
+        // Using postValue to ensure safe thread handling
+        memorialCreationFee.postValue(null)
+        selectedPackage.postValue(null)
+        selectedButtonId.postValue(null)
+
+        fullName.postValue(null)
+        dateBirth.postValue(null)
+        datePassing.postValue(null)
+        biography.postValue(null)
+        image.postValue(null)
+
+        mediaList.postValue(ArrayList()) // Reset to empty ArrayList
+        familyNames.postValue(ArrayList()) // Reset to empty ArrayList
+        familyRelationships.postValue(ArrayList()) // Reset to empty ArrayList
+
+        obituaryText.postValue(null)
+        keyEvents.postValue(null)
+
+        funeralDateTime.postValue(null)
+        funeralLocation.postValue(null)
+        funeralAdtlInfo.postValue(null)
+
+        guestBook.postValue(null)
+        privacy.postValue(null)
+
+        backgroundTheme.postValue(null)
+        pictureFrame.postValue(null)
+        bgMusic.postValue(null)
+        virtualCandle.postValue(null)
+        virtualFlower.postValue(null)
+        favQuote.postValue(null)
     }
 }

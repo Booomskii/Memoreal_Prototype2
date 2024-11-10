@@ -145,8 +145,7 @@ class SignUpActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@SignUpActivity,
                     "Password must be at least 8 characters long, contains one " +
-                            "uppercase letter, one " +
-                            "number, and one special character!",
+                            "uppercase letter, and one digit/number",
                     Toast.LENGTH_SHORT
                 ).show()
                 return false
@@ -169,13 +168,13 @@ class SignUpActivity : AppCompatActivity() {
         val minLength = password.length >= 8
         val hasUpperCase = password.any {it.isUpperCase()}
         val hasNumber = password.any {it.isDigit()}
-        val hasSpecChar = password.any {it.isSpecialChar()}
-        return minLength && hasUpperCase && hasNumber && hasSpecChar
+        /*val hasSpecChar = password.any {it.isSpecialChar()}*/
+        return minLength && hasUpperCase && hasNumber /*&& hasSpecChar*/
     }
 
-    private fun Char.isSpecialChar(): Boolean {
+    /*private fun Char.isSpecialChar(): Boolean {
         return !this.isLetterOrDigit() && !this.isWhitespace()
-    }
+    }*/
 
     private fun clearInput(){
         val textFields = listOf(emailAdd, username, password, conpassword)

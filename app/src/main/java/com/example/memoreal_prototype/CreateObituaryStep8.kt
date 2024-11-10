@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -19,6 +20,7 @@ import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.fragment.app.activityViewModels
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.bumptech.glide.Glide
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -58,17 +60,23 @@ class CreateObituaryStep8 : Fragment() {
         val flowerImageView = view.findViewById<ImageView>(R.id.imgFlower)
         val candleImageView = view.findViewById<ImageView>(R.id.imgCandle)
         val obituaryImage = view.findViewById<ImageView>(R.id.picture_image)
-        var frameName = ""
-        var flowerName = ""
-        var candleName = ""
         val imageUriStr = sharedViewModel.image.value
         val imageUri = Uri.parse(imageUriStr)
+
+        Glide.with(requireContext())
+            .load(imageUri)
+            .fitCenter() // Scale the image to fit within the ImageView while maintaining aspect ratio
+            .into(obituaryImage)
 
         val bgTheme = sharedViewModel.backgroundTheme.value
         val picFrame = sharedViewModel.pictureFrame.value
         val bgMusic = sharedViewModel.bgMusic.value
         val vflower = sharedViewModel.virtualFlower.value
         val vcandle = sharedViewModel.virtualCandle.value
+
+        var frameName = ""
+        var flowerName = ""
+        var candleName = ""
 
         Log.d("Obituary", "Obituary Photo: ${sharedViewModel.image.value ?: "default_image_path"}")
         Log.d("Obituary", "Date of Birth: ${sharedViewModel.dateBirth.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"}")
@@ -217,7 +225,6 @@ class CreateObituaryStep8 : Fragment() {
                     registerObituaryCustomization(obituary_cust)
                     addEachFamilyMember()
                     createGalleryAndMedia()
-                    sharedViewModel.clearData()
 
                     Toast.makeText(requireContext(),"Obituary created successfully", Toast.LENGTH_SHORT).show()
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -445,7 +452,9 @@ class CreateObituaryStep8 : Fragment() {
                         } ?: Log.e("MediaType", "Unable to determine MIME type for: $mediaUri")
                     }
                     // Step 4: Publish the obituary after gallery and media are added
-                    publishObituary()
+                    publishObituary {
+                        sharedViewModel.clearData()
+                    }
                 } else {
                     Log.e("Gallery Error", "Failed to create gallery. Skipping media addition.")
                 }
@@ -533,8 +542,10 @@ class CreateObituaryStep8 : Fragment() {
         userId = sharedPreferences.getInt("userId", -1)
     }
 
-    private fun publishObituary(){
+    private fun publishObituary(onSuccess: () -> Unit) {
         getUserId()
+
+        // Set up and create the obituary
         val obituaryPhoto = sharedViewModel.image.value ?: "default_image_path"
         val dateOfBirth = sharedViewModel.dateBirth.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
         val dateOfDeath = sharedViewModel.datePassing.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
@@ -548,7 +559,7 @@ class CreateObituaryStep8 : Fragment() {
         val privacy = sharedViewModel.privacy.value ?: "Public"
         val enaGuestbook = sharedViewModel.guestBook.value ?: false
         val favoriteQuote = sharedViewModel.favQuote.value ?: "No favorite quote."
-        /*val formattedFuneralDateTime = formatFuneralDateTime(funDateTime)*/
+
         val obituary = com.example.memoreal_prototype.models.Obituary(
             0,
             userId.toInt(),
@@ -562,7 +573,6 @@ class CreateObituaryStep8 : Fragment() {
             dateOfDeath,
             obituaryText,
             keyEvents,
-            /*formattedFuneralDateTime,*/
             funDateTime,
             funLocation,
             adtlInfo,
@@ -574,7 +584,9 @@ class CreateObituaryStep8 : Fragment() {
         )
 
         registerObituary(obituary)
+        onSuccess()
     }
+
 
     private fun registerObituary(obituary: com.example.memoreal_prototype.models.Obituary) {
         val url = baseUrl + "api/addObituary"
