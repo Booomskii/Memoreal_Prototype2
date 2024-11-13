@@ -49,10 +49,12 @@ class CreateObituaryStep3 : Fragment() {
         if (resultCode == AppCompatActivity.RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             val resultUri = UCrop.getOutput(data!!)
             if (resultUri != null) {
+                sharedViewModel.image.value = null
                 uploadImg.setImageURI(null)  // Clear previous image first
                 uploadImg.setImageURI(resultUri)  // Set the new cropped image
                 imageUri = resultUri            // Update stored image URI
                 sharedViewModel.image.value = resultUri.toString()  // Update the ViewModel immediately
+                Log.d("Step3Fragment", "Updated image URI: ${resultUri.toString()}")
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
             val cropError = UCrop.getError(data!!)
@@ -190,23 +192,23 @@ class CreateObituaryStep3 : Fragment() {
 
     private fun inputValidator(fullName: String, dateBirth: String, datePassing: String, biography: String, imageUri: Uri?): Boolean {
         return when {
-            fullName.isNullOrEmpty() -> {
+            fullName.isEmpty() -> {
                 Toast.makeText(requireContext(), "Enter the person's full name", Toast.LENGTH_SHORT).show()
                 false
             }
-            dateBirth.isNullOrEmpty() -> {
+            dateBirth.isEmpty() -> {
                 Toast.makeText(requireContext(), "Enter the person's date of birth", Toast.LENGTH_SHORT).show()
                 false
             }
-            datePassing.isNullOrEmpty() -> {
+            datePassing.isEmpty() -> {
                 Toast.makeText(requireContext(), "Enter the person's date of passing", Toast.LENGTH_SHORT).show()
                 false
             }
-            biography.isNullOrEmpty() -> {
+            biography.isEmpty() -> {
                 Toast.makeText(requireContext(), "Enter the person's biography", Toast.LENGTH_SHORT).show()
                 false
             }
-            imageUri == null -> { // Proper image check
+            imageUri == null -> {
                 Toast.makeText(requireContext(), "Please upload an image", Toast.LENGTH_SHORT).show()
                 false
             }
@@ -236,9 +238,18 @@ class CreateObituaryStep3 : Fragment() {
 
     private fun startCrop(uri: Uri) {
         val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
+
+        // Convert 200dp and 230dp to pixels
+        val widthPx = dpToPx(150f, requireContext())
+        val heightPx = dpToPx(180f, requireContext())
+
         UCrop.of(uri, destinationUri)
-            .withAspectRatio(9f, 16f) // Portrait aspect ratio
-            .withMaxResultSize(1080, 1920) // Set maximum result size as needed
+            .withAspectRatio(150f, 180f) // Setting the aspect ratio to 200:230
+            .withMaxResultSize(widthPx, heightPx) // Set maximum result size
             .start(requireContext(), this)
+    }
+
+    private fun dpToPx(dp: Float, context: Context): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
     }
 }

@@ -92,7 +92,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bordered_rectangle"
-                    android:drawableEnd="@drawable/baseline_location_pin_24"
                     android:ems="10"
                     android:gravity="top"
                     android:hint="@string/location"

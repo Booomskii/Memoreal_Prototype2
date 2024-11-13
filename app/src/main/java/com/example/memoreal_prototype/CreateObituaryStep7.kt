@@ -37,7 +37,6 @@ class CreateObituaryStep7 : Fragment() {
         val vcandleSpinner = view.findViewById<Spinner>(R.id.spinnerVCandles)
         val favQuoteET = view.findViewById<EditText>(R.id.etFavQuote)
 
-
         val frameItems = listOf(
             Pair(R.drawable.classic1_option, "Classic 1"),
             Pair(R.drawable.classic2_option, "Classic 2"),
@@ -138,6 +137,15 @@ class CreateObituaryStep7 : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
+        bgMusicSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedMusic = bgMusicSpinner.selectedItem.toString()
+                sharedViewModel.bgMusic.value = selectedMusic
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
         // Observe and set the selected values
         sharedViewModel.virtualCandle.observe(viewLifecycleOwner) { selectedPair ->
             selectedPair?.let {
@@ -160,6 +168,14 @@ class CreateObituaryStep7 : Fragment() {
             }
         }
 
+        sharedViewModel.bgMusic.observe(viewLifecycleOwner) { bgMusic ->
+            bgMusic?.let {
+                val position = adapter3.getPosition(it)
+                if (position >= 0) {
+                    bgMusicSpinner.setSelection(position)
+                }
+            }
+        }
 
         // Observe the selected background theme and set the spinner's selection based on it
         sharedViewModel.backgroundTheme.observe(viewLifecycleOwner) { selectedTheme ->
@@ -285,8 +301,7 @@ class CreateObituaryStep7 : Fragment() {
 
         // This method is called to create each view in the dropdown (when the spinner is expanded)
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val itemView = convertView ?: LayoutInflater.from(context).inflate(R.layout
-                .spinner_flowers, parent, false)
+            val itemView = convertView ?: LayoutInflater.from(context).inflate(R.layout.spinner_flowers, parent, false)
             val imageView = itemView.findViewById<ImageView>(R.id.spinner_image)
             val textView = itemView.findViewById<TextView>(R.id.spinner_text)
 
@@ -316,8 +331,7 @@ class CreateObituaryStep7 : Fragment() {
 
         // This method is called to create each view in the dropdown (when the spinner is expanded)
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val itemView = convertView ?: LayoutInflater.from(context).inflate(R.layout
-                .spinner_candles, parent, false)
+            val itemView = convertView ?: LayoutInflater.from(context).inflate(R.layout.spinner_candles, parent, false)
             val imageView = itemView.findViewById<ImageView>(R.id.spinner_image)
             val textView = itemView.findViewById<TextView>(R.id.spinner_text)
 

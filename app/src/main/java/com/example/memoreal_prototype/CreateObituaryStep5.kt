@@ -50,41 +50,36 @@ class CreateObituaryStep5 : Fragment() {
 
         funeralDateTimeET.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = funeralDateTimeET.compoundDrawables[2]
-                drawableEnd?.let {
-                    if (event.rawX >= (funeralDateTimeET.right - it.bounds.width())) {
-                        val calendar = Calendar.getInstance()
+                val calendar = Calendar.getInstance()
 
-                        // Show DatePickerDialog
-                        val datePickerDialog = DatePickerDialog(
+                // Show DatePickerDialog
+                val datePickerDialog = DatePickerDialog(
+                    requireContext(),
+                    { _, year, month, dayOfMonth ->
+                        // After selecting the date, show TimePickerDialog
+                        val timePickerDialog = TimePickerDialog(
                             requireContext(),
-                            { _, year, month, dayOfMonth ->
-                                // After selecting the date, show TimePickerDialog
-                                val timePickerDialog = TimePickerDialog(
-                                    requireContext(),
-                                    { _, hourOfDay, minute ->
-                                        // Format the date and time for MSSQL format (yyyy-MM-dd HH:mm:ss)
-                                        val calendar = Calendar.getInstance().apply {
-                                            set(year, month, dayOfMonth, hourOfDay, minute)
-                                        }
-                                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                                        val formattedDate = dateFormat.format(calendar.time)
-                                        funeralDateTimeET.setText(formattedDate)
-                                    },
-                                    calendar.get(Calendar.HOUR_OF_DAY),
-                                    calendar.get(Calendar.MINUTE),
-                                    true // Use 24-hour format
-                                )
-                                timePickerDialog.show()
+                            { _, hourOfDay, minute ->
+                                // Format the date and time for MSSQL format (yyyy-MM-dd HH:mm:ss)
+                                val calendar = Calendar.getInstance().apply {
+                                    set(year, month, dayOfMonth, hourOfDay, minute)
+                                }
+                                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                val formattedDate = dateFormat.format(calendar.time)
+                                funeralDateTimeET.setText(formattedDate)
                             },
-                            calendar.get(Calendar.YEAR),
-                            calendar.get(Calendar.MONTH),
-                            calendar.get(Calendar.DAY_OF_MONTH)
+                            calendar.get(Calendar.HOUR_OF_DAY),
+                            calendar.get(Calendar.MINUTE),
+                            true // Use 24-hour format
                         )
-                        datePickerDialog.show()
-                        return@setOnTouchListener true
-                    }
-                }
+                        timePickerDialog.show()
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+                datePickerDialog.show()
+                return@setOnTouchListener true
             }
             v.performClick()
             false

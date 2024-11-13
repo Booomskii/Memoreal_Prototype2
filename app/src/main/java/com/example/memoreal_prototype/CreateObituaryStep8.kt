@@ -3,6 +3,7 @@ package com.example.memoreal_prototype
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -13,10 +14,12 @@ import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.util.TypedValueCompat.dpToPx
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.activityViewModels
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -46,6 +49,8 @@ class CreateObituaryStep8 : Fragment() {
     private var userId = 0
 
     private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
+    private lateinit var mediaPlayer: MediaPlayer
+    private var isPlaying = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,17 +61,23 @@ class CreateObituaryStep8 : Fragment() {
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
         val publishButton = view.findViewById<Button>(R.id.btnPublish)
         val prevButton = view.findViewById<Button>(R.id.btnPrev)
-        val frameImageView = view.findViewById<ImageView>(R.id.frame_image)
         val flowerImageView = view.findViewById<ImageView>(R.id.imgFlower)
         val candleImageView = view.findViewById<ImageView>(R.id.imgCandle)
-        val obituaryImage = view.findViewById<ImageView>(R.id.picture_image)
+        val obituaryImage = view.findViewById<ImageView>(R.id.obituary_image)
         val imageUriStr = sharedViewModel.image.value
-        val imageUri = Uri.parse(imageUriStr)
+        var imageUri = Uri.parse(imageUriStr)
+        val playPauseButton = view.findViewById<ImageButton>(R.id.btnPlayPause)
+        val stopButton = view.findViewById<ImageButton>(R.id.btnStop)
 
-        Glide.with(requireContext())
-            .load(imageUri)
-            .fitCenter() // Scale the image to fit within the ImageView while maintaining aspect ratio
-            .into(obituaryImage)
+        // Load the image using Glide, which also gives you scaling options
+        sharedViewModel.image.observe(viewLifecycleOwner) { imageUriString ->
+            imageUriString?.let {
+                val imageUri = Uri.parse(it)
+                requireActivity().runOnUiThread {
+                    obituaryImage.setImageURI(imageUri)
+                }
+            }
+        }
 
         val bgTheme = sharedViewModel.backgroundTheme.value
         val picFrame = sharedViewModel.pictureFrame.value
@@ -92,7 +103,6 @@ class CreateObituaryStep8 : Fragment() {
         Log.d("Obituary", "Guestbook Enabled: ${sharedViewModel.guestBook.value ?: false}")
         Log.d("Obituary", "Favorite Quote: ${sharedViewModel.favQuote.value ?: "No favorite quote."}")
 
-
         obituaryImage.setImageURI(imageUri)
 
         picFrame?.let {
@@ -111,7 +121,7 @@ class CreateObituaryStep8 : Fragment() {
         }
 
         val obituary_cust = com.example.memoreal_prototype.models.Obituary_Customization(
-            0, bgTheme!!, bgMusic!!, frameName, flowerName, candleName
+            0, bgTheme!!, frameName, bgMusic!!, flowerName, candleName
         )
 
         val backgroundThemeMap = mapOf(
@@ -158,36 +168,52 @@ class CreateObituaryStep8 : Fragment() {
             "Candle 8" to R.drawable.candle8
         )
 
-        frameName.let {
-            val drawableResId = pictureFrameMap[it]
-            if (drawableResId != null) {
-                frameImageView.setImageResource(drawableResId)
-            } else {
-                frameImageView.setImageResource(R.drawable.classic1)
+        sharedViewModel.bgMusic.observe(viewLifecycleOwner) { musicName ->
+            // Update the MediaPlayer with the new music
+            setupMediaPlayer()
+            if (isPlaying) {
+                startMusic()
+                playPauseButton.setImageResource(R.drawable.baseline_pause_circle_24) // Set to pause icon
             }
         }
 
-        flowerName.let {
-            val drawableResId = flowerMap[it]
-            if (drawableResId != null) {
-                flowerImageView.setImageResource(drawableResId)
+        setupMediaPlayer()
+        startMusic()
+        playPauseButton.setImageResource(R.drawable.baseline_pause_circle_24)
+
+        playPauseButton.setOnClickListener {
+            if (isPlaying) {
+                pauseMusic()
+                playPauseButton.setImageResource(R.drawable.baseline_play_circle_24) // Set to play icon
             } else {
-                flowerImageView.setImageResource(R.drawable.default_flower_icon)
+                startMusic()
+                playPauseButton.setImageResource(R.drawable.baseline_pause_circle_24) // Set to pause icon
+            }
+            isPlaying = !isPlaying // Toggle the isPlaying state
+        }
+
+        stopButton.setOnClickListener {
+            stopMusic()
+            playPauseButton.setImageResource(R.drawable.baseline_play_circle_24) // Set back to play icon
+        }
+
+        sharedViewModel.backgroundTheme.observe(viewLifecycleOwner) { bgTheme ->
+            val backgroundResource = backgroundThemeMap[bgTheme]
+
+            // Set the background only if a valid resource is found
+            backgroundResource?.let {
+                // Apply background to the main layout (e.g., NestedScrollView or ConstraintLayout)
+                val mainLayout = view.findViewById<NestedScrollView>(R.id.nestedScrollView8)
+                mainLayout.setBackgroundResource(it)
             }
         }
 
-        candleName.let {
-            val drawableResId = candleMap[it]
-            if (drawableResId != null) {
-                candleImageView.setImageResource(drawableResId)
-            } else {
-                candleImageView.setImageResource(R.drawable.default_candle_icon)
-            }
-        }
-
-        /*loadImageFromSharedPreferences()*/
+        setFrameForeground(frameName, obituaryImage, pictureFrameMap, R.drawable.classic1)
+        loadImage(flowerName, flowerImageView, flowerMap, R.drawable.default_flower_icon)
+        loadImage(candleName, candleImageView, candleMap, R.drawable.default_candle_icon)
 
         backButton.setOnClickListener {
+            stopMusic()
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.frame_layout, HomeFragment())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
@@ -225,6 +251,7 @@ class CreateObituaryStep8 : Fragment() {
                     registerObituaryCustomization(obituary_cust)
                     addEachFamilyMember()
                     createGalleryAndMedia()
+                    stopMusic()
 
                     Toast.makeText(requireContext(),"Obituary created successfully", Toast.LENGTH_SHORT).show()
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -238,6 +265,7 @@ class CreateObituaryStep8 : Fragment() {
         }
 
         prevButton.setOnClickListener {
+            stopMusic()
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.frame_layout, CreateObituaryStep7())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
@@ -247,6 +275,17 @@ class CreateObituaryStep8 : Fragment() {
         return view
     }
 
+    private fun loadImage(resourceName: String?, imageView: ImageView, resourceMap: Map<String, Int>, defaultResource: Int) {
+        // Set the actual image resource (e.g., the photo inside the frame)
+        val resourceId = resourceMap[resourceName] ?: defaultResource
+        imageView.setImageResource(resourceId)
+    }
+
+    // Additional method to change the frame foreground programmatically
+    private fun setFrameForeground(resourceName: String?, imageView: ImageView, frameMap: Map<String, Int>, defaultFrame: Int) {
+        val frameResourceId = frameMap[resourceName] ?: defaultFrame
+        imageView.foreground = resources.getDrawable(frameResourceId, requireContext().theme)
+    }
 
     private fun saveImageToInternalStorage(uri: Uri): String? {
         return try {
@@ -675,5 +714,62 @@ class CreateObituaryStep8 : Fragment() {
         val targetFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val date = originalFormat.parse(dateString)
         return targetFormat.format(date)
+    }
+
+    private fun setupMediaPlayer() {
+        // Release any existing media player instance to avoid state issues
+        if (this::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
+        }
+
+        val musicMap = mapOf(
+            "Amazing Grace Instrumental" to R.raw.amazing_grace_instrumental,
+            "Emotional Soaking Prayer" to R.raw.christian_instrumental_piano_worship_calm_emotional_soaking_prayer,
+            "Living on the Prayer" to R.raw.living_on_the_prayer,
+            "Mindfulness Meditation" to R.raw.mindfulness_meditation,
+            "Peaceful Prayer Ambience" to R.raw.peaceful_prayer_meditation_piano_ambient_music,
+            "Silent Prayer" to R.raw.silent_prayer_instrumental,
+        )
+        val selectedMusic = sharedViewModel.bgMusic.value
+        val musicResId = musicMap[selectedMusic] ?: R.raw.amazing_grace_instrumental // Replace with default if not found
+
+        mediaPlayer = MediaPlayer.create(requireContext(), musicResId)
+        mediaPlayer.setOnCompletionListener {
+            isPlaying = false
+            view?.findViewById<ImageButton>(R.id.btnPlayPause)?.setImageResource(R.drawable.baseline_play_circle_24)
+        }
+    }
+
+
+    private fun startMusic() {
+        if (!mediaPlayer.isPlaying) {
+            mediaPlayer.start()
+            isPlaying = true
+        }
+    }
+
+    private fun pauseMusic() {
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+            isPlaying = false
+        }
+    }
+
+    // Function to stop playing the music
+    private fun stopMusic() {
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.stop()
+            isPlaying = false
+            mediaPlayer.prepare() // Prepare the player again to allow for replay
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Release MediaPlayer resources when the fragment is destroyed
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.stop()
+        }
+        mediaPlayer.release()
     }
 }
