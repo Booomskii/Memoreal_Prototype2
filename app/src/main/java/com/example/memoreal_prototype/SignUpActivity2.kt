@@ -1,6 +1,7 @@
 package com.example.memoreal_prototype
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.yalantis.ucrop.UCrop
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -23,27 +25,39 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
+import java.io.File
 import java.io.IOException
 import java.util.Calendar
-
 
 class SignUpActivity2 : AppCompatActivity() {
 
     private lateinit var uploadImg: ImageView
-    private lateinit var image: String
-
     private var imageUri: Uri? = null
     val client = UserSession.client
     val baseUrl = UserSession.baseUrl
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
-            uri: Uri? ->
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
-            uploadImg.setImageURI(uri)
-            imageUri = uri
-            image = imageUri.toString()
+            imageUri = null  // Reset previous image URI
+            startCrop(uri)    // Start the crop activity
         } else {
             Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            val resultUri = UCrop.getOutput(data!!)
+            if (resultUri != null) {
+                uploadImg.setImageURI(null)  // Clear previous image first
+                uploadImg.setImageURI(resultUri)  // Set the new cropped image
+                imageUri = resultUri            // Update stored image URI
+                Log.d("SignUpActivity2", "Updated image URI: ${resultUri.toString()}")
+            }
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            val cropError = UCrop.getError(data!!)
+            Toast.makeText(this, "Crop error: ${cropError?.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -61,26 +75,6 @@ class SignUpActivity2 : AppCompatActivity() {
         val middleInitial = findViewById<EditText>(R.id.editTextMI)
         val contactNum = findViewById<EditText>(R.id.editTextNumber)
         val birthDate = findViewById<EditText>(R.id.editTextDate)
-        /*val genderSpinner = findViewById<Spinner>(R.id.spinnerGender)
-        val genderItems = listOf("Select Gender", "Male", "Female", "Transgender", "Non-binary", "Genderfluid", "Cisgender")
-        val genderAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, genderItems)
-        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        genderSpinner.adapter = genderAdapter*/
-
-        /*genderSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedItem = parent.getItemAtPosition(position).toString()
-                if (selectedItem == "Select Gender") {
-                    Toast.makeText(this@SignUpActivity2, "Select Gender", Toast.LENGTH_SHORT).show()
-                } else {
-                    // Handle selected gender
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Toast.makeText(this@SignUpActivity2, "Select Gender", Toast.LENGTH_SHORT).show()
-            }
-        }*/
 
         uploadImg = findViewById(R.id.imageViewUploadPic)
         uploadImg.setOnClickListener {
@@ -96,7 +90,6 @@ class SignUpActivity2 : AppCompatActivity() {
             val datePickerDialog = DatePickerDialog(
                 this,
                 { _, selectedYear, selectedMonth, selectedDay ->
-                    // Update the editText with the selected date
                     birthDate.setText(String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear))
                 },
                 year, month, day
@@ -129,9 +122,9 @@ class SignUpActivity2 : AppCompatActivity() {
             }
         }
 
-        skip.setOnClickListener{
+        skip.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Logout")
+                .setTitle("Skip Personal Information")
                 .setMessage("Are you sure you want to skip entering your Personal Information?")
                 .setPositiveButton("Yes") { _, _ ->
                     loginSuccess()
@@ -150,64 +143,38 @@ class SignUpActivity2 : AppCompatActivity() {
         }
     }
 
-    private fun inputValidator(fname:String?, lname:String?, mi:String?, bdate:String?,
-                               contact:String?, image:String?): Boolean {
+    private fun inputValidator(fname: String?, lname: String?, mi: String?, bdate: String?,
+                               contact: String?, image: String?): Boolean {
         return when {
             fname.isNullOrEmpty() -> {
-                Toast.makeText(
-                    this@SignUpActivity2,
-                    "Enter your First Name",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return false
+                Toast.makeText(this, "Enter your First Name", Toast.LENGTH_SHORT).show()
+                false
             }
             lname.isNullOrEmpty() -> {
-                Toast.makeText(
-                    this@SignUpActivity2,
-                    "Enter your Last Name",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return false
+                Toast.makeText(this, "Enter your Last Name", Toast.LENGTH_SHORT).show()
+                false
             }
             mi.isNullOrEmpty() -> {
-                Toast.makeText(
-                    this@SignUpActivity2,
-                    "Enter your Middle Initial",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return false
+                Toast.makeText(this, "Enter your Middle Initial", Toast.LENGTH_SHORT).show()
+                false
             }
             contact.isNullOrEmpty() -> {
-                Toast.makeText(
-                    this@SignUpActivity2,
-                    "Enter your Contact Number",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return false
+                Toast.makeText(this, "Enter your Contact Number", Toast.LENGTH_SHORT).show()
+                false
             }
             bdate.isNullOrEmpty() -> {
-                Toast.makeText(
-                    this@SignUpActivity2,
-                    "Enter your Birthdate",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return false
+                Toast.makeText(this, "Enter your Birthdate", Toast.LENGTH_SHORT).show()
+                false
             }
             imageUri == null -> {
-                Toast.makeText(
-                    this@SignUpActivity2,
-                    "Please upload an image",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return false
+                Toast.makeText(this, "Please upload an image", Toast.LENGTH_SHORT).show()
+                false
             }
-            else -> {
-                return true
-            }
+            else -> true
         }
     }
 
-    private fun loginSuccess(){
+    private fun loginSuccess() {
         val sharedPreferences = getSharedPreferences("userSession", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putBoolean("isLoggedIn", true)
@@ -218,9 +185,8 @@ class SignUpActivity2 : AppCompatActivity() {
 
     private fun registerUser2(user: com.example.memoreal_prototype.models.User, password: String) {
         val username = intent.getStringExtra("username")
-        val url = baseUrl + "api/updateUser/$username"
+        val url = "$baseUrl/api/updateUser/$username"
 
-        // Create a JSON object to send to the server
         val json = JSONObject().apply {
             put("FIRST_NAME", user.FIRST_NAME)
             put("LAST_NAME", user.LAST_NAME)
@@ -230,7 +196,7 @@ class SignUpActivity2 : AppCompatActivity() {
             put("EMAIL", user.EMAIL)
             put("BIRTHDATE", user.BIRTHDATE)
             put("PICTURE", user.PICTURE)
-            put("PASSWORD", password)  // Include the plain text password
+            put("PASSWORD", password)
         }.toString()
 
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
@@ -249,34 +215,52 @@ class SignUpActivity2 : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    // Show success message
                     runOnUiThread {
                         Toast.makeText(applicationContext, "User info updated successfully", Toast.LENGTH_LONG).show()
                     }
                 } else {
-                    // Parse the response to get the error message
-                    val errorBody = response.body?.string()
-                    val errorMessage = try {
-                        // Try to extract the "message" from the JSON response
-                        val jsonError = JSONObject(errorBody ?: "")
-                        jsonError.getString("message")
-                    } catch (e: Exception) {
-                        "Update failed: Unknown error"
-                    }
+                    // Log the response code for debugging purposes
+                    Log.e("UpdateUserDetails", "Error: ${response.code} - ${response.message}")
 
-                    // Show the error message as a toast
+                    val errorBody = response.body?.string()
                     runOnUiThread {
-                        Toast.makeText(applicationContext, errorMessage, Toast.LENGTH_LONG).show()
+                        if (errorBody != null) {
+                            try {
+                                val jsonError = JSONObject(errorBody)
+                                val errorMessage = jsonError.optString("message", "Unknown error")
+                                Toast.makeText(applicationContext, "Update failed: $errorMessage", Toast.LENGTH_LONG).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(applicationContext, "Update failed: Could not parse error message", Toast.LENGTH_LONG).show()
+                            }
+                        } else {
+                            Toast.makeText(applicationContext, "Update failed: Empty response from server", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
         })
     }
 
+    private fun startCrop(uri: Uri) {
+        val filename = "cropped_image_${System.currentTimeMillis()}.jpg"
+        val destinationUri = Uri.fromFile(File(applicationContext.cacheDir, filename))
+
+        val widthPx = dpToPx(150f, this)
+        val heightPx = dpToPx(180f, this)
+
+        UCrop.of(uri, destinationUri)
+            .withAspectRatio(150f, 180f)
+            .withMaxResultSize(widthPx, heightPx)
+            .start(this)
+    }
+
+    private fun dpToPx(dp: Float, context: Context): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
+    }
+
     override fun onBackPressed() {
         Toast.makeText(
-            this@SignUpActivity2,
-            "Complete the sign up process first or click 'Skip'",
+            this, "Complete the sign up process first or click 'Skip'",
             Toast.LENGTH_SHORT
         ).show()
     }

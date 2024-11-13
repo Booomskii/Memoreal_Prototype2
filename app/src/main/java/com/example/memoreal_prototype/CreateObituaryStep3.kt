@@ -237,14 +237,15 @@ class CreateObituaryStep3 : Fragment() {
     }
 
     private fun startCrop(uri: Uri) {
-        val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
+        val filename = "cropped_image_${System.currentTimeMillis()}.jpg"
+        val destinationUri = Uri.fromFile(File(requireContext().cacheDir, filename))
 
         // Convert 200dp and 230dp to pixels
         val widthPx = dpToPx(150f, requireContext())
         val heightPx = dpToPx(180f, requireContext())
 
         UCrop.of(uri, destinationUri)
-            .withAspectRatio(150f, 180f) // Setting the aspect ratio to 200:230
+            .withAspectRatio(150f, 180f) // Setting the aspect ratio to 150:180
             .withMaxResultSize(widthPx, heightPx) // Set maximum result size
             .start(requireContext(), this)
     }

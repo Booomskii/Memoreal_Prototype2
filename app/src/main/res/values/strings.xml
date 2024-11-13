@@ -151,7 +151,7 @@
     <string name="favQuotes">Favorite Quote</string>
     <string name="aiImage">A.I. Generative Image</string>
     <string name="upload">Upload</string>
-    <string name="uploadItems">Upload Items</string>
+    <string name="config">Configure</string>
     <string-array name="privacy_spinner">
         <item>Private</item>
         <item>Public</item>
@@ -202,6 +202,7 @@
     <string name="delete">Delete</string>
     <!--Memoreal Profile Section-->
     <string name="myProfile">My Profile</string>
+    <string name="age">Age</string>
     <!--Memoreal Explore Section-->
     <string name="explore">Explore</string>
     <string name="searchObit">Search Obituaries</string>

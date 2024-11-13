@@ -20,11 +20,18 @@
         android:hint="Family Member's Name"
         android:inputType="textPersonName" />
 
+    <Spinner
+        android:id="@+id/spinnerFamilyMemberRelationship"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="8dp" />
+
     <EditText
-        android:id="@+id/etFamilyMemberRelationship"
+        android:id="@+id/etCustomRelationship"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Relationship"
+        android:hint="Specify Relationship"
+        android:visibility="gone"
         android:inputType="text" />
 
     <Button

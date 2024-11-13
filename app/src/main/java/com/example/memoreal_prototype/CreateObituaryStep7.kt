@@ -2,6 +2,7 @@ package com.example.memoreal_prototype
 
 import android.content.Context
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,9 +16,27 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 
 class CreateObituaryStep7 : Fragment() {
+
+    val client = UserSession.client
+    val url = UserSession.d_idUrl
+    val authorization = UserSession.authorization
 
     private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
@@ -36,6 +55,7 @@ class CreateObituaryStep7 : Fragment() {
         val vflowerSpinner = view.findViewById<Spinner>(R.id.spinnerVFlowers)
         val vcandleSpinner = view.findViewById<Spinner>(R.id.spinnerVCandles)
         val favQuoteET = view.findViewById<EditText>(R.id.etFavQuote)
+        val uploadAI = view.findViewById<Button>(R.id.btnUploadAIItem)
 
         val frameItems = listOf(
             Pair(R.drawable.classic1_option, "Classic 1"),
@@ -196,6 +216,12 @@ class CreateObituaryStep7 : Fragment() {
                 .commit()
         }
 
+        uploadAI.setOnClickListener {
+            // Open dialog to upload photo
+            val uploadPhotoDialog = UploadPhotoDialogFragment()
+            uploadPhotoDialog.show(parentFragmentManager, "UploadPhotoDialog")
+        }
+
         nextButton.setOnClickListener {
             val backgroundTheme = backgroundSpinner.selectedItem.toString()
             val pictureFrame = frameSpinner.selectedItem as? Pair<Int, String>
@@ -239,6 +265,36 @@ class CreateObituaryStep7 : Fragment() {
         setSpinnerTextColor(vcandleSpinner)
 
         return view
+    }
+
+    private fun sendGenerateVideoRequest(prompt: String, voiceId: String, sourceUrl: String) {
+        // Create JSON object with the request body data
+        val json = JSONObject().apply {
+            put("prompt", prompt)
+            put("voiceId", voiceId)
+            put("sourceUrl", sourceUrl)
+        }
+
+        // Define the media type
+        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val body: RequestBody = json.toString().toRequestBody(mediaType)
+
+        // Create the request
+        val request = Request.Builder()
+            .url(url) // Replace with your Node.js server endpoint
+            .post(body)
+            .addHeader("Authorization", authorization)
+            .build()
+
+        // Execute the request
+        client.newCall(request).execute().use { response: Response ->
+            if (!response.isSuccessful) {
+                throw IOException("Unexpected code $response")
+            }
+
+            // Handle the response
+            println(response.body?.string())
+        }
     }
 
     private fun setSpinnerTextColor(spinner: Spinner) {

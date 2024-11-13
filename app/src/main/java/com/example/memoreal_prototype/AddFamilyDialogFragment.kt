@@ -1,18 +1,12 @@
 package com.example.memoreal_prototype
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 
@@ -27,10 +21,30 @@ class AddFamilyDialogFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.fragment_add_family, container, false)
 
         val etFamilyMemberName = view.findViewById<EditText>(R.id.etFamilyMemberName)
-        val etFamilyMemberRelationship = view.findViewById<EditText>(R.id.etFamilyMemberRelationship)
+        val spinnerRelationship = view.findViewById<Spinner>(R.id.spinnerFamilyMemberRelationship)
+        val etCustomRelationship = view.findViewById<EditText>(R.id.etCustomRelationship)
         val btnAddFamilyMember = view.findViewById<Button>(R.id.btnAddFamilyMember)
         val familyMemberList = view.findViewById<LinearLayout>(R.id.familyMemberList)
         val btnClose = view.findViewById<ImageView>(R.id.btnClose)
+
+        // Set up the spinner with predefined relationships
+        val relationships = listOf("Mother", "Father", "Sibling", "Spouse", "Child", "Grandparent", "Other")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, relationships)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerRelationship.adapter = adapter
+
+        // Show or hide the custom relationship EditText based on the selected item
+        spinnerRelationship.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if (relationships[position] == "Other") {
+                    etCustomRelationship.visibility = View.VISIBLE
+                } else {
+                    etCustomRelationship.visibility = View.GONE
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         // Observe changes in the family member list and update the UI accordingly
         sharedViewModel.familyMembers.observe(viewLifecycleOwner) {
@@ -43,14 +57,19 @@ class AddFamilyDialogFragment : DialogFragment() {
 
         btnAddFamilyMember.setOnClickListener {
             val name = etFamilyMemberName.text.toString()
-            val relationship = etFamilyMemberRelationship.text.toString()
+            val relationship = if (spinnerRelationship.selectedItem.toString() == "Other") {
+                etCustomRelationship.text.toString()
+            } else {
+                spinnerRelationship.selectedItem.toString()
+            }
 
             if (name.isNotEmpty() && relationship.isNotEmpty()) {
                 sharedViewModel.addFamilyMember(name, relationship)
 
                 // Clear the EditTexts for the next entry
                 etFamilyMemberName.text.clear()
-                etFamilyMemberRelationship.text.clear()
+                etCustomRelationship.text.clear()
+                spinnerRelationship.setSelection(0)
             } else {
                 Toast.makeText(requireContext(), "Please enter both name and relationship", Toast.LENGTH_SHORT).show()
             }
@@ -108,5 +127,3 @@ class AddFamilyDialogFragment : DialogFragment() {
         )
     }
 }
-
-

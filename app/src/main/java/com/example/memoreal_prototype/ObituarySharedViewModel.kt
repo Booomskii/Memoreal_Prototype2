@@ -36,6 +36,7 @@ class ObituarySharedViewModel: ViewModel() {
     val virtualCandle = MutableLiveData<Pair<Int, String>?>()
     val virtualFlower = MutableLiveData<Pair<Int, String>?>()
     val favQuote = MutableLiveData<String?>()
+    val imageUri = MutableLiveData<String?>()
     /*Create Obituary Step 8*/
 
     fun clearData() {

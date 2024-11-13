@@ -3,17 +3,18 @@ package com.example.memoreal_prototype
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import okhttp3.Call
@@ -21,7 +22,6 @@ import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import java.io.File
 import java.io.IOException
 
 class ProfileFragment : Fragment() {
@@ -43,9 +43,7 @@ class ProfileFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         setupToolbar(view)
-        val deleteButton = view.findViewById<Button>(R.id.deleteButton)
 
-        // Initialize the views here
         userName = view.findViewById(R.id.username)
         userFullName = view.findViewById(R.id.userFullName)
         userContact = view.findViewById(R.id.userContact)
@@ -53,12 +51,7 @@ class ProfileFragment : Fragment() {
         userBDate = view.findViewById(R.id.userBDate)
         userPhoto = view.findViewById(R.id.userPhoto)
 
-        // Call the function to fetch the user data
         fetchUser()
-
-        deleteButton.setOnClickListener {
-            confirmDeleteUser()
-        }
 
         return view
     }
@@ -66,7 +59,6 @@ class ProfileFragment : Fragment() {
     private fun setupToolbar(view: View) {
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
-        val settings = toolbar.findViewById<ImageView>(R.id.settings)
 
         backButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -74,9 +66,35 @@ class ProfileFragment : Fragment() {
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .commit()
         }
+
+        val settings = view.findViewById<ImageView>(R.id.settings)
+        settings.setOnClickListener {
+            // Create an instance of PopupMenu
+            val popupMenu = PopupMenu(requireContext(), settings)
+
+            // Inflate the menu resource into the PopupMenu
+            popupMenu.menuInflater.inflate(R.menu.profile_settings_menu, popupMenu.menu)
+
+            // Set a listener for menu item clicks
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.editProfile -> {
+                        editUser()
+                        true
+                    }
+                    R.id.deleteProfile -> {
+                        confirmDeleteUser()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            // Show the popup menu
+            popupMenu.show()
+        }
     }
 
-    private fun fetchUser () {
+    private fun fetchUser() {
         val masterKey = MasterKey.Builder(requireContext())
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
@@ -190,7 +208,7 @@ class ProfileFragment : Fragment() {
                     Log.d("Delete User", "User deleted successfully")
                     requireActivity().runOnUiThread {
                         Toast.makeText(context, "User deleted successfully", Toast.LENGTH_SHORT).show()
-                        // Optionally, navigate back or update the UI
+                        logOut()
                     }
                 } else {
                     Log.e("Delete User", "Error: ${response.code} - ${response.message}")
@@ -208,10 +226,14 @@ class ProfileFragment : Fragment() {
             .setMessage("Are you sure you want to delete your account?")
             .setPositiveButton("Yes") { _, _ ->
                 deleteUser()
-                logOut()
             }
             .setNegativeButton("No", null)
             .show()
+    }
+
+    private fun editUser() {
+        // Implement user edit functionality here
+        Toast.makeText(requireContext(), "Edit user clicked", Toast.LENGTH_SHORT).show()
     }
 
     private fun logOut() {

@@ -265,12 +265,12 @@
                 app:layout_constraintVertical_bias="0.765" />
 
             <Button
-                android:id="@+id/btnUploadARItem"
+                android:id="@+id/btnUploadAIItem"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:backgroundTint="@color/memo_orange"
-                android:drawableEnd="@drawable/baseline_upload_24"
-                android:text="@string/uploadItems"
+                android:drawableEnd="@drawable/baseline_open_in_new_24"
+                android:text="@string/config"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
