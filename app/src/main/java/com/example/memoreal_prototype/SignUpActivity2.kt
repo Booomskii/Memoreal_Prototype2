@@ -1,5 +1,6 @@
 package com.example.memoreal_prototype
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.yalantis.ucrop.UCrop
@@ -26,8 +28,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class SignUpActivity2 : AppCompatActivity() {
 
@@ -68,7 +75,7 @@ class SignUpActivity2 : AppCompatActivity() {
         val username = intent.getStringExtra("username")
         val password = intent.getStringExtra("password")
         val email = intent.getStringExtra("email")
-        val skip = findViewById<TextView>(R.id.textViewSkip)
+        /*val skip = findViewById<TextView>(R.id.textViewSkip)*/
         val cont = findViewById<Button>(R.id.btnContinue)
         val firstName = findViewById<EditText>(R.id.editTextFirstName)
         val lastName = findViewById<EditText>(R.id.editTextLastName)
@@ -103,26 +110,20 @@ class SignUpActivity2 : AppCompatActivity() {
             val mi = middleInitial.text.toString()
             val contact = contactNum.text.toString()
             val bdate = birthDate.text.toString()
+            val formattedBDate = formatBDateForMSSQL(bdate) ?: ""
             val image = imageUri?.toString() ?: ""
 
-            // Validate inputs
             if (inputValidator(fname, lname, mi, bdate, contact, image)) {
-                // Create a user object without the password
                 val user = com.example.memoreal_prototype.models.User(
                     0, fname, lname, mi, username!!, contact, email!!,
-                    bdate, image, ""  // No hashed password needed here
+                    formattedBDate, image, ""
                 )
 
-                // Call the function to update user details, passing the plain password
-                registerUser2(user, password!!) // Pass the plain password
-                loginSuccess() // Proceed to the next activity
-                val intent = Intent(applicationContext, HomePageActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+                registerUser2(user, password!!)
             }
         }
 
-        skip.setOnClickListener {
+        /*skip.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Skip Personal Information")
                 .setMessage("Are you sure you want to skip entering your Personal Information?")
@@ -134,7 +135,7 @@ class SignUpActivity2 : AppCompatActivity() {
                 }
                 .setNegativeButton("No", null)
                 .show()
-        }
+        }*/
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -185,7 +186,7 @@ class SignUpActivity2 : AppCompatActivity() {
 
     private fun registerUser2(user: com.example.memoreal_prototype.models.User, password: String) {
         val username = intent.getStringExtra("username")
-        val url = "$baseUrl/api/updateUser/$username"
+        val url = "$baseUrl"+"api/updateUser/$username"
 
         val json = JSONObject().apply {
             put("FIRST_NAME", user.FIRST_NAME)
@@ -215,9 +216,28 @@ class SignUpActivity2 : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    runOnUiThread {
-                        Toast.makeText(applicationContext, "User info updated successfully", Toast.LENGTH_LONG).show()
+                    imageUri?.let {
+                        val savedImagePath = saveImageToInternalStorage(it)
+                        if (savedImagePath != null) {
+                            // If image saved successfully, you may want to store the path
+                            Log.d("SignUpActivity2", "Image saved at: $savedImagePath")
+                            // Optionally, save the image path in shared preferences or session data for future use
+                            val sharedPreferences = getSharedPreferences("userSession", MODE_PRIVATE)
+                            val editor = sharedPreferences.edit()
+                            editor.putString("profileImagePath", savedImagePath)
+                            editor.apply()
+                        } else {
+                            Log.e("SignUpActivity2", "Failed to save image to internal storage.")
+                            runOnUiThread {
+                                Toast.makeText(applicationContext, "Image saving failed, please try again.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
+
+                    loginSuccess() // Proceed to the next activity
+                    val intent = Intent(applicationContext, HomePageActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 } else {
                     // Log the response code for debugging purposes
                     Log.e("UpdateUserDetails", "Error: ${response.code} - ${response.message}")
@@ -256,6 +276,52 @@ class SignUpActivity2 : AppCompatActivity() {
 
     private fun dpToPx(dp: Float, context: Context): Int {
         return (dp * context.resources.displayMetrics.density).toInt()
+    }
+
+    private fun saveImageToInternalStorage(uri: Uri): String? {
+        val context = this@SignUpActivity2 // Replace this with your current context if different
+        val fileName = "profile_picture_${System.currentTimeMillis()}.jpg"
+        val file = File(context.filesDir, fileName)
+
+        try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            val outputStream: OutputStream = FileOutputStream(file)
+
+            val buffer = ByteArray(1024)
+            var length: Int
+
+            while (inputStream?.read(buffer).also { length = it ?: -1 } != -1) {
+                outputStream.write(buffer, 0, length)
+            }
+
+            outputStream.flush()
+            outputStream.close()
+            inputStream?.close()
+
+            // Return the file path to save in the database or for later use
+            return file.absolutePath
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.e("SaveImage", "Failed to save image: ${e.message}")
+            return null
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun formatBDateForMSSQL(birthDate: String): String? {
+        return try {
+            // Input format expected to be "dd/MM/yyyy"
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = inputFormat.parse(birthDate)
+
+            // Output format for MSSQL expected to be "yyyy-MM-dd"
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            Log.e("SignUpActivity2", "Date format conversion error: ${e.message}")
+            null
+        }
     }
 
     override fun onBackPressed() {

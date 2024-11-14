@@ -203,6 +203,8 @@
     <!--Memoreal Profile Section-->
     <string name="myProfile">My Profile</string>
     <string name="age">Age</string>
+    <string name="editProfile">Edit Profile</string>
+    <string name="save">Save</string>
     <!--Memoreal Explore Section-->
     <string name="explore">Explore</string>
     <string name="searchObit">Search Obituaries</string>

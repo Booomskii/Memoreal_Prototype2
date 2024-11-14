@@ -3,6 +3,8 @@ package com.example.memoreal_prototype
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -22,7 +24,10 @@ import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
+import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ProfileFragment : Fragment() {
 
@@ -142,14 +147,33 @@ class ProfileFragment : Fragment() {
                             val birthDate = jsonObject.optString("BIRTHDATE", "N/A")
                             val picture = jsonObject.optString("PICTURE", "")
 
+                            val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                            val date = originalFormat.parse(birthDate)
+                            val desiredFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val formattedDate = desiredFormat.format(date)
+
                             // Update the UI on the main thread
                             requireActivity().runOnUiThread {
                                 userName.text = username
                                 userFullName.text = fullName
                                 userContact.text = contact
                                 userEmail.text = email
-                                userBDate.text = birthDate
-                                // Optionally, load the user picture into userPhoto using a library like Glide or Picasso
+                                userBDate.text = formattedDate
+
+                                // Load the user photo from internal storage
+                                if (picture.isNotEmpty()) {
+                                    val bitmap = loadImageFromInternalStorage(picture)
+                                    if (bitmap != null) {
+                                        userPhoto.setImageBitmap(bitmap)
+                                    } else {
+                                        Log.e("ProfileFragment", "Failed to load image from path: $picture")
+                                        // Optionally, set a placeholder or default image if loading fails
+                                        userPhoto.setImageResource(R.drawable.baseline_person_24)
+                                    }
+                                } else {
+                                    // Set a default image if no picture is provided
+                                    userPhoto.setImageResource(R.drawable.baseline_person_24)
+                                }
                             }
                         } catch (e: Exception) {
                             Log.e("Fetch User", "JSON parsing error: ${e.message}")
@@ -232,8 +256,10 @@ class ProfileFragment : Fragment() {
     }
 
     private fun editUser() {
-        // Implement user edit functionality here
-        Toast.makeText(requireContext(), "Edit user clicked", Toast.LENGTH_SHORT).show()
+        (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+            .replace(R.id.frame_layout, EditProfileFragment())
+            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
+            .commit()
     }
 
     private fun logOut() {
@@ -264,5 +290,27 @@ class ProfileFragment : Fragment() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         requireActivity().finish()
+    }
+
+    private fun loadImageFromInternalStorage(imagePath: String): Bitmap? {
+        return try {
+            // Remove the "file://" prefix if present
+            val cleanPath = imagePath.replace("file://", "")
+
+            // Create a File object for the given path
+            val imgFile = File(cleanPath)
+
+            // Check if the file exists
+            if (imgFile.exists()) {
+                // Decode the image from the file path
+                BitmapFactory.decodeFile(imgFile.absolutePath)
+            } else {
+                Log.e("ProfileFragment", "Image file does not exist at path: $cleanPath")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("ProfileFragment", "Failed to load image: ${e.message}")
+            null
+        }
     }
 }
