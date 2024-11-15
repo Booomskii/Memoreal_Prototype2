@@ -16,6 +16,7 @@ import java.io.IOException
 import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -148,19 +149,77 @@ class MyObituariesFragment : Fragment() {
     }
 
     private fun setupRecyclerView(obituaries: List<Obituary>) {
-        obituaryAdapter = ObituaryAdapter(obituaries) { obituaryId ->
-            // Show a confirmation dialog before deleting
-            AlertDialog.Builder(requireContext())
-                .setTitle("Delete Obituary")
-                .setMessage("Are you sure you want to delete this obituary?")
-                .setPositiveButton("Yes") { _, _ ->
-                    deleteObituary(obituaryId)
-                }
-                .setNegativeButton("No", null)
-                .show()
-        }
+        obituaryAdapter = ObituaryAdapter(
+            obituaries,
+            onDeleteClick = { obituaryId ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Obituary")
+                    .setMessage("Are you sure you want to delete this obituary?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        deleteObituary(obituaryId)
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            },
+            onItemClick = { obituary ->
+                openObituaryDetailFragment(obituary.OBITUARYID)
+            }
+        )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = obituaryAdapter
+
+        // Attach ItemTouchHelper to handle swipe gestures
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    private fun openObituaryDetailFragment(obituaryId: Int) {
+        val obituaryFragment = ObituaryFragment()
+
+        // Pass the obituary ID as an argument to the new fragment
+        val bundle = Bundle().apply {
+            putInt("obituaryId", obituaryId)
+        }
+        obituaryFragment.arguments = bundle
+
+        // Replace the current fragment with ObituaryDetailFragment
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.frame_layout, obituaryFragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.adapterPosition
+            val obituary = obituaryAdapter.getObituaryAt(position)
+
+            if (direction == ItemTouchHelper.LEFT) {
+                // Show a confirmation dialog before deleting
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Obituary")
+                    .setMessage("Are you sure you want to delete this obituary?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        deleteObituary(obituary.OBITUARYID)
+                    }
+                    .setNegativeButton("No") { _, _ ->
+                        obituaryAdapter.notifyItemChanged(position) // Cancel swipe
+                    }
+                    .show()
+            } else if (direction == ItemTouchHelper.RIGHT) {
+                // Handle Edit
+                Toast.makeText(requireContext(), "Edit feature for obituary ${obituary.OBITUARYNAME} clicked", Toast.LENGTH_SHORT).show()
+                obituaryAdapter.notifyItemChanged(position) // Reset swipe
+            }
+        }
     }
 
     private fun deleteObituary(obituaryId: Int) {

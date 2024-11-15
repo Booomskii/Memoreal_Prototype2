@@ -1,6 +1,5 @@
 package com.example.memoreal_prototype
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memoreal_prototype.models.Obituary
@@ -50,7 +50,7 @@ class ExploreFragment : Fragment() {
     }
 
     private fun setupToolbar(view: View) {
-        val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
 
         backButton.setOnClickListener {
@@ -67,13 +67,27 @@ class ExploreFragment : Fragment() {
     }
 
     private fun setupRecyclerView(obituaries: List<Obituary>) {
-        obituaryAdapter = ObituaryAdapter(obituaries)
+        obituaryAdapter = ObituaryAdapter(
+            obituaries,
+            onItemClick = { obituary ->
+                // Open details fragment with obituary ID
+                val obituaryFragment = ObituaryFragment().apply {
+                    arguments = Bundle().apply {
+                        putInt("OBITUARYID", obituary.OBITUARYID)
+                    }
+                }
+                (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout, obituaryFragment)
+                    .addToBackStack("ExploreFragment")
+                    .commit()
+            }
+        )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = obituaryAdapter
     }
 
     private fun fetchObituaries() {
-        val url = "$baseUrl"+"api/allObit"
+        val url = "$baseUrl" + "api/allObit"
         Log.d("API", "Requesting URL: $url")
         val request = Request.Builder()
             .url(url)
@@ -117,28 +131,30 @@ class ExploreFragment : Fragment() {
 
         for (i in 0 until jsonArray.length()) {
             val jsonObject = jsonArray.getJSONObject(i)
-            obituaries.add(Obituary(
-                jsonObject.getInt("OBITUARYID"),
-                jsonObject.getInt("USERID"),
-                jsonObject.getInt("GALLERYID"),
-                jsonObject.getInt("FAMILYID"),
-                jsonObject.getInt("OBITCUSTID"),
-                jsonObject.optString("BIOGRAPHY"),
-                jsonObject.getString("OBITUARYNAME"),
-                jsonObject.getString("OBITUARY_PHOTO"),
-                jsonObject.getString("DATEOFBIRTH"),
-                jsonObject.getString("DATEOFDEATH"),
-                jsonObject.getString("KEYEVENTS"),
-                jsonObject.getString("OBITUARYTEXT"),
-                jsonObject.optString("FUN_DATETIME"),
-                jsonObject.optString("FUN_LOCATION"),
-                jsonObject.optString("ADTLINFO"),
-                jsonObject.optString("FAVORITEQUOTE"),
-                jsonObject.getBoolean("ENAGUESTBOOK"),
-                jsonObject.getString("PRIVACY"),
-                jsonObject.getString("CREATIONDATE"),
-                jsonObject.getString("LASTMODIFIED")
-            ))
+            obituaries.add(
+                Obituary(
+                    jsonObject.getInt("OBITUARYID"),
+                    jsonObject.getInt("USERID"),
+                    jsonObject.getInt("GALLERYID"),
+                    jsonObject.getInt("FAMILYID"),
+                    jsonObject.getInt("OBITCUSTID"),
+                    jsonObject.optString("BIOGRAPHY"),
+                    jsonObject.getString("OBITUARYNAME"),
+                    jsonObject.getString("OBITUARY_PHOTO"),
+                    jsonObject.getString("DATEOFBIRTH"),
+                    jsonObject.getString("DATEOFDEATH"),
+                    jsonObject.getString("KEYEVENTS"),
+                    jsonObject.getString("OBITUARYTEXT"),
+                    jsonObject.optString("FUN_DATETIME"),
+                    jsonObject.optString("FUN_LOCATION"),
+                    jsonObject.optString("ADTLINFO"),
+                    jsonObject.optString("FAVORITEQUOTE"),
+                    jsonObject.getBoolean("ENAGUESTBOOK"),
+                    jsonObject.getString("PRIVACY"),
+                    jsonObject.getString("CREATIONDATE"),
+                    jsonObject.getString("LASTMODIFIED")
+                )
+            )
         }
         return obituaries
     }

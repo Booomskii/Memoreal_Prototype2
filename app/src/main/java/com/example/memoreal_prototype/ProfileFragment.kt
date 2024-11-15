@@ -26,7 +26,12 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class ProfileFragment : Fragment() {
@@ -40,7 +45,8 @@ class ProfileFragment : Fragment() {
     private lateinit var userEmail: TextView
     private lateinit var userBDate: TextView
     private lateinit var userPhoto: ImageView
-    private lateinit var sharedPreferences: SharedPreferences
+
+    private var bdate = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +54,8 @@ class ProfileFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         setupToolbar(view)
+        val ageTV = view.findViewById<TextView>(R.id.age)
+        ageTV.text = calculateAge(bdate).toString()
 
         userName = view.findViewById(R.id.username)
         userFullName = view.findViewById(R.id.userFullName)
@@ -159,6 +167,7 @@ class ProfileFragment : Fragment() {
                                 userContact.text = contact
                                 userEmail.text = email
                                 userBDate.text = formattedDate
+                                bdate = formattedDate
 
                                 // Load the user photo from internal storage
                                 if (picture.isNotEmpty()) {
@@ -313,4 +322,28 @@ class ProfileFragment : Fragment() {
             null
         }
     }
+
+    private fun calculateAge(birthDate: String): Int {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val birthDateCalendar = Calendar.getInstance()
+
+        try {
+            val date = dateFormat.parse(birthDate)
+            birthDateCalendar.time = date
+        } catch (e: ParseException) {
+            e.printStackTrace()
+            return 0 // In case of parsing failure
+        }
+
+        val today = Calendar.getInstance()
+
+        var age = today.get(Calendar.YEAR) - birthDateCalendar.get(Calendar.YEAR)
+
+        if (today.get(Calendar.DAY_OF_YEAR) < birthDateCalendar.get(Calendar.DAY_OF_YEAR)) {
+            age--
+        }
+
+        return age
+    }
+
 }

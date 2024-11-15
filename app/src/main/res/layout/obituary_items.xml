@@ -6,227 +6,79 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:backgroundTint="@color/memo_orange"
+    android:clickable="true"
+    android:focusable="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/itemContainer"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="100dp">
 
         <ImageView
             android:id="@+id/obituaryPhoto"
             android:layout_width="100dp"
-            android:layout_height="110dp"
+            android:layout_height="100dp"
             android:scaleType="centerCrop"
+            android:background="@color/memo_light_orange"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="0.05"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
-            android:id="@+id/obituaryName"
-            android:layout_width="150dp"
+            android:id="@+id/dateLived"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/temp"
-            android:textSize="10sp"
-            android:textStyle="bold"
             android:textColor="@color/black"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/biography"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.092" />
-
-        <TextView
-            android:id="@+id/dateBirth"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.185" />
-
-        <TextView
-            android:id="@+id/dateDeath"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.278" />
-
-        <TextView
-            android:id="@+id/keyEvents"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.672" />
-
-        <TextView
-            android:id="@+id/obitText"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.765" />
-
-        <TextView
-            android:id="@+id/funDateTime"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.371" />
+            app:layout_constraintVertical_bias="0.433" />
 
         <TextView
             android:id="@+id/funLocation"
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/temp"
-            android:textSize="10sp"
             android:textColor="@color/black"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
+            app:layout_constraintHorizontal_bias="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.464" />
-
-        <TextView
-            android:id="@+id/adtlInfo"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.471"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.557" />
-
-        <TextView
-            android:id="@+id/favQuote"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.857" />
-
-        <TextView
-            android:id="@+id/privacy"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.950" />
-
-        <TextView
-            android:id="@+id/guestBook"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/temp"
-            android:textSize="10sp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.655"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.672" />
+            app:layout_constraintVertical_bias="0.638" />
 
         <TextView
             android:id="@+id/createDate"
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/temp"
-            android:textSize="10sp"
             android:textColor="@color/black"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.655"
+            app:layout_constraintHorizontal_bias="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.765" />
+            app:layout_constraintVertical_bias="0.987" />
 
         <TextView
-            android:id="@+id/lastModified"
-            android:layout_width="150dp"
+            android:id="@+id/obituaryName"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/temp"
-            android:textSize="10sp"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.655"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.857" />
-
-        <Button
-            android:id="@+id/editButton"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/edit"
-            android:backgroundTint="@color/memo_light_orange"
+            android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -234,18 +86,5 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <Button
-            android:id="@+id/deleteButton"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/delete"
-            android:backgroundTint="@color/red"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.315" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

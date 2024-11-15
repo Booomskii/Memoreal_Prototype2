@@ -200,6 +200,8 @@
     <!--Memoreal My Obituaries Section-->
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="obit">Obituary</string>
+    <string name="obitHeader">In Loving Memory Of  </string>
     <!--Memoreal Profile Section-->
     <string name="myProfile">My Profile</string>
     <string name="age">Age</string>
