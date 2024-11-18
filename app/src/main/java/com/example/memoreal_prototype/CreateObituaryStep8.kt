@@ -698,23 +698,6 @@ class CreateObituaryStep8 : Fragment() {
         })
     }
 
-    fun formatFuneralDateTime(inputDateTime: String): String {
-        val inputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-
-        return try {
-            val date = inputFormat.parse(inputDateTime)
-            if (date != null) {
-                outputFormat.format(date)
-            } else {
-                ""
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ""
-        }
-    }
-
     private fun formatDateToMSSQL(dateString: String): String {
         val originalFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
         val targetFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

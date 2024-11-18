@@ -73,7 +73,7 @@ class ExploreFragment : Fragment() {
                 // Open details fragment with obituary ID
                 val obituaryFragment = ObituaryFragment().apply {
                     arguments = Bundle().apply {
-                        putInt("OBITUARYID", obituary.OBITUARYID)
+                        putInt("obituaryId", obituary.OBITUARYID)
                     }
                 }
                 (activity as HomePageActivity).supportFragmentManager.beginTransaction()

@@ -20,9 +20,12 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import com.example.memoreal_prototype.models.Obituary
 import com.example.memoreal_prototype.models.Obituary_Customization
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ObituaryFragment : Fragment() {
 
@@ -69,14 +72,6 @@ class ObituaryFragment : Fragment() {
         return view
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // Release MediaPlayer resources when the fragment view is destroyed
-        if (this::mediaPlayer.isInitialized) {
-            mediaPlayer.release()
-        }
-    }
-
     private fun setupToolbar(view: View) {
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
@@ -90,7 +85,7 @@ class ObituaryFragment : Fragment() {
         backButton.setOnClickListener {
             activity?.let {
                 it.supportFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, HomeFragment())
+                    .replace(R.id.frame_layout, ExploreFragment())
                     .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                     .commit()
             }
@@ -160,6 +155,12 @@ class ObituaryFragment : Fragment() {
                                 // Update the obitImage UI here
                                 fetchedObituary?.let {
                                     val obitImage = view?.findViewById<ImageView>(R.id.obituary_image)
+                                    val obitName = view?.findViewById<TextView>(R.id.tvObitName)
+                                    val dateBirth = view?.findViewById<TextView>(R.id.tvDateBirth)
+                                    val dateDeath = view?.findViewById<TextView>(R.id.tvDateDeath)
+                                    val biography = view?.findViewById<TextView>(R.id.tvBio)
+                                    val age = view?.findViewById<TextView>(R.id.tvAge)
+
                                     if (it.OBITUARYPHOTO.isNotEmpty()) {
                                         val bitmap = loadImageFromInternalStorage(it.OBITUARYPHOTO)
                                         if (bitmap != null) {
@@ -171,6 +172,24 @@ class ObituaryFragment : Fragment() {
                                     } else {
                                         obitImage?.setImageResource(R.drawable.baseline_person_24)
                                     }
+
+                                    val originalFormat = SimpleDateFormat("yyyy-dd-MM'T'HH:mm:ss" +
+                                            ".SSS'Z'", Locale.getDefault())
+                                    val date = originalFormat.parse(it.DATEOFBIRTH)
+                                    val date2 = originalFormat.parse(it.DATEOFDEATH)
+
+                                    // Change the desired format to "MMM. dd, yyyy" to get "Nov. 19, 2024"
+                                    val desiredFormat = SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault())
+
+                                    val formattedDate = date?.let { desiredFormat.format(it) }
+                                    val formattedDate2 = date2?.let { desiredFormat.format(it) }
+
+                                    obitName?.text = it.OBITUARYNAME
+                                    dateBirth?.text = formattedDate ?: ""
+                                    dateDeath?.text = formattedDate2 ?: ""
+                                    biography?.text = it.BIOGRAPHY
+
+                                    /*age?.text = it.AGE*/
                                 }
 
                                 // Update vflower and vcandle UI here
@@ -179,6 +198,29 @@ class ObituaryFragment : Fragment() {
                                     val vcandle = view?.findViewById<ImageView>(R.id.imgCandle)
                                     val obitImage = view?.findViewById<ImageView>(R.id
                                         .obituary_image)
+                                    val musicLabel = view?.findViewById<TextView>(R.id.musicName)
+                                    musicLabel?.isSelected = true
+                                    musicLabel?.text = it.BGMUSIC
+                                    music = it.BGMUSIC
+
+                                    val backgroundThemeMap = mapOf(
+                                        "Pattern 1" to R.drawable.pattern1,
+                                        "Pattern 2" to R.drawable.pattern2,
+                                        "Pattern 3" to R.drawable.pattern3,
+                                        "Artistic 1" to R.drawable.artistic1,
+                                        "Artistic 2" to R.drawable.artistic2,
+                                        "Artistic 3" to R.drawable.artistic3,
+                                        "Heaven 1" to R.drawable.heaven1,
+                                        "Heaven 2" to R.drawable.heaven2,
+                                        "Heaven 3" to R.drawable.heaven3
+                                    )
+                                    val backgroundTheme = it.BGTHEME
+                                    val backgroundResource = backgroundThemeMap[backgroundTheme]
+                                    backgroundResource?.let{
+                                        val mainLayout = view?.findViewById<NestedScrollView>(R.id
+                                            .nestedScrollView8)
+                                        mainLayout?.setBackgroundResource(it)
+                                    }
 
                                     val flowerMap = mapOf(
                                         "Rose" to R.drawable.rose,
@@ -218,10 +260,6 @@ class ObituaryFragment : Fragment() {
                                     }
                                     loadImage(it.VFLOWER, vflower!!, flowerMap, R.drawable.default_flower_icon)
                                     loadImage(it.VCANDLE, vcandle!!, candleMap, R.drawable.default_candle_icon)
-
-                                    val musicLabel = view?.findViewById<TextView>(R.id.musicName)
-                                    musicLabel?.text = it.BGMUSIC
-                                    music = it.BGMUSIC
 
                                     setupMediaPlayer()
                                     startMusic()
@@ -328,5 +366,33 @@ class ObituaryFragment : Fragment() {
     private fun setFrameForeground(resourceName: String?, imageView: ImageView, frameMap: Map<String, Int>, defaultFrame: Int) {
         val frameResourceId = frameMap[resourceName] ?: defaultFrame
         imageView.foreground = resources.getDrawable(frameResourceId, requireContext().theme)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pauseMusic() // Pause the music when the app goes to the background
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Check if mediaPlayer is initialized and if it was playing before going into the background
+        if (this::mediaPlayer.isInitialized && !isPlaying) {
+            startMusic()
+            val playPauseButton = view?.findViewById<ImageButton>(R.id.btnPlayPause)
+            playPauseButton?.setImageResource(R.drawable.baseline_pause_circle_24)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopMusic() // Stop the music when the app is stopped
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Release MediaPlayer resources when the fragment view is destroyed
+        if (this::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
+        }
     }
 }

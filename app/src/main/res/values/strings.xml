@@ -201,7 +201,8 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="obit">Obituary</string>
-    <string name="obitHeader">In Loving Memory Of  </string>
+    <string name="obitHeader">In Loving Memory Of&#160;&#160;</string>
+    <string name="bio">Biography:</string>
     <!--Memoreal Profile Section-->
     <string name="myProfile">My Profile</string>
     <string name="age">Age</string>

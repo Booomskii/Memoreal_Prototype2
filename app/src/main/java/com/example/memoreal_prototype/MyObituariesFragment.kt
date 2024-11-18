@@ -1,6 +1,9 @@
 package com.example.memoreal_prototype
 
 import android.app.AlertDialog
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -16,6 +19,7 @@ import java.io.IOException
 import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -218,6 +222,94 @@ class MyObituariesFragment : Fragment() {
                 // Handle Edit
                 Toast.makeText(requireContext(), "Edit feature for obituary ${obituary.OBITUARYNAME} clicked", Toast.LENGTH_SHORT).show()
                 obituaryAdapter.notifyItemChanged(position) // Reset swipe
+            }
+        }
+
+        override fun onChildDraw(
+            canvas: Canvas,
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            dX: Float,
+            dY: Float,
+            actionState: Int,
+            isCurrentlyActive: Boolean
+        ) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                val itemView = viewHolder.itemView
+                val paint = Paint()
+
+                // Draw background
+                if (dX > 0) {
+                    // Swiping to the right (Edit)
+                    paint.color = Color.parseColor("#388E3C") // Green color
+                    canvas.drawRect(
+                        itemView.left.toFloat(),
+                        itemView.top.toFloat(),
+                        itemView.left + dX,
+                        itemView.bottom.toFloat(),
+                        paint
+                    )
+
+                    // Draw Edit icon and text
+                    val editIcon = ContextCompat.getDrawable(requireContext(), R.drawable
+                        .baseline_edit_24)
+                    // Use your edit icon drawable
+                    val iconMargin = (itemView.height - editIcon!!.intrinsicHeight) / 2
+                    val iconTop = itemView.top + (itemView.height - editIcon.intrinsicHeight) / 2
+                    val iconBottom = iconTop + editIcon.intrinsicHeight
+                    val iconLeft = itemView.left + iconMargin
+                    val iconRight = iconLeft + editIcon.intrinsicWidth
+                    editIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    editIcon.draw(canvas)
+
+                    paint.color = Color.WHITE
+                    paint.textSize = 40f
+                    paint.isAntiAlias = true
+                    canvas.drawText(
+                        "Edit",
+                        itemView.left + iconMargin + editIcon.intrinsicWidth + 20f,
+                        (itemView.top + itemView.height / 2 + 10).toFloat(),
+                        paint
+                    )
+                } else if (dX < 0) {
+                    // Swiping to the left (Delete)
+                    paint.color = Color.parseColor("#D32F2F") // Red color
+                    canvas.drawRect(
+                        itemView.right + dX,
+                        itemView.top.toFloat(),
+                        itemView.right.toFloat(),
+                        itemView.bottom.toFloat(),
+                        paint
+                    )
+
+                    // Draw Delete icon and text
+                    val deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable
+                        .baseline_delete_24) // Use your delete icon drawable
+                    val iconMargin = (itemView.height - deleteIcon!!.intrinsicHeight) / 2
+                    val iconTop = itemView.top + (itemView.height - deleteIcon.intrinsicHeight) / 2
+                    val iconBottom = iconTop + deleteIcon.intrinsicHeight
+                    val iconRight = itemView.right - iconMargin
+                    val iconLeft = iconRight - deleteIcon.intrinsicWidth
+                    deleteIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    deleteIcon.draw(canvas)
+
+                    paint.color = Color.WHITE
+                    paint.textSize = 40f
+                    paint.isAntiAlias = true
+                    canvas.drawText(
+                        "Delete",
+                        itemView.right - iconMargin - deleteIcon.intrinsicWidth - 120f,
+                        (itemView.top + itemView.height / 2 + 10).toFloat(),
+                        paint
+                    )
+                }
+
+                // Fade the view out during the swipe
+                val alpha = 1.0f - Math.abs(dX) / recyclerView.width
+                itemView.alpha = alpha
+                itemView.translationX = dX
+            } else {
+                super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
         }
     }
