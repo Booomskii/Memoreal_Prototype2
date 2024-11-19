@@ -2,7 +2,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nestedScrollView"
+    android:id="@+id/nsvObituary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -11,8 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:backgroundTint="@color/white"
-        android:background="@color/white">
+        android:background="@android:color/transparent">
 
         <include
             layout="@layout/my_obituaries_toolbar"
@@ -37,6 +36,7 @@
                 android:id="@+id/constraintLayout6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0"
@@ -66,12 +66,13 @@
                 android:id="@+id/constraintLayout"
                 android:layout_width="150dp"
                 android:layout_height="200dp"
+                android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.932"
+                app:layout_constraintHorizontal_bias="0.950"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.195">
+                app:layout_constraintVertical_bias="0.180">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -87,7 +88,7 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.12" />
+                    app:layout_constraintVertical_bias="0.088" />
 
                 <TextView
                     android:id="@+id/tvObitName"
@@ -104,7 +105,7 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.344" />
+                    app:layout_constraintVertical_bias="0.277" />
 
                 <TextView
                     android:id="@+id/tvAge"
@@ -113,14 +114,31 @@
                     android:fontFamily="@font/poppins_medium"
                     android:gravity="center"
                     android:text="@string/temp"
-                    android:textSize="12sp"
                     android:textColor="@color/black"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvObitName"
-                    app:layout_constraintVertical_bias="0.050" />
+                    app:layout_constraintVertical_bias="0.0" />
+
+                <TextView
+                    android:id="@+id/tvDateBorn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_medium"
+                    android:gravity="start"
+                    android:text="@string/born"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvAge"
+                    app:layout_constraintVertical_bias="0.108" />
 
                 <TextView
                     android:id="@+id/tvDateBirth"
@@ -129,14 +147,31 @@
                     android:fontFamily="@font/poppins_medium"
                     android:gravity="center"
                     android:text="@string/temp"
-                    android:textSize="12sp"
                     android:textColor="@color/black"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvAge"
-                    app:layout_constraintVertical_bias="0.275" />
+                    app:layout_constraintVertical_bias="0.358" />
+
+                <TextView
+                    android:id="@+id/tvDatePassed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_medium"
+                    android:gravity="start"
+                    android:text="@string/passed"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDateBirth"
+                    app:layout_constraintVertical_bias="0.281" />
 
                 <TextView
                     android:id="@+id/tvDateDeath"
@@ -145,34 +180,38 @@
                     android:fontFamily="@font/poppins_medium"
                     android:gravity="center"
                     android:text="@string/temp"
-                    android:textSize="12sp"
                     android:textColor="@color/black"
+                    android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDateBirth"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDatePassed"
                     app:layout_constraintVertical_bias="0.0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/textView10"
-                android:layout_width="320dp"
+                android:layout_width="315dp"
                 android:layout_height="wrap_content"
                 android:text="@string/bio"
+                android:textColor="@color/black"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.491"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.458" />
+                app:layout_constraintVertical_bias="0.440" />
 
             <TextView
                 android:id="@+id/tvBio"
-                android:layout_width="320dp"
+                android:layout_width="315dp"
                 android:layout_height="wrap_content"
                 android:text="@string/temp"
+                android:textColor="@color/black"
+                android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.491"
@@ -180,35 +219,72 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView10"
                 app:layout_constraintVertical_bias="0.0" />
 
-            <LinearLayout
-                android:id="@+id/buttonLayout"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayoutNavigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
                 android:orientation="horizontal"
+                android:layout_marginTop="28dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvBio">
 
                 <Button
-                    android:id="@+id/aboutButton"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btnAbout"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="About" />
+                    android:backgroundTint="@color/memo_orange"
+                    android:text="@string/about"
+                    android:textColor="@color/white"
+                    android:padding="6dp"
+                    app:cornerRadius="0dp"
+                    app:layout_constraintWidth_percent="0.25"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/contactButton"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btnFamily"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Contact" />
+                    android:backgroundTint="@color/memo_orange"
+                    android:text="@string/family"
+                    android:textColor="@color/white"
+                    android:padding="6dp"
+                    app:cornerRadius="0dp"
+                    app:layout_constraintWidth_percent="0.25"
+                    app:layout_constraintStart_toEndOf="@id/btnAbout"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/servicesButton"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btnGallery"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Services" />
-            </LinearLayout>
+                    android:backgroundTint="@color/memo_orange"
+                    android:text="@string/gallery"
+                    android:padding="6dp"
+                    android:textColor="@color/white"
+                    app:cornerRadius="0dp"
+                    app:layout_constraintWidth_percent="0.25"
+                    app:layout_constraintStart_toEndOf="@id/btnFamily"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/btnGuestbook"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/memo_orange"
+                    android:text="@string/guestbook"
+                    android:textColor="@color/white"
+                    android:padding="6dp"
+                    app:cornerRadius="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btnGallery"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.25" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayoutMusicControls"
@@ -223,8 +299,8 @@
 
                 <TextView
                     android:id="@+id/musicName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="115dp"
+                    android:layout_height="17dp"
                     android:ellipsize="marquee"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -238,10 +314,10 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnPlayPause"
-                    app:layout_constraintHorizontal_bias="0.800"
+                    app:layout_constraintHorizontal_bias="0.761"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.500" />
+                    app:layout_constraintVertical_bias="0.5" />
 
                 <ImageButton
                     android:id="@+id/btnPlayPause"
@@ -271,69 +347,116 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout7"
-                android:layout_width="300dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="45dp"
-                android:background="@android:color/transparent"
-                android:orientation="vertical"
+            <FrameLayout
+                android:id="@+id/fragmentContainer"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.495"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayoutMusicControls"
-                app:layout_constraintVertical_bias="0.933">
+                app:layout_constraintTop_toBottomOf="@id/constraintLayoutNavigation"
+                app:layout_constraintVertical_bias="1.0">
 
-                <ImageView
-                    android:id="@+id/imgFlower"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/default_flower_icon"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayoutTributes"
+                android:layout_width="320dp"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                tools:layout_editor_absoluteX="34dp"
+                tools:layout_editor_absoluteY="375dp">
+
+                <Button
+                    android:id="@+id/btnFlower"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginBottom="2dp"
+                    android:background="@drawable/default_flower_icon"
+                    android:padding="6dp"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toTopOf="@+id/btnCandle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.68" />
+                    app:layout_constraintVertical_bias="0.0"
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textView16"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/virtualFlowers"
+                    android:gravity="center"
+                    android:text="@string/offerFlower"
                     android:textColor="@color/black"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.231"
+                    app:layout_constraintHorizontal_bias="0.300"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.657" />
+                    app:layout_constraintVertical_bias="0.1" />
 
-                <ImageView
-                    android:id="@+id/imgCandle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/default_candle_icon"
+                <Button
+                    android:id="@+id/btnCandle"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="24dp"
+                    android:background="@drawable/default_candle_icon"
+                    android:padding="6dp"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.607"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.683" />
+                    app:layout_constraintVertical_bias="1.0"
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/virtualCandles"
+                    android:gravity="center"
+                    android:text="@string/lightCandle"
                     android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.300"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.9" />
+
+                <Button
+                    android:id="@+id/btnDonate"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/heart"
+                    android:padding="6dp"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.650"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.25" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/makeDonation"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.657" />
+                    app:layout_constraintVertical_bias="0.5" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,6 +1,5 @@
 package com.example.memoreal_prototype
 
-import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
@@ -16,10 +15,12 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 import android.util.Log
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.example.memoreal_prototype.models.Obituary
 import com.example.memoreal_prototype.models.Obituary_Customization
@@ -34,6 +35,7 @@ class ObituaryFragment : Fragment() {
     private var userId = 0
 
     private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var buttons: List<Button>
     private var isPlaying = false
     private var fetchedObituary: Obituary? = null
     private var fetchedObitCust: Obituary_Customization? = null
@@ -48,6 +50,45 @@ class ObituaryFragment : Fragment() {
         val playPauseButton = view.findViewById<ImageButton>(R.id.btnPlayPause)
         val stopButton = view.findViewById<ImageButton>(R.id.btnStop)
         val obituaryId = arguments?.getInt("obituaryId")
+        val aboutButton = view.findViewById<Button>(R.id.btnAbout)
+        val familyButton = view.findViewById<Button>(R.id.btnFamily)
+        val galleryButton = view.findViewById<Button>(R.id.btnGallery)
+        val guestbookButton = view.findViewById<Button>(R.id.btnGuestbook)
+
+// Initialize the buttons list
+        buttons = listOf(aboutButton, familyButton, galleryButton, guestbookButton)
+
+// Set default fragment and highlight the About button initially
+        replaceFragment(AboutFragment())
+        highlightSelectedButton(aboutButton)
+
+        aboutButton.setOnClickListener {
+            replaceFragment(AboutFragment())
+            highlightSelectedButton(aboutButton)
+        }
+
+        familyButton.setOnClickListener {
+            replaceFragment(FamilyFragment())
+            highlightSelectedButton(familyButton)
+        }
+
+        galleryButton.setOnClickListener {
+            replaceFragment(GalleryFragment())
+            highlightSelectedButton(galleryButton)
+        }
+
+        guestbookButton.setOnClickListener {
+            replaceFragment(GuestbookFragment())
+            highlightSelectedButton(guestbookButton)
+        }
+
+        // Optionally set the initial selected state, e.g., select "About" button by default
+        aboutButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.memo_orange))
+        familyButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color
+            .black))
+        galleryButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
+        guestbookButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
+
 
         if (obituaryId != null) {
             fetchObituaryById(obituaryId)
@@ -90,6 +131,26 @@ class ObituaryFragment : Fragment() {
                     .commit()
             }
         }
+    }
+
+    private fun highlightSelectedButton(selectedButton: Button) {
+        // Iterate over all buttons and update their appearance
+        buttons.forEach { button ->
+            if (button == selectedButton) {
+                button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.memo_orange)) // Highlight color
+                button.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            } else {
+                button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black)) // Default color
+                button.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val transaction = childFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainer, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     private fun fetchObituaryById(obituaryId: Int) {
@@ -194,8 +255,8 @@ class ObituaryFragment : Fragment() {
 
                                 // Update vflower and vcandle UI here
                                 fetchedObitCust?.let {
-                                    val vflower = view?.findViewById<ImageView>(R.id.imgFlower)
-                                    val vcandle = view?.findViewById<ImageView>(R.id.imgCandle)
+                                    val vflower = view?.findViewById<Button>(R.id.btnFlower)
+                                    val vcandle = view?.findViewById<Button>(R.id.btnCandle)
                                     val obitImage = view?.findViewById<ImageView>(R.id
                                         .obituary_image)
                                     val musicLabel = view?.findViewById<TextView>(R.id.musicName)
@@ -215,11 +276,13 @@ class ObituaryFragment : Fragment() {
                                         "Heaven 3" to R.drawable.heaven3
                                     )
                                     val backgroundTheme = it.BGTHEME
+                                    Log.d("OBITUARY PAGE", it.BGTHEME)
                                     val backgroundResource = backgroundThemeMap[backgroundTheme]
-                                    backgroundResource?.let{
-                                        val mainLayout = view?.findViewById<NestedScrollView>(R.id
-                                            .nestedScrollView8)
-                                        mainLayout?.setBackgroundResource(it)
+                                    if (isAdded && view != null) {
+                                        val mainLayout = view?.findViewById<NestedScrollView>(R.id.nsvObituary)
+                                        backgroundResource?.let {
+                                            mainLayout?.setBackgroundResource(it)
+                                        } ?: Log.e("BACKGROUND THEME", "Background resource is null for value: $backgroundTheme")
                                     }
 
                                     val flowerMap = mapOf(

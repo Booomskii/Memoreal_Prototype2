@@ -203,6 +203,15 @@
     <string name="obit">Obituary</string>
     <string name="obitHeader">In Loving Memory Of&#160;&#160;</string>
     <string name="bio">Biography:</string>
+    <string name="passed">Passed:</string>
+    <string name="born">Born:</string>
+    <string name="about">About</string>
+    <string name="family">Family</string>
+    <string name="guestbook">Guestbook</string>
+    <string name="gallery">Gallery</string>
+    <string name="lightCandle">Light a Candle</string>
+    <string name="offerFlower">Offer a Flower</string>
+    <string name="makeDonation">Make a Donation</string>
     <!--Memoreal Profile Section-->
     <string name="myProfile">My Profile</string>
     <string name="age">Age</string>
