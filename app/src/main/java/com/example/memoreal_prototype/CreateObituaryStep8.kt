@@ -228,41 +228,64 @@ class CreateObituaryStep8 : Fragment() {
 
         publishButton.setOnClickListener {
             AlertDialog.Builder(requireContext())
-                .setTitle("Logout")
+                .setTitle("Publish Obituary")
                 .setMessage("Are you sure you want to publish this Obituary?")
                 .setPositiveButton("Yes") { _, _ ->
+                    // Create a list to store updated file paths
+                    val updatedMediaList = mutableListOf<String>()
+
+                    // Save the main image (if it exists)
                     val imageUriString = sharedViewModel.image.value
                     if (imageUriString != null) {
                         val imageUri = Uri.parse(imageUriString)
-                        val savedFileName = saveImageToInternalStorage(imageUri)
+                        val savedFileName = saveMediaToInternalStorage(imageUri, isVideo = false)
                         if (savedFileName != null) {
-                            Log.d("SaveImage", "Image saved successfully: $savedFileName")
+                            Log.d("SaveMedia", "Image saved successfully: $savedFileName")
+                            // Update the sharedViewModel with the new internal storage path
+                            sharedViewModel.image.value = savedFileName
                         } else {
-                            Log.e("SaveImage", "Failed to save the image.")
+                            Log.e("SaveMedia", "Failed to save the image.")
                         }
                     } else {
-                        Log.e("SaveImage", "Image Uri is null.")
+                        Log.e("SaveMedia", "Image Uri is null.")
                     }
+
+                    // Save additional media files (images and videos)
                     val mediaList = sharedViewModel.mediaList.value
                     mediaList?.forEach { mediaUriString ->
                         val mediaUri = Uri.parse(mediaUriString)
-                        val savedFileName = saveImageToInternalStorage(mediaUri)
+                        // Determine if media is a video based on the URI's MIME type
+                        val mimeType = requireContext().contentResolver.getType(mediaUri)
+                        val isVideo = mimeType?.startsWith("video") == true
+
+                        val savedFileName = saveMediaToInternalStorage(mediaUri, isVideo)
                         if (savedFileName != null) {
-                            Log.d("SaveImage", "Image saved successfully: $savedFileName")
+                            Log.d("SaveMedia", "Media saved successfully: $savedFileName")
+                            // Add the saved file path to the updated list
+                            updatedMediaList.add(savedFileName)
                         } else {
-                            Log.e("SaveImage", "Failed to save the image: $mediaUriString")
+                            Log.e("SaveMedia", "Failed to save the media: $mediaUriString")
                         }
                     }
 
+                    // Convert MutableList to ArrayList and update the sharedViewModel mediaList with the new internal storage paths
+                    sharedViewModel.mediaList.value = ArrayList(updatedMediaList)
+
+                    // Proceed with the rest of the operations
                     registerObituaryCustomization(obituary_cust)
                     addEachFamilyMember()
                     createGalleryAndMedia()
                     stopMusic()
 
-                    Toast.makeText(requireContext(),"Obituary created successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Obituary created successfully", Toast.LENGTH_SHORT).show()
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
                         .replace(R.id.frame_layout, HomeFragment())
-                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
+                        .setCustomAnimations(
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left,
+                            R.anim.slide_out_left,
+                            R.anim.slide_out_right
+                        )
                         .addToBackStack("CreateObituaryStep8")
                         .commit()
                 }
@@ -293,11 +316,17 @@ class CreateObituaryStep8 : Fragment() {
         imageView.foreground = resources.getDrawable(frameResourceId, requireContext().theme)
     }
 
-    private fun saveImageToInternalStorage(uri: Uri): String? {
+    private fun saveMediaToInternalStorage(uri: Uri, isVideo: Boolean): String? {
         return try {
             val inputStream = requireContext().contentResolver.openInputStream(uri)
-            val fileName = "image_${System.currentTimeMillis()}.jpg"
-            val file = File(requireContext().filesDir, fileName)
+
+            val extension = if (isVideo) "mp4" else "jpg"
+            val mediaType = if (isVideo) "videos" else "images"
+            val fileName = "media_${System.currentTimeMillis()}.$extension"
+
+            // Create a directory for media (either images or videos)
+            val mediaDir = requireContext().getDir(mediaType, Context.MODE_PRIVATE)
+            val file = File(mediaDir, fileName)
             val outputStream = FileOutputStream(file)
 
             inputStream?.copyTo(outputStream)
@@ -305,17 +334,15 @@ class CreateObituaryStep8 : Fragment() {
             inputStream?.close()
             outputStream.close()
 
-            // Save the file name to SharedPreferences
-            val sharedPreferences = requireContext().getSharedPreferences("obituaryImage", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("savedImageFileName", fileName).apply()
-
-            fileName // Return file name
+            // Return the file path for direct access
+            file.absolutePath
         } catch (e: IOException) {
             e.printStackTrace()
-            Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Failed to save media", Toast.LENGTH_SHORT).show()
             null
         }
     }
+
 
     private fun registerObituaryCustomization(obituaryCust: com.example.memoreal_prototype.models.Obituary_Customization) {
         val url = baseUrl + "api/addObituaryCust"
@@ -463,17 +490,27 @@ class CreateObituaryStep8 : Fragment() {
         })
     }
 
+    private fun getMimeTypeFromFilePath(filePath: String): String? {
+        val extension = filePath.substringAfterLast('.', "")
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+    }
+
     private fun createGalleryAndMedia() {
         val mediaList = sharedViewModel.mediaList.value ?: arrayListOf()
 
-        // Step 2: Create the gallery and media only if media exists
         if (mediaList.isNotEmpty()) {
-            addGallery { createdGalleryId ->  // Pass a callback to handle the created gallery ID
-                if (createdGalleryId != 0) { // Check if the gallery was created successfully
-                    // Step 3: After the gallery is created, proceed to add the media
-                    mediaList.forEach { mediaString ->
-                        val mediaUri = Uri.parse(mediaString)
-                        val mimeType = requireContext().contentResolver.getType(mediaUri)
+            addGallery { createdGalleryId ->
+                if (createdGalleryId != 0) {
+                    mediaList.forEach { savedFilePath ->
+                        val mediaFile = File(savedFilePath)
+                        val fileUri = Uri.fromFile(mediaFile)
+
+                        // First, try using the ContentResolver to get the MIME type
+                        var mimeType = requireContext().contentResolver.getType(fileUri)
+                        if (mimeType == null) {
+                            // If ContentResolver fails, use the file extension
+                            mimeType = getMimeTypeFromFilePath(savedFilePath)
+                        }
 
                         mimeType?.let {
                             val fileType = when {
@@ -487,14 +524,14 @@ class CreateObituaryStep8 : Fragment() {
                                     0,  // Gallery Media ID (auto-incremented)
                                     createdGalleryId,  // Use the newly created GALLERYID
                                     fileType,  // File type (Image or Video)
-                                    mediaString,  // File name or URI
+                                    savedFilePath,  // File name or URI (now internal storage path)
                                     ""  // This will be handled by the server (upload date)
                                 )
                                 registerMedia(galleryMedia)
                             } else {
                                 Log.e("MediaType", "Unsupported media type: $mimeType")
                             }
-                        } ?: Log.e("MediaType", "Unable to determine MIME type for: $mediaUri")
+                        } ?: Log.e("MediaType", "Unable to determine MIME type for: $savedFilePath")
                     }
                     // Step 4: Publish the obituary after gallery and media are added
                     publishObituary {

@@ -39,6 +39,9 @@ class ObituarySharedViewModel: ViewModel() {
     val imageUri = MutableLiveData<String?>()
     /*Create Obituary Step 8*/
 
+    /*Obituary*/
+    val obituaryId = MutableLiveData<Int?>()
+
     fun clearData() {
         // Using postValue to ensure safe thread handling
         memorialCreationFee.postValue(null)

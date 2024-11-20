@@ -1,14 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp"
     tools:context=".AboutFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:text="@string/bio"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tvBio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/temp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/open_sans"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/keyLifeEvents"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/tvLifeEvents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/temp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/open_sans"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/quote"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/tvQuote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/temp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/open_sans"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/funDateTime"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/tvFunDateTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/temp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/open_sans"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/funLocation"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/tvFunLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/temp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/open_sans"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/funInfo"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/tvFunInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/temp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/open_sans"/>
+</LinearLayout>

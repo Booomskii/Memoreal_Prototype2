@@ -22,10 +22,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.activityViewModels
 import com.example.memoreal_prototype.models.Obituary
 import com.example.memoreal_prototype.models.Obituary_Customization
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 class ObituaryFragment : Fragment() {
@@ -40,6 +42,7 @@ class ObituaryFragment : Fragment() {
     private var fetchedObituary: Obituary? = null
     private var fetchedObitCust: Obituary_Customization? = null
     private var music = ""
+    private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,10 +58,10 @@ class ObituaryFragment : Fragment() {
         val galleryButton = view.findViewById<Button>(R.id.btnGallery)
         val guestbookButton = view.findViewById<Button>(R.id.btnGuestbook)
 
-// Initialize the buttons list
+        // Initialize the buttons list
         buttons = listOf(aboutButton, familyButton, galleryButton, guestbookButton)
 
-// Set default fragment and highlight the About button initially
+        // Set default fragment and highlight the About button initially
         replaceFragment(AboutFragment())
         highlightSelectedButton(aboutButton)
 
@@ -215,11 +218,11 @@ class ObituaryFragment : Fragment() {
                             requireActivity().runOnUiThread {
                                 // Update the obitImage UI here
                                 fetchedObituary?.let {
+                                    sharedViewModel.obituaryId.value = it.OBITUARYID
                                     val obitImage = view?.findViewById<ImageView>(R.id.obituary_image)
                                     val obitName = view?.findViewById<TextView>(R.id.tvObitName)
                                     val dateBirth = view?.findViewById<TextView>(R.id.tvDateBirth)
                                     val dateDeath = view?.findViewById<TextView>(R.id.tvDateDeath)
-                                    val biography = view?.findViewById<TextView>(R.id.tvBio)
                                     val age = view?.findViewById<TextView>(R.id.tvAge)
 
                                     if (it.OBITUARYPHOTO.isNotEmpty()) {
@@ -248,15 +251,31 @@ class ObituaryFragment : Fragment() {
                                     obitName?.text = it.OBITUARYNAME
                                     dateBirth?.text = formattedDate ?: ""
                                     dateDeath?.text = formattedDate2 ?: ""
-                                    biography?.text = it.BIOGRAPHY
+                                    if (date != null && date2 != null) {
+                                        val birthCalendar = Calendar.getInstance().apply { time =
+                                            date }
+                                        val deathCalendar = Calendar.getInstance().apply { time =
+                                            date2 }
 
-                                    /*age?.text = it.AGE*/
+                                        var ageValue = deathCalendar.get(Calendar.YEAR) -
+                                                birthCalendar.get(Calendar.YEAR)
+                                        if (deathCalendar.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+                                            ageValue--
+                                        }
+
+                                        val age = view?.findViewById<TextView>(R.id.tvAge)
+                                        age?.text = "$ageValue years old"
+                                    }
                                 }
 
                                 // Update vflower and vcandle UI here
                                 fetchedObitCust?.let {
-                                    val vflower = view?.findViewById<Button>(R.id.btnFlower)
-                                    val vcandle = view?.findViewById<Button>(R.id.btnCandle)
+                                    val vflower = view?.findViewById<ImageView>(R.id.imgFlower)
+                                    val vcandle = view?.findViewById<ImageView>(R.id.imgCandle)
+
+                                    vflower?.setImageResource(R.drawable.default_flower_icon)
+                                    vcandle?.setImageResource(R.drawable.default_candle_icon)
+
                                     val obitImage = view?.findViewById<ImageView>(R.id
                                         .obituary_image)
                                     val musicLabel = view?.findViewById<TextView>(R.id.musicName)
@@ -420,7 +439,6 @@ class ObituaryFragment : Fragment() {
     }
 
     private fun loadImage(resourceName: String?, imageView: ImageView, resourceMap: Map<String, Int>, defaultResource: Int) {
-        // Set the actual image resource (e.g., the photo inside the frame)
         val resourceId = resourceMap[resourceName] ?: defaultResource
         imageView.setImageResource(resourceId)
     }

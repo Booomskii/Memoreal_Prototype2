@@ -201,6 +201,15 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="obit">Obituary</string>
+    <!--Memoreal Profile Section-->
+    <string name="myProfile">My Profile</string>
+    <string name="age">Age</string>
+    <string name="editProfile">Edit Profile</string>
+    <string name="save">Save</string>
+    <!--Memoreal Explore Section-->
+    <string name="explore">Explore</string>
+    <string name="searchObit">Search Obituaries</string>
+    <!--Memoreal Obituary Page-->
     <string name="obitHeader">In Loving Memory Of&#160;&#160;</string>
     <string name="bio">Biography:</string>
     <string name="passed">Passed:</string>
@@ -212,15 +221,16 @@
     <string name="lightCandle">Light a Candle</string>
     <string name="offerFlower">Offer a Flower</string>
     <string name="makeDonation">Make a Donation</string>
-    <!--Memoreal Profile Section-->
-    <string name="myProfile">My Profile</string>
-    <string name="age">Age</string>
-    <string name="editProfile">Edit Profile</string>
-    <string name="save">Save</string>
-    <!--Memoreal Explore Section-->
-    <string name="explore">Explore</string>
-    <string name="searchObit">Search Obituaries</string>
-
+    <string name="keyLifeEvents">Key Life Events:</string>
+    <string name="quote">Favorite Quote:</string>
+    <string name="funDateTime">Funeral Date and Time:</string>
+    <string name="funLocation">Funeral Location:</string>
+    <string name="funInfo">Funeral Additional Information:</string>
+    <string name="familyName">Member Name</string>
+    <string name="familyRelationship">Relationship</string>
+    <string name="photos">Photos:</string>
+    <string name="videos">Videos:</string>
+    <string name="aiVids">AI Generated Videos:</string>
 
     <!--Placeholders-->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -22,4 +22,6 @@
     <color name="yellow">#F7EA5F</color>
     <!--My Obituaries Colors-->
     <color name="red">#FF0000</color>
+    <!--Obituary Colors-->
+    <color name="pinkRed">#FE2C54</color>
 </resources>

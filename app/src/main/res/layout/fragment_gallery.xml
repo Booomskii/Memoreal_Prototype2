@@ -1,14 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="8dp"
+    android:orientation="vertical"
     tools:context=".GalleryFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:text="@string/photos"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp" />
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/photoContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/videos"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp" />
+
+    <LinearLayout
+        android:id="@+id/videoContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/aiVids"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
+        android:textStyle="bold"
+        android:padding="8dp" />
+
+    <LinearLayout
+        android:id="@+id/aiVideoContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+</LinearLayout>
