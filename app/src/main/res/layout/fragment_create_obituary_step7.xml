@@ -49,7 +49,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="340dp"
-            android:layout_height="500dp"
+            android:layout_height="600dp"
             android:layout_marginTop="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -98,7 +98,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.11" />
+                app:layout_constraintVertical_bias="0.090" />
 
             <Spinner
                 android:id="@+id/spinnerPicFrame"
@@ -116,7 +116,7 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.100" />
+                app:layout_constraintVertical_bias="0.080" />
 
             <TextView
                 android:layout_width="150dp"
@@ -128,7 +128,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.210 " />
+                app:layout_constraintVertical_bias="0.165 " />
 
             <Spinner
                 android:id="@+id/spinnerBGMusic"
@@ -145,7 +145,7 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.200" />
+                app:layout_constraintVertical_bias="0.160" />
 
             <TextView
                 android:layout_width="150dp"
@@ -158,7 +158,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.321" />
+                app:layout_constraintVertical_bias="0.230" />
 
             <TextView
                 android:layout_width="150dp"
@@ -170,7 +170,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.378" />
+                app:layout_constraintVertical_bias="0.285" />
 
             <Spinner
                 android:id="@+id/spinnerVFlowers"
@@ -188,7 +188,7 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.373" />
+                app:layout_constraintVertical_bias="0.280" />
 
             <TextView
                 android:layout_width="150dp"
@@ -200,7 +200,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.474" />
+                app:layout_constraintVertical_bias="0.360" />
 
             <Spinner
                 android:id="@+id/spinnerVCandles"
@@ -218,7 +218,7 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.473" />
+                app:layout_constraintVertical_bias="0.360" />
 
             <TextView
                 android:layout_width="150dp"
@@ -231,7 +231,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.59" />
+                app:layout_constraintVertical_bias="0.430" />
 
             <EditText
                 android:id="@+id/etFavQuote"
@@ -250,7 +250,7 @@
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.658" />
+                app:layout_constraintVertical_bias="0.480" />
 
             <TextView
                 android:layout_width="150dp"
@@ -262,7 +262,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.765" />
+                app:layout_constraintVertical_bias="0.565" />
 
             <Button
                 android:id="@+id/btnUploadAIItem"
@@ -274,10 +274,10 @@
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.954"
+                app:layout_constraintHorizontal_bias="0.83"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.763" />
+                app:layout_constraintVertical_bias="0.565" />
 
             <TextView
                 android:layout_width="150dp"
@@ -289,7 +289,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.655" />
+                app:layout_constraintVertical_bias="0.485" />
 
             <Button
                 android:id="@+id/btnPrev"
@@ -321,6 +321,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.929" />
 
+            <LinearLayout
+                android:id="@+id/aiVideoContainerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.628" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

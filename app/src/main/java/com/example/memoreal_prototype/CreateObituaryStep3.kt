@@ -104,6 +104,7 @@ class CreateObituaryStep3 : Fragment() {
             pickImageLauncher.launch("image/*")
         }
 
+        // Updated DatePickerDialog for Date of Birth EditText
         dateBirthET.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = dateBirthET.compoundDrawables[2]
@@ -113,7 +114,9 @@ class CreateObituaryStep3 : Fragment() {
                         val datePickerDialog = DatePickerDialog(
                             requireContext(),
                             { _, year, month, dayOfMonth ->
-                                dateBirthET.setText(String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year))
+                                // Format the selected date as yyyy-MM-dd for MSSQL compatibility
+                                val formattedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                                dateBirthET.setText(formattedDate)
                             },
                             calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
                         )
@@ -126,6 +129,7 @@ class CreateObituaryStep3 : Fragment() {
             false
         }
 
+        // Updated DatePickerDialog for Date of Passing EditText
         datePassingET.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = datePassingET.compoundDrawables[2]
@@ -135,7 +139,9 @@ class CreateObituaryStep3 : Fragment() {
                         val datePickerDialog = DatePickerDialog(
                             requireContext(),
                             { _, year, month, dayOfMonth ->
-                                datePassingET.setText(String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year))
+                                // Format the selected date as yyyy-MM-dd for MSSQL compatibility
+                                val formattedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                                datePassingET.setText(formattedDate)
                             },
                             calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
                         )
@@ -216,11 +222,13 @@ class CreateObituaryStep3 : Fragment() {
         }
     }
 
-    fun parseDate(dateStr: String, fieldName: String): Date? {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    private fun parseDate(dateStr: String, fieldName: String): Date? {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return if (dateStr.isNotEmpty()) {
             try {
-                dateFormat.parse(dateStr)
+                val date = dateFormat.parse(dateStr)
+                Log.d("CreateObituaryStep3", "$fieldName parsed successfully: $date")
+                date
             } catch (e: ParseException) {
                 e.printStackTrace()
                 Toast.makeText(requireContext(), "Invalid $fieldName format", Toast.LENGTH_SHORT).show()
@@ -231,6 +239,7 @@ class CreateObituaryStep3 : Fragment() {
             null
         }
     }
+
 
     private fun dateValidator(dateBirth: Date, datePassing: Date): Boolean {
         return !dateBirth.after(Date()) && !datePassing.before(dateBirth)

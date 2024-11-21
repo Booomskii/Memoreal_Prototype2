@@ -1,23 +1,20 @@
 package com.example.memoreal_prototype
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -28,6 +25,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
@@ -35,8 +33,10 @@ import java.io.IOException
 class CreateObituaryStep7 : Fragment() {
 
     val client = UserSession.client
+    val baseUrl = UserSession.baseUrl
     val url = UserSession.d_idUrl
     val authorization = UserSession.authorization
+    private lateinit var aiVideoContainerLayout : LinearLayout
 
     private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
@@ -258,43 +258,18 @@ class CreateObituaryStep7 : Fragment() {
                 .commit()
         }
 
-        setSpinnerTextColor(backgroundSpinner)
-        setSpinnerTextColor(frameSpinner)
         setSpinnerTextColor(bgMusicSpinner)
         setSpinnerTextColor(vflowerSpinner)
         setSpinnerTextColor(vcandleSpinner)
 
-        return view
-    }
-
-    private fun sendGenerateVideoRequest(prompt: String, voiceId: String, sourceUrl: String) {
-        // Create JSON object with the request body data
-        val json = JSONObject().apply {
-            put("prompt", prompt)
-            put("voiceId", voiceId)
-            put("sourceUrl", sourceUrl)
-        }
-
-        // Define the media type
-        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
-        val body: RequestBody = json.toString().toRequestBody(mediaType)
-
-        // Create the request
-        val request = Request.Builder()
-            .url(url) // Replace with your Node.js server endpoint
-            .post(body)
-            .addHeader("Authorization", authorization)
-            .build()
-
-        // Execute the request
-        client.newCall(request).execute().use { response: Response ->
-            if (!response.isSuccessful) {
-                throw IOException("Unexpected code $response")
+        // Retrieve generated video and add to LinearLayout container when SharedViewModel videoId is updated
+        sharedViewModel.videoId.observe(viewLifecycleOwner) { videoId ->
+            if (videoId != null) {
+                retrieveGeneratedVideo(videoId)
             }
-
-            // Handle the response
-            println(response.body?.string())
         }
+
+        return view
     }
 
     private fun setSpinnerTextColor(spinner: Spinner) {
@@ -307,6 +282,147 @@ class CreateObituaryStep7 : Fragment() {
                 // No action needed here
             }
         }
+    }
+
+    private fun retrieveGeneratedVideo(videoId: String) {
+        val handler = Handler(Looper.getMainLooper())
+        val apiUrl = "$baseUrl" + "api/retrieveVideo/$videoId"
+
+        fun pollVideoStatus() {
+            Log.d("VideoRetrieve", "Requesting URL: $apiUrl")
+
+            val request = Request.Builder()
+                .url(apiUrl)
+                .get()
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("VideoRetrieve", "Failed to retrieve video: ${e.message}")
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(requireContext(), "Failed to retrieve video", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    // Read the response body while still in the background thread
+                    val responseString = response.body?.string()
+
+                    handler.postDelayed({
+                        if (response.isSuccessful) {
+                            responseString?.let {
+                                try {
+                                    val jsonObject = JSONObject(it)
+
+                                    // Check the status field if it exists
+                                    val status = jsonObject.optString("status", "unknown")
+
+                                    if (status == "done" && jsonObject.has("result_url")) {
+                                        // Video rendering is complete, retrieve result URL
+                                        val resultUrl = jsonObject.getString("result_url")
+                                        Log.d("VideoRetrieve", "Result URL: $resultUrl")
+
+                                        requireActivity().runOnUiThread {
+                                            addVideoThumbnail(resultUrl)
+                                            downloadAndSaveVideo(resultUrl)
+                                            Toast.makeText(requireContext(), "Video retrieved successfully", Toast.LENGTH_SHORT).show()
+                                        }
+                                    } else if (jsonObject.has("pending_url")) {
+                                        // Video is still processing, continue polling
+                                        Log.d("VideoRetrieve", "Video still pending, polling again in 5 seconds...")
+                                        handler.postDelayed({ pollVideoStatus() }, 5000)
+                                    } else {
+                                        // Unexpected response, log an error
+                                        Log.e("VideoRetrieve", "Unexpected response: No valid URL or status found.")
+                                        requireActivity().runOnUiThread {
+                                            Toast.makeText(requireContext(), "Unexpected response format, unable to proceed.", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                } catch (e: JSONException) {
+                                    Log.e("VideoRetrieve", "Failed to parse JSON: ${e.message}")
+                                    requireActivity().runOnUiThread {
+                                        Toast.makeText(requireContext(), "Unexpected response format", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        } else {
+                            Log.e("VideoRetrieve", "Retrieve failed with response code: ${response.code}, response body: $responseString")
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(requireContext(), "Retrieve failed with response code: ${response.code}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }, 5000) // Delay for 5 seconds before processing the response
+                }
+            })
+        }
+
+        // Start polling the status of the video
+        pollVideoStatus()
+    }
+
+    private fun addVideoThumbnail(resultUrl: String) {
+        aiVideoContainerLayout = view?.findViewById(R.id.aiVideoContainerLayout)!!
+
+        // Inflate the custom thumbnail layout
+        val thumbnailLayout = LayoutInflater.from(requireContext()).inflate(R.layout.layout_video_thumbnail, aiVideoContainerLayout, false)
+
+        val thumbnailImageView = thumbnailLayout.findViewById<ImageView>(R.id.thumbnail_image)
+        val playIconImageView = thumbnailLayout.findViewById<ImageView>(R.id.play_icon)
+
+        // Load the thumbnail using Glide
+        Glide.with(this)
+            .load(resultUrl) // Load thumbnail from the video URL
+            .placeholder(R.drawable.baseline_photo_24) // Replace with your placeholder image
+            .into(thumbnailImageView)
+
+        // Add the thumbnail layout to the LinearLayout container
+        aiVideoContainerLayout.addView(thumbnailLayout)
+
+        // Set OnClickListener for the thumbnail to preview the video
+        thumbnailLayout.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resultUrl))
+            intent.setDataAndType(Uri.parse(resultUrl), "video/*") // Set the MIME type to video
+            startActivity(intent)
+        }
+    }
+
+    private fun downloadAndSaveVideo(videoUrl: String) {
+        val request = Request.Builder().url(videoUrl).build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("VideoDownload", "Failed to download video: ${e.message}")
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireContext(), "Failed to download video", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    response.body?.let { body ->
+                        try {
+                            val file = File(requireContext().filesDir, "generated_video_${System.currentTimeMillis()}.mp4")
+                            val outputStream = file.outputStream()
+                            outputStream.use { body.byteStream().copyTo(it) }
+
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(requireContext(), "Video saved successfully", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: IOException) {
+                            Log.e("VideoDownload", "Failed to save video: ${e.message}")
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(requireContext(), "Failed to save video", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    Log.e("VideoDownload", "Download failed with response code: ${response.code}")
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(requireContext(), "Download failed with response code: ${response.code}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
     }
 
     private class ImageSpinnerAdapter(
@@ -399,3 +515,4 @@ class CreateObituaryStep7 : Fragment() {
         }
     }
 }
+

@@ -96,8 +96,8 @@ class CreateObituaryStep8 : Fragment() {
         var candleName = ""
 
         Log.d("Obituary", "Obituary Photo: ${sharedViewModel.image.value ?: "default_image_path"}")
-        Log.d("Obituary", "Date of Birth: ${sharedViewModel.dateBirth.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"}")
-        Log.d("Obituary", "Date of Death: ${sharedViewModel.datePassing.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"}")
+        Log.d("Obituary", "Date of Birth: ${sharedViewModel.dateBirth.value ?: "1900-01-01"}")
+        Log.d("Obituary", "Date of Death: ${sharedViewModel.datePassing.value ?: "1900-01-01"}")
         Log.d("Obituary", "Obituary Name: ${sharedViewModel.fullName.value ?: "Unknown Name"}")
         Log.d("Obituary", "Biography: ${sharedViewModel.biography.value ?: "No biography available."}")
         Log.d("Obituary", "Obituary Text: ${sharedViewModel.obituaryText.value ?: "No obituary text provided."}")

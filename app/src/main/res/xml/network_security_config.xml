@@ -21,4 +21,5 @@
         <!--<domain includeSubdomains="true">192.168.161.101</domain>
         <domain includeSubdomains="true">192.168.161.124</domain>-->
     </domain-config>
+    <base-config cleartextTrafficPermitted="true" />
 </network-security-config>

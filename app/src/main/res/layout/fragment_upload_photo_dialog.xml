@@ -1,30 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/baseline_person_24" />
-
-    <Button
-        android:id="@+id/btnSelectImage"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Image"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp" />
+        android:backgroundTint="@color/white"
+        android:padding="20dp">
 
-    <Button
-        android:id="@+id/btnUploadImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Upload Image"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_below="@id/btnClose"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/baseline_person_24" />
+
+        <Button
+            android:id="@+id/btnSelectImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imageView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="14dp"
+            android:text="Select Image" />
+
+        <TextView
+            android:id="@+id/tvPrompt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnSelectImage"
+            android:layout_marginTop="16dp"
+            android:text="Enter the prompt for the video generation:" />
+
+        <EditText
+            android:id="@+id/etPrompt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPrompt"
+            android:layout_marginTop="8dp"
+            android:hint="Enter prompt here" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupVoice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/etPrompt"
+            android:layout_marginTop="16dp">
+
+            <RadioButton
+                android:id="@+id/radioMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male Voice" />
+
+            <RadioButton
+                android:id="@+id/radioFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female Voice"
+                android:layout_marginStart="16dp" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btnGenerateVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generate Video"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/radioGroupVoice"
+            android:layout_marginTop="16dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/btnGenerateVideo"
+            android:layout_marginTop="10dp"/>
+    </RelativeLayout>
+</ScrollView>
