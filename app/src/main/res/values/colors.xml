@@ -24,4 +24,6 @@
     <color name="red">#FF0000</color>
     <!--Obituary Colors-->
     <color name="pinkRed">#FE2C54</color>
+    <!--Add Family Colors-->
+    <color name="whiteyyelow">#EDE8DC</color>
 </resources>

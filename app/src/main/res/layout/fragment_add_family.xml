@@ -3,8 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:backgroundTint="@color/white">
+    android:padding="30dp"
+    android:background="@color/white"
+    android:clipToPadding="false">
+
 
     <ImageView
         android:id="@+id/btnClose"
@@ -38,10 +40,11 @@
         android:id="@+id/btnAddFamilyMember"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Family Member"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/memo_light_orange"/>
+        android:backgroundTint="@color/memo_light_orange"
+        android:text="Add Family Member"
+        android:textColor="@color/black" />
 
     <ScrollView
         android:layout_width="match_parent"
