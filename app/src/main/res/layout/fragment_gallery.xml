@@ -16,11 +16,13 @@
         android:textStyle="bold"
         android:padding="8dp" />
 
-    <LinearLayout
+    <GridLayout
         android:id="@+id/photoContainerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:columnCount="4"
+        android:orientation="horizontal"
+        android:padding="8dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -31,11 +33,13 @@
         android:textStyle="bold"
         android:padding="8dp" />
 
-    <LinearLayout
+    <GridLayout
         android:id="@+id/videoContainerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:columnCount="4"
+        android:orientation="horizontal"
+        android:padding="8dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -46,10 +50,12 @@
         android:textStyle="bold"
         android:padding="8dp" />
 
-    <LinearLayout
+    <GridLayout
         android:id="@+id/aiVideoContainerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:columnCount="4"
+        android:orientation="horizontal"
+        android:padding="8dp"/>
 
 </LinearLayout>

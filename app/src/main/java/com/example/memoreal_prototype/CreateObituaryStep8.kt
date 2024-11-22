@@ -269,6 +269,10 @@ class CreateObituaryStep8 : Fragment() {
                     }
 
                     // Convert MutableList to ArrayList and update the sharedViewModel mediaList with the new internal storage paths
+                    val aiVideoUrls = sharedViewModel.aiVideoUrl.value ?: ArrayList()
+                    updatedMediaList.addAll(aiVideoUrls)
+
+                    // Update sharedViewModel mediaList
                     sharedViewModel.mediaList.value = ArrayList(updatedMediaList)
 
                     // Proceed with the rest of the operations
@@ -505,15 +509,14 @@ class CreateObituaryStep8 : Fragment() {
                         val mediaFile = File(savedFilePath)
                         val fileUri = Uri.fromFile(mediaFile)
 
-                        // First, try using the ContentResolver to get the MIME type
                         var mimeType = requireContext().contentResolver.getType(fileUri)
                         if (mimeType == null) {
-                            // If ContentResolver fails, use the file extension
                             mimeType = getMimeTypeFromFilePath(savedFilePath)
                         }
 
                         mimeType?.let {
                             val fileType = when {
+                                savedFilePath.contains("ai_video") -> "AI Video" // Set media type as AI Video if it matches the file name pattern
                                 mimeType.startsWith("image/") -> "Image"
                                 mimeType.startsWith("video/") -> "Video"
                                 else -> ""
@@ -521,11 +524,11 @@ class CreateObituaryStep8 : Fragment() {
 
                             if (fileType.isNotEmpty()) {
                                 val galleryMedia = com.example.memoreal_prototype.models.GalleryMedia(
-                                    0,  // Gallery Media ID (auto-incremented)
-                                    createdGalleryId,  // Use the newly created GALLERYID
-                                    fileType,  // File type (Image or Video)
-                                    savedFilePath,  // File name or URI (now internal storage path)
-                                    ""  // This will be handled by the server (upload date)
+                                    0,
+                                    createdGalleryId,
+                                    fileType,
+                                    savedFilePath,
+                                    ""
                                 )
                                 registerMedia(galleryMedia)
                             } else {
@@ -533,7 +536,6 @@ class CreateObituaryStep8 : Fragment() {
                             }
                         } ?: Log.e("MediaType", "Unable to determine MIME type for: $savedFilePath")
                     }
-                    // Step 4: Publish the obituary after gallery and media are added
                     publishObituary {
                         sharedViewModel.clearData()
                     }
@@ -629,8 +631,8 @@ class CreateObituaryStep8 : Fragment() {
 
         // Set up and create the obituary
         val obituaryPhoto = sharedViewModel.image.value ?: "default_image_path"
-        val dateOfBirth = sharedViewModel.dateBirth.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
-        val dateOfDeath = sharedViewModel.datePassing.value?.let { formatDateToMSSQL(it) } ?: "1900-01-01"
+        val dateOfBirth = sharedViewModel.dateBirth.value ?: "1900-01-01"
+        val dateOfDeath = sharedViewModel.datePassing.value ?: "1900-01-01"
         val obituaryName = sharedViewModel.fullName.value ?: "Unknown Name"
         val biography = sharedViewModel.biography.value ?: "No biography available."
         val obituaryText = sharedViewModel.obituaryText.value ?: "No obituary text provided."

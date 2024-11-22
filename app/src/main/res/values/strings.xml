@@ -231,6 +231,7 @@
     <string name="photos">Photos:</string>
     <string name="videos">Videos:</string>
     <string name="aiVids">AI Generated Videos:</string>
+    <string name="obitText">Obituary Text:</string>
 
     <!--Placeholders-->
     <string name="hello_blank_fragment">Hello blank fragment</string>

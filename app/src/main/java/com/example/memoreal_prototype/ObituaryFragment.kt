@@ -223,7 +223,7 @@ class ObituaryFragment : Fragment() {
                                     val obitName = view?.findViewById<TextView>(R.id.tvObitName)
                                     val dateBirth = view?.findViewById<TextView>(R.id.tvDateBirth)
                                     val dateDeath = view?.findViewById<TextView>(R.id.tvDateDeath)
-                                    val age = view?.findViewById<TextView>(R.id.tvAge)
+                                    val obitText = view?.findViewById<TextView>(R.id.tvObitText)
 
                                     if (it.OBITUARYPHOTO.isNotEmpty()) {
                                         val bitmap = loadImageFromInternalStorage(it.OBITUARYPHOTO)
@@ -251,6 +251,8 @@ class ObituaryFragment : Fragment() {
                                     obitName?.text = it.OBITUARYNAME
                                     dateBirth?.text = formattedDate ?: ""
                                     dateDeath?.text = formattedDate2 ?: ""
+                                    obitText?.text = it.OBITUARYTEXT
+
                                     if (date != null && date2 != null) {
                                         val birthCalendar = Calendar.getInstance().apply { time =
                                             date }
@@ -276,8 +278,7 @@ class ObituaryFragment : Fragment() {
                                     vflower?.setImageResource(R.drawable.default_flower_icon)
                                     vcandle?.setImageResource(R.drawable.default_candle_icon)
 
-                                    val obitImage = view?.findViewById<ImageView>(R.id
-                                        .obituary_image)
+                                    val obitImage = view?.findViewById<ImageView>(R.id.obituary_image)
                                     val musicLabel = view?.findViewById<TextView>(R.id.musicName)
                                     musicLabel?.isSelected = true
                                     musicLabel?.text = it.BGMUSIC

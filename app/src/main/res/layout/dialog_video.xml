@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Close Button -->
+    <ImageButton
+        android:id="@+id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+    <!-- Video View -->
+    <VideoView
+        android:id="@+id/dialogVideoView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/closeButton"
+        android:layout_marginTop="16dp"
+        android:adjustViewBounds="true" />
+
+    <!-- SeekBar for Video -->
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialogVideoView"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <!-- Stop Button -->
+    <ImageButton
+        android:id="@+id/stopButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_below="@id/seekBar"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="50dp"
+        android:padding="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_stop_circle_24"
+        android:background="@color/white"/>
+
+    <!-- Play/Pause Button -->
+    <ImageButton
+        android:id="@+id/playPauseButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_toEndOf="@id/stopButton"
+        android:layout_below="@id/seekBar"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="50dp"
+        android:padding="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_pause_circle_24"
+        android:background="@color/white"/>
+
+</RelativeLayout>

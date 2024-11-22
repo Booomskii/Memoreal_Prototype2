@@ -39,6 +39,7 @@ class ObituarySharedViewModel: ViewModel() {
     val imageUri = MutableLiveData<String?>()
     val imgurImageUrl = MutableLiveData<String?>()
     val videoId = MutableLiveData<String?>()
+    val aiVideoUrl = MutableLiveData<ArrayList<String>>(ArrayList())
     /*Create Obituary Step 8*/
 
     /*Obituary*/
@@ -76,5 +77,6 @@ class ObituarySharedViewModel: ViewModel() {
         virtualCandle.postValue(null)
         virtualFlower.postValue(null)
         favQuote.postValue(null)
+        videoId.postValue(null)
     }
 }

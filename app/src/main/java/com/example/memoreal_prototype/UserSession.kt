@@ -18,10 +18,10 @@ abstract class UserSession: AppCompatActivity() {
 
     companion object {
         val client = OkHttpClient()
-        var baseUrl = "http://192.168.1.9:4848/"
-        /*var baseUrl = "http://192.168.120.252:4848/"*/
+        /*var baseUrl = "http://192.168.1.9:4848/"*/
+        var baseUrl = "http://192.168.254.111:4848/"
         val d_idUrl = "https://api.d-id.com/talks"
-        val apiKey = "Ym9vbXNraWkxcGVnQGdtYWlsLmNvbQ:xGOxNGNMuqiheQse3iC4B"
+        val apiKey = "amVjamVjanI4OUBnbWFpbC5jb20:FeDUBSYXek7nUj0stgNgr"
         val imgurClientId = "7699629ad3600c5"
         val imgurAccessToken = "e9bf673e90400cbfe7066a282f1f4fa166cc1e06"
         val imgurRefreshToken = "67fa196d39b08dab558bc8e77efcb636758cd46f"
@@ -108,5 +108,4 @@ abstract class UserSession: AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
 }

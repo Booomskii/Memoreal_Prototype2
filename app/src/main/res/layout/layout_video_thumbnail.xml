@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/baseline_photo_24" />
+        android:src="@drawable/baseline_photo_24"
+        android:visibility="invisible"/>
 
     <ImageView
         android:id="@+id/play_icon"
@@ -17,6 +18,15 @@
         android:layout_height="64dp"
         android:layout_centerInParent="true"
         android:background="@drawable/baseline_play_circle_24"
-        android:backgroundTint="@color/white"/>
+        android:backgroundTint="@color/white"
+        android:visibility="invisible"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="visible" />
 
 </RelativeLayout>
