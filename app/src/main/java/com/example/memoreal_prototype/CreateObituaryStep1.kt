@@ -53,7 +53,6 @@ class CreateObituaryStep1 : Fragment() {
         val button4 = view.findViewById<Button>(R.id.btnPck4)
         val videoView = view.findViewById<VideoView>(R.id.aiSample)
 
-        slideshowImageView = view.findViewById(R.id.slideshowImageView)
         previousButton = view.findViewById(R.id.previousButton)
         nextButton = view.findViewById(R.id.nextButton)
 
@@ -107,25 +106,6 @@ class CreateObituaryStep1 : Fragment() {
             videoView.start()
         }
 
-        previousButton.setOnClickListener {
-            if (currentIndex > 0) {
-                currentIndex--
-                slideshowImageView.setImageResource(imageResIds[currentIndex])
-                updateButtonVisibility()
-            }
-        }
-
-        nextButton.setOnClickListener {
-            if (currentIndex < imageResIds.size - 1) {
-                currentIndex++
-                slideshowImageView.setImageResource(imageResIds[currentIndex])
-                updateButtonVisibility()
-            }
-        }
-
-        // Set initial button visibility
-        updateButtonVisibility()
-
         return view
     }
 
@@ -154,22 +134,5 @@ class CreateObituaryStep1 : Fragment() {
         sharedViewModel.memorialCreationFee.value = true
         sharedViewModel.selectedPackage.value = selectedPackage
         sharedViewModel.selectedButtonId.value = clickedButton.id
-    }
-
-    private fun updateButtonVisibility() {
-        when (currentIndex) {
-            0 -> {
-                previousButton.visibility = View.GONE
-                nextButton.visibility = View.VISIBLE
-            }
-            imageResIds.size - 1 -> {
-                previousButton.visibility = View.VISIBLE
-                nextButton.visibility = View.GONE
-            }
-            else -> {
-                previousButton.visibility = View.VISIBLE
-                nextButton.visibility = View.VISIBLE
-            }
-        }
     }
 }
