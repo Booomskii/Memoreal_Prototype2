@@ -53,9 +53,6 @@ class CreateObituaryStep1 : Fragment() {
         val button4 = view.findViewById<Button>(R.id.btnPck4)
         val videoView = view.findViewById<VideoView>(R.id.aiSample)
 
-        previousButton = view.findViewById(R.id.previousButton)
-        nextButton = view.findViewById(R.id.nextButton)
-
         val buttons = listOf(button1, button2, button3, button4)
 
         sharedViewModel.selectedButtonId.observe(viewLifecycleOwner) { selectedId ->

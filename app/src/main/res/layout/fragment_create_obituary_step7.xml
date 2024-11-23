@@ -243,6 +243,7 @@
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:scrollbars="horizontal"
+                android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"
                 app:layout_constraintBottom_toBottomOf="parent"

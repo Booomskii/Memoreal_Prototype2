@@ -95,7 +95,7 @@
                     android:ems="10"
                     android:gravity="top"
                     android:hint="@string/keyEvents"
-                    android:inputType="textEmailAddress"
+                    android:inputType="textMultiLine"
                     android:textColor="@color/black"
                     android:textColorHint="@color/grey"
                     android:textSize="14sp"
