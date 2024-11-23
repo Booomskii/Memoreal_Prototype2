@@ -10,6 +10,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import android.net.Uri
+import android.widget.ImageButton
+import android.widget.VideoView
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -24,6 +27,17 @@ class CreateObituaryStep1 : Fragment() {
     private var selectedButton: Button? = null
     private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
+    private lateinit var slideshowImageView: ImageView
+    private lateinit var previousButton: ImageButton
+    private lateinit var nextButton: ImageButton
+
+    private val imageResIds = listOf(
+        R.drawable.slide_image_1,
+        R.drawable.slide_image_2,
+        R.drawable.slide_image_3
+    )
+    private var currentIndex = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +51,11 @@ class CreateObituaryStep1 : Fragment() {
         val button2 = view.findViewById<Button>(R.id.btnPck2)
         val button3 = view.findViewById<Button>(R.id.btnPck3)
         val button4 = view.findViewById<Button>(R.id.btnPck4)
+        val videoView = view.findViewById<VideoView>(R.id.aiSample)
+
+        slideshowImageView = view.findViewById(R.id.slideshowImageView)
+        previousButton = view.findViewById(R.id.previousButton)
+        nextButton = view.findViewById(R.id.nextButton)
 
         val buttons = listOf(button1, button2, button3, button4)
 
@@ -62,7 +81,6 @@ class CreateObituaryStep1 : Fragment() {
             }
         }
 
-
         backButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.frame_layout, HomeFragment())
@@ -79,6 +97,34 @@ class CreateObituaryStep1 : Fragment() {
         }
 
         (activity as HomePageActivity).showBottomNavigation()
+
+        // Set up video view to play the video
+        val videoUri = Uri.parse("android.resource://${requireActivity().packageName}/raw/ai_sample")
+        videoView.setVideoURI(videoUri)
+        videoView.setOnPreparedListener { mediaPlayer ->
+            mediaPlayer.isLooping = true
+            mediaPlayer.setVolume(0f, 0f) // Mute the video
+            videoView.start()
+        }
+
+        previousButton.setOnClickListener {
+            if (currentIndex > 0) {
+                currentIndex--
+                slideshowImageView.setImageResource(imageResIds[currentIndex])
+                updateButtonVisibility()
+            }
+        }
+
+        nextButton.setOnClickListener {
+            if (currentIndex < imageResIds.size - 1) {
+                currentIndex++
+                slideshowImageView.setImageResource(imageResIds[currentIndex])
+                updateButtonVisibility()
+            }
+        }
+
+        // Set initial button visibility
+        updateButtonVisibility()
 
         return view
     }
@@ -108,5 +154,22 @@ class CreateObituaryStep1 : Fragment() {
         sharedViewModel.memorialCreationFee.value = true
         sharedViewModel.selectedPackage.value = selectedPackage
         sharedViewModel.selectedButtonId.value = clickedButton.id
+    }
+
+    private fun updateButtonVisibility() {
+        when (currentIndex) {
+            0 -> {
+                previousButton.visibility = View.GONE
+                nextButton.visibility = View.VISIBLE
+            }
+            imageResIds.size - 1 -> {
+                previousButton.visibility = View.VISIBLE
+                nextButton.visibility = View.GONE
+            }
+            else -> {
+                previousButton.visibility = View.VISIBLE
+                nextButton.visibility = View.VISIBLE
+            }
+        }
     }
 }

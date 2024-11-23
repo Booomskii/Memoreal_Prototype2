@@ -20,41 +20,61 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.453" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.050" />
 
-    <EditText
-        android:id="@+id/editTextPword"
-        android:layout_width="220dp"
-        android:layout_height="40dp"
-        android:background="@drawable/edittext_border1"
-        android:ems="10"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.612" />
-
-    <EditText
-        android:id="@+id/editTextUname"
-        android:layout_width="220dp"
-        android:layout_height="40dp"
-        android:background="@drawable/edittext_border1"
-        android:ems="10"
-        android:hint="@string/username"
-        android:inputType="text"
-        android:outlineProvider="none"
-        android:textSize="16sp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameTextInputLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewMemoreal"
-        app:layout_constraintVertical_bias="0.07" />
+        app:layout_constraintVertical_bias="0.0"
+        app:boxStrokeWidth="2dp"
+        app:boxStrokeColor="@color/text_input_border_color"
+        app:boxBackgroundMode="outline">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextUname"
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:hint="@string/username"
+            android:inputType="text"
+            android:textColorHint="@color/hint_color_state"
+            android:textSize="16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordTextInputLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:endIconMode="password_toggle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextInputLayout"
+        app:layout_constraintVertical_bias="0.030"
+        app:boxStrokeWidth="2dp"
+        app:boxStrokeColor="@color/text_input_border_color"
+        app:boxBackgroundMode="outline">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextPword"
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:textColorHint="@color/hint_color_state"
+            android:textSize="16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btnSubmit"
@@ -81,7 +101,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13"
+        app:layout_constraintVertical_bias="0.11"
         app:srcCompat="@drawable/memoreal_logo" />
 
     <TextView

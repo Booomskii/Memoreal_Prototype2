@@ -56,12 +56,7 @@ class MyObituariesFragment : Fragment() {
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
 
-        backButton.setOnClickListener {
-            (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, HomeFragment())
-                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .commit()
-        }
+        backButton.visibility = View.GONE
     }
 
     private fun fetchObituariesByUser() {

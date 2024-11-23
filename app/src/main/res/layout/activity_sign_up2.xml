@@ -34,53 +34,83 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.471">
 
-        <EditText
-            android:id="@+id/editTextMI"
-            android:layout_width="60dp"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_border1"
-            android:ems="10"
-            android:hint="@string/mi"
-            android:inputType="text"
-            android:textSize="16sp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/firstNameTextInputLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.115"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp"
+            app:boxStrokeColor="@color/text_input_border_color">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextFirstName"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="@string/firstName"
+                android:inputType="text"
+                android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/lastNameTextInputLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.34"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp"
+            app:boxStrokeColor="@color/text_input_border_color">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextLastName"
+                android:layout_width="130dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="@string/lastName"
+                android:inputType="text"
+                android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/miTextInputLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.58"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.381" />
+            app:layout_constraintVertical_bias="0.34"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp"
+            app:boxStrokeColor="@color/text_input_border_color">
 
-        <EditText
-            android:id="@+id/editTextFirstName"
-            android:layout_width="200dp"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_border1"
-            android:ems="10"
-            android:hint="@string/firstName"
-            android:inputType="text"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.179" />
-
-        <EditText
-            android:id="@+id/editTextLastName"
-            android:layout_width="130dp"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_border1"
-            android:ems="10"
-            android:hint="@string/lastName"
-            android:inputType="text"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.381" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextMI"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="@string/mi"
+                android:inputType="text"
+                android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/textViewPersonalDetails"
@@ -97,43 +127,64 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.053" />
 
-        <EditText
-            android:id="@+id/editTextDate"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_border1"
-            android:ems="10"
-            android:hint="@string/bdate"
-            android:inputType="date"
-            android:textSize="16sp"
-            android:drawableEnd="@drawable/baseline_calendar_month_24"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dateTextInputLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.582" />
+            app:layout_constraintVertical_bias="0.57"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/baseline_calendar_month_24"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp"
+            app:boxStrokeColor="@color/text_input_border_color">
 
-        <EditText
-            android:id="@+id/editTextNumber"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_border1"
-            android:ems="10"
-            android:hint="@string/contactNum"
-            android:inputType="number"
-            android:textSize="16sp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextDate"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="@string/bdate"
+                android:inputType="date"
+                android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/contactNumberTextInputLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.78" />
+            app:layout_constraintVertical_bias="0.8"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp"
+            app:boxStrokeColor="@color/text_input_border_color">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextNumber"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="@string/contactNum"
+                android:inputType="number"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
             android:id="@+id/imageViewUploadPic"
             android:layout_width="93dp"
-            android:layout_height="104dp"
+            android:layout_height="110dp"
             android:background="@drawable/rounded_corner_button_1"
             android:clickable="true"
             android:focusable="true"
@@ -150,7 +201,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="299dp"
-        android:layout_height="71dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -188,7 +239,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />

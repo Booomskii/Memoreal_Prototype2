@@ -186,16 +186,18 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="30dp"
+            android:layout_height="350dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="100dp"
             android:orientation="vertical"
+            android:paddingBottom="20dp"
+            android:background="@drawable/gradient_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintVertical_bias="1.0">
 
             <TextView
                 android:id="@+id/textView5"
@@ -205,18 +207,19 @@
                 android:gravity="center"
                 android:text="@string/videoAI"
                 android:textColor="@color/memo_orange"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
+                android:fontFamily="@font/poppins_medium"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.491"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintVertical_bias="0.020" />
 
             <TextView
                 android:id="@+id/textView6"
-                android:layout_width="320dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="fill_horizontal"
@@ -224,14 +227,27 @@
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="italic"
+                android:fontFamily="@font/open_sans"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.494"
+                app:layout_constraintHorizontal_bias="0.119"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView5"
-                app:layout_constraintVertical_bias="0.024" />
+                app:layout_constraintVertical_bias="0.13" />
+
+            <VideoView
+                android:id="@+id/aiSample"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.885"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.229" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/packageConstraintLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -240,7 +256,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView6"
-                app:layout_constraintVertical_bias="0.313">
+                app:layout_constraintVertical_bias="1">
 
                 <Button
                     android:id="@+id/btnPck1"
@@ -379,14 +395,13 @@
             android:text="@string/proceed"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.868"
+            app:layout_constraintHorizontal_bias="0.888"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

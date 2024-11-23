@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- State when the input is focused -->
+    <item android:color="@color/border1" android:state_focused="true"/>
+
+    <!-- State when the input is enabled but not focused -->
+    <item android:color="@color/border1" android:state_enabled="true"/>
+
+    <!-- State when the input is disabled -->
+    <item android:color="@color/border1" android:state_enabled="false"/>
+</selector>

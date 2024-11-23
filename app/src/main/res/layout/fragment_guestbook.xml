@@ -1,14 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".GuestbookFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-</FrameLayout>
+        <!-- Container for Guest Name and Message -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/memo_orange"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/editTextGuestName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Guest Name"
+                android:textColor="@color/black"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/editTextMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Message"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:lines="4"
+                android:textColor="@color/black"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/buttonSubmitGuestbook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Submit" />
+        </LinearLayout>
+
+        <!-- RecyclerView for Guests Signed in the Guestbook -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewGuestbook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
+

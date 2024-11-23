@@ -130,6 +130,7 @@
     <string name="addMedia">Add Photos or Videos</string>
     <string name="familyInfo">Family Information</string>
     <string name="mngFamily">Manage Family Members</string>
+    <string name="hintFamily">Family Member\'s Name</string>
     <string name="step5">Step 5 of 8: Funeral Details</string>
     <string name="dateTime">Date and Time</string>
     <string name="location">Location</string>

@@ -1,7 +1,5 @@
 package com.example.memoreal_prototype.models
 
-import org.w3c.dom.Text
-
 data class User(
     val USERID:Int,
     val FIRST_NAME:String? = null,
@@ -86,8 +84,16 @@ data class Payment(
 
 data class Guestbook(
     var GUESTBOOKID:Int,
-    var USERID:Int,
+    var USERID:Int? = null,
     var GUESTNAME:String,
     var MESSAGE:String? = null,
     var POSTINGDATE:String
+)
+
+data class Tribute(
+    var TRIBUTEID:Int,
+    var USERID:Int? = null,
+    var OFFEREDFLOWER:String? = null,
+    var LIGHTEDCANDLE:String? = null,
+    var OFFERINGDATE:String
 )

@@ -1,6 +1,7 @@
 package com.example.memoreal_prototype
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -32,6 +33,8 @@ class AddFamilyDialogFragment : DialogFragment() {
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, relationships)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerRelationship.adapter = adapter
+
+        setSpinnerTextColor(spinnerRelationship)
 
         // Show or hide the custom relationship EditText based on the selected item
         spinnerRelationship.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -117,6 +120,18 @@ class AddFamilyDialogFragment : DialogFragment() {
         layout.addView(removeButton)
 
         return layout
+    }
+
+    private fun setSpinnerTextColor(spinner: Spinner) {
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                (view as? TextView)?.setTextColor(Color.BLACK)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // No action needed here
+            }
+        }
     }
 
     override fun onStart() {

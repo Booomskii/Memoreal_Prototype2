@@ -161,7 +161,53 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="8dp">
+
+                <!-- ImageView for Slideshow -->
+                <ImageView
+                    android:id="@+id/slideshowImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:scaleType="centerCrop"
+                    android:layout_centerInParent="true"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/slide_image_1" />
+
+                <!-- Previous Button -->
+                <ImageButton
+                    android:id="@+id/previousButton"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/baseline_navigate_before_24"
+                    app:tint="@color/memo_orange"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone"
+                    android:padding="8dp" />
+
+                <!-- Next Button -->
+                <ImageButton
+                    android:id="@+id/nextButton"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/baseline_navigate_next_24"
+                    app:tint="@color/memo_orange"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="8dp" />
+
+            </RelativeLayout>
+
         </LinearLayout>
+
     </ScrollView>
 
 </FrameLayout>

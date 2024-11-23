@@ -19,7 +19,8 @@
         android:id="@+id/etFamilyMemberName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Family Member's Name"
+        android:hint="@string/hintFamily"
+        android:textColor="@color/black"
         android:inputType="textPersonName" />
 
     <Spinner

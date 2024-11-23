@@ -64,6 +64,7 @@ dependencies {
     implementation("com.github.yalantis:ucrop:2.2.8")
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
+    implementation("com.google.android.material:material:1.9.0")
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")

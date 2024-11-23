@@ -1,59 +1,107 @@
 package com.example.memoreal_prototype
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [GuestbookFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class GuestbookFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    val client = UserSession.client
+    val baseUrl = UserSession.baseUrl
+
+    private var userId = 0
+    private var tributeId = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_guestbook, container, false)
+        val view = inflater.inflate(R.layout.fragment_guestbook, container, false)
+
+        // Initialize UI elements
+        val editTextGuestName = view.findViewById<EditText>(R.id.editTextGuestName)
+        val editTextMessage = view.findViewById<EditText>(R.id.editTextMessage)
+        val buttonSubmitGuestbook = view.findViewById<Button>(R.id.buttonSubmitGuestbook)
+
+        getUserId()
+        val guestbook = com.example.memoreal_prototype.models.Guestbook(
+            0,
+            userId,
+            editTextGuestName.text.toString(),
+            editTextMessage.text.toString(),
+            ""
+        )
+
+        buttonSubmitGuestbook.setOnClickListener {
+            addGuestbook(guestbook)
+        }
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment GuestbookFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            GuestbookFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun getUserId(){
+        val masterKey = MasterKey.Builder(requireContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        // Initialize EncryptedSharedPreferences
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            requireContext(),
+            "userSession",  // File name
+            masterKey,      // Master key for encryption
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        userId = sharedPreferences.getInt("userId", -1)
+    }
+
+    private fun addGuestbook(guestbook: com.example.memoreal_prototype.models.Guestbook) {
+        val url = baseUrl + "api/addGuestbook"
+
+        val json = JSONObject().apply {
+            put("USERID", guestbook.USERID)
+            put("GUESTNAME", guestbook.GUESTNAME)
+            put("MESSAGE", guestbook.MESSAGE)
+        }.toString()
+
+        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Register Guestbook", "Request failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.d("Register Guestbook", "Guestbook registered successfully")
+                } else {
+                    Log.e("Register Guestbook", "Failed to register guestbook: ${response
+                        .message}")
                 }
             }
+        })
     }
 }
