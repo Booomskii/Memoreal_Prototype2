@@ -164,8 +164,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:paddingBottom="16dp"
                 android:paddingTop="8dp">
 
@@ -173,7 +171,7 @@
                 <ImageView
                     android:id="@+id/slideshowImageView"
                     android:layout_width="match_parent"
-                    android:layout_height="160dp"
+                    android:layout_height="180dp"
                     android:scaleType="centerCrop"
                     android:layout_centerInParent="true"
                     android:adjustViewBounds="true"

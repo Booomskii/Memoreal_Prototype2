@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var uname: String
     val client = UserSession.client
     val baseUrl = UserSession.baseUrl
+    private lateinit var editor: SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,7 +220,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun saveUserId(userId: Int) {
-        val sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().putInt("USER_ID", userId).apply()
     }
 

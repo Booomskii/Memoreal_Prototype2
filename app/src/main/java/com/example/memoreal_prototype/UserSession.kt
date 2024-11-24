@@ -93,6 +93,7 @@ abstract class UserSession: AppCompatActivity() {
             editor.putBoolean("isGuestUser", false)
             editor.putString("username", "Guest User")
             editor.putString("accessToken", "")
+            editor.putInt("userId", 0)
             editor.apply()
         } catch (e: SecurityException) {
             // Handle decryption failure by clearing the preferences

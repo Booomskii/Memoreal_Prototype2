@@ -271,12 +271,12 @@ class CreateObituaryStep7 : Fragment() {
         setSpinnerTextColor(backgroundSpinner)
         setSpinnerTextColor(frameSpinner)
 
-        // Retrieve generated video and add to LinearLayout container when SharedViewModel videoId is updated
         sharedViewModel.videoId.observe(viewLifecycleOwner) { videoId ->
-            if (videoId != null) {
+            if (videoId != null && sharedViewModel.isVideoRetrieved.value == false) {
                 retrieveGeneratedVideo(videoId)
             }
         }
+
 
         return view
     }
@@ -358,6 +358,9 @@ class CreateObituaryStep7 : Fragment() {
                     addVideoThumbnail(it)
                     downloadAndSaveVideo(it)
                     Toast.makeText(requireContext(), "Video retrieved successfully", Toast.LENGTH_SHORT).show()
+
+                    // Set `isVideoRetrieved` to true in the SharedViewModel
+                    sharedViewModel.isVideoRetrieved.value = true
                 }
             }
         }

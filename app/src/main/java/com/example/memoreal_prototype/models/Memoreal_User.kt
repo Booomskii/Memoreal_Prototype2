@@ -85,14 +85,18 @@ data class Payment(
 data class Guestbook(
     var GUESTBOOKID:Int,
     var USERID:Int? = null,
+    var OBITUARYID:Int,
     var GUESTNAME:String,
     var MESSAGE:String? = null,
-    var POSTINGDATE:String
+    var POSTINGDATE:String,
+    var PROFILEPICTURE:String? = null,
+    var FULLNAME:String
 )
 
 data class Tribute(
     var TRIBUTEID:Int,
     var USERID:Int? = null,
+    var OBITUARYID:Int,
     var OFFEREDFLOWER:String? = null,
     var LIGHTEDCANDLE:String? = null,
     var OFFERINGDATE:String

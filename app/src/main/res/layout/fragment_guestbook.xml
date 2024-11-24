@@ -23,7 +23,8 @@
                 android:id="@+id/editTextGuestName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Guest Name"
+                android:hint="@string/guestName"
+                android:textColorHint="@color/white"
                 android:textColor="@color/black"
                 android:inputType="textPersonName" />
 
@@ -31,7 +32,8 @@
                 android:id="@+id/editTextMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Message"
+                android:hint="@string/msg"
+                android:textColorHint="@color/white"
                 android:inputType="textMultiLine"
                 android:gravity="top"
                 android:lines="4"
@@ -42,15 +44,43 @@
                 android:id="@+id/buttonSubmitGuestbook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/lightbrown"
                 android:layout_marginTop="16dp"
-                android:text="Submit" />
+                android:text="@string/submit"
+                android:textColor="@color/black"
+                android:layout_gravity="end"/>
         </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/divider_1"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gbEntries"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
+            />
 
         <!-- RecyclerView for Guests Signed in the Guestbook -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewGuestbook"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/divider_1_inverted"
+            android:layout_marginTop="20dp"
+            />
 
     </LinearLayout>
 

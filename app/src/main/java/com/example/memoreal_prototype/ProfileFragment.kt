@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.bumptech.glide.Glide
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -171,14 +172,18 @@ class ProfileFragment : Fragment() {
 
                                 // Load the user photo from internal storage
                                 if (picture.isNotEmpty()) {
-                                    val bitmap = loadImageFromInternalStorage(picture)
-                                    if (bitmap != null) {
-                                        userPhoto.setImageBitmap(bitmap)
-                                    } else {
-                                        Log.e("ProfileFragment", "Failed to load image from path: $picture")
-                                        // Optionally, set a placeholder or default image if loading fails
-                                        userPhoto.setImageResource(R.drawable.baseline_person_24)
-                                    }
+                                    // Remove "file://" prefix if present
+                                    val cleanPath = picture.replace("file://", "")
+
+                                    // Create a File object for the given path
+                                    val imgFile = File(cleanPath)
+
+                                    // Load image using Glide
+                                    Glide.with(requireContext())
+                                        .load(imgFile)
+                                        .placeholder(R.drawable.baseline_person_24) // Set placeholder image
+                                        .error(R.drawable.baseline_person_24) // Set error image if loading fails
+                                        .into(userPhoto)
                                 } else {
                                     // Set a default image if no picture is provided
                                     userPhoto.setImageResource(R.drawable.baseline_person_24)
@@ -299,28 +304,6 @@ class ProfileFragment : Fragment() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         requireActivity().finish()
-    }
-
-    private fun loadImageFromInternalStorage(imagePath: String): Bitmap? {
-        return try {
-            // Remove the "file://" prefix if present
-            val cleanPath = imagePath.replace("file://", "")
-
-            // Create a File object for the given path
-            val imgFile = File(cleanPath)
-
-            // Check if the file exists
-            if (imgFile.exists()) {
-                // Decode the image from the file path
-                BitmapFactory.decodeFile(imgFile.absolutePath)
-            } else {
-                Log.e("ProfileFragment", "Image file does not exist at path: $cleanPath")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("ProfileFragment", "Failed to load image: ${e.message}")
-            null
-        }
     }
 
     private fun calculateAge(birthDate: String): Int {

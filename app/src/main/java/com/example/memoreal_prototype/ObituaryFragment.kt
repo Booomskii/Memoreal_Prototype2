@@ -182,6 +182,8 @@ class ObituaryFragment : Fragment() {
                         val obitCustIdArray = jsonObject.getJSONArray("OBITCUSTID")
                         val obitCustId = obitCustIdArray.getInt(0)
 
+                        sharedViewModel.clearData()
+
                         fetchedObituary = Obituary(
                             OBITUARYID = jsonObject.getInt("OBITUARYID"),
                             USERID = jsonObject.getInt("USERID"),
@@ -219,6 +221,8 @@ class ObituaryFragment : Fragment() {
                                 // Update the obitImage UI here
                                 fetchedObituary?.let {
                                     sharedViewModel.obituaryId.value = it.OBITUARYID
+                                    Log.d("ENAGUESTBOOK IN OBITUARY: ", it.ENAGUESTBOOK.toString())
+                                    sharedViewModel.enaGuestbook.postValue(it.ENAGUESTBOOK)
                                     val obitImage = view?.findViewById<ImageView>(R.id.obituary_image)
                                     val obitName = view?.findViewById<TextView>(R.id.tvObitName)
                                     val dateBirth = view?.findViewById<TextView>(R.id.tvDateBirth)
@@ -393,6 +397,8 @@ class ObituaryFragment : Fragment() {
         val musicResId = musicMap[selectedMusic] ?: R.raw.amazing_grace_instrumental // Replace with default if not found
 
         mediaPlayer = MediaPlayer.create(requireContext(), musicResId)
+        mediaPlayer.isLooping = true // Enable looping
+
         mediaPlayer.setOnCompletionListener {
             isPlaying = false
             view?.findViewById<ImageButton>(R.id.btnPlayPause)?.setImageResource(R.drawable.baseline_play_circle_24)

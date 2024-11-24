@@ -644,6 +644,8 @@ class CreateObituaryStep8 : Fragment() {
         val enaGuestbook = sharedViewModel.guestBook.value ?: false
         val favoriteQuote = sharedViewModel.favQuote.value ?: "No favorite quote."
 
+        Log.d("Dates:", "$dateOfBirth, $dateOfDeath")
+
         val obituary = com.example.memoreal_prototype.models.Obituary(
             0,
             userId.toInt(),
