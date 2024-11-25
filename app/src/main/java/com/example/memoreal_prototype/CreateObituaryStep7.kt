@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.children
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -271,12 +272,21 @@ class CreateObituaryStep7 : Fragment() {
         setSpinnerTextColor(backgroundSpinner)
         setSpinnerTextColor(frameSpinner)
 
-        sharedViewModel.videoId.observe(viewLifecycleOwner) { videoId ->
-            if (videoId != null && sharedViewModel.isVideoRetrieved.value == false) {
-                retrieveGeneratedVideo(videoId)
+        sharedViewModel.videoIds.observe(viewLifecycleOwner) { videoIds ->
+            videoIds?.forEach { videoId ->
+                val isRetrieved = sharedViewModel.isVideoRetrievedMap.value?.get(videoId) ?: false
+                if (isRetrieved) {
+                    // Add the thumbnail if video is already retrieved
+                    val videoUrl = sharedViewModel.retrievedVideos.value?.find { it.contains(videoId) }
+                    if (videoUrl != null) {
+                        addVideoThumbnail(videoUrl)
+                    }
+                } else {
+                    // Retrieve video if not retrieved
+                    retrieveGeneratedVideo(videoId)
+                }
             }
         }
-
 
         return view
     }
@@ -294,6 +304,12 @@ class CreateObituaryStep7 : Fragment() {
     }
 
     private fun retrieveGeneratedVideo(videoId: String) {
+        // Check if the video is already retrieved
+        if (sharedViewModel.isVideoRetrievedMap.value?.get(videoId) == true) {
+            Log.d("VideoRetrieve", "Video already retrieved, skipping for videoId: $videoId")
+            return
+        }
+
         val apiUrl = "$baseUrl" + "api/retrieveVideo/$videoId"
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -326,28 +342,28 @@ class CreateObituaryStep7 : Fragment() {
                                     }
                                     status == "pending" || data.has("pending_url") -> {
                                         // Video is still processing, continue polling
-                                        Log.d("VideoRetrieve", "Video still pending, polling again in 5 seconds...")
+                                        Log.d("VideoRetrieve", "Video $videoId still pending, polling again in 5 seconds...")
                                         delay(5000) // Wait for 5 seconds before the next poll
                                     }
                                     else -> {
                                         // Handle unexpected status
-                                        Log.e("VideoRetrieve", "Unexpected status or response")
+                                        Log.e("VideoRetrieve", "Unexpected status or response for videoId: $videoId")
                                         delay(5000) // Retry after a delay
                                     }
                                 }
                             } else {
                                 // Log unsuccessful responses and retry after delay
-                                Log.e("VideoRetrieve", "Failed to retrieve video: ${jsonObject.optString("message", "Unknown error")}")
+                                Log.e("VideoRetrieve", "Failed to retrieve video $videoId: ${jsonObject.optString("message", "Unknown error")}")
                                 delay(5000) // Retry after a delay
                             }
                         }
                     } else {
                         // Log unsuccessful responses and retry after delay
-                        Log.e("VideoRetrieve", "Retrieve failed with response code: ${response.code}")
+                        Log.e("VideoRetrieve", "Retrieve failed for video $videoId with response code: ${response.code}")
                         delay(5000) // Retry after a delay
                     }
                 } catch (e: IOException) {
-                    Log.e("VideoRetrieve", "Failed to retrieve video: ${e.message}")
+                    Log.e("VideoRetrieve", "Failed to retrieve video $videoId: ${e.message}")
                     delay(5000) // Retry after a delay in case of network failure
                 }
             }
@@ -357,10 +373,15 @@ class CreateObituaryStep7 : Fragment() {
                 withContext(Dispatchers.Main) {
                     addVideoThumbnail(it)
                     downloadAndSaveVideo(it)
-                    Toast.makeText(requireContext(), "Video retrieved successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Video retrieved successfully for videoId: $videoId", Toast.LENGTH_SHORT).show()
 
-                    // Set `isVideoRetrieved` to true in the SharedViewModel
-                    sharedViewModel.isVideoRetrieved.value = true
+                    // Set `isVideoRetrieved` to true for this videoId in the SharedViewModel
+                    sharedViewModel.isVideoRetrievedMap.value?.put(videoId, true)
+                    sharedViewModel.isVideoRetrievedMap.postValue(sharedViewModel.isVideoRetrievedMap.value)
+
+                    // Add the retrieved video URL to the list
+                    sharedViewModel.retrievedVideos.value?.add(it)
+                    sharedViewModel.retrievedVideos.postValue(sharedViewModel.retrievedVideos.value)
                 }
             }
         }
@@ -369,9 +390,21 @@ class CreateObituaryStep7 : Fragment() {
     private fun addVideoThumbnail(resultUrl: String) {
         val aiVideoContainerLayout = view?.findViewById<GridLayout>(R.id.aiVideoContainerLayout) ?: return
 
+        // Check if a thumbnail for this video URL already exists
+        val existingThumbnail = aiVideoContainerLayout.children.find {
+            it.tag == resultUrl
+        }
+        if (existingThumbnail != null) {
+            Log.d("VideoThumbnail", "Thumbnail for this video already exists.")
+            return
+        }
+
         // Inflate the custom thumbnail layout
         val thumbnailLayout = LayoutInflater.from(requireContext())
             .inflate(R.layout.layout_video_thumbnail, aiVideoContainerLayout, false)
+
+        // Set the tag for easy identification
+        thumbnailLayout.tag = resultUrl
 
         // Set fixed dimensions for the thumbnail layout in GridLayout
         val layoutParams = GridLayout.LayoutParams().apply {
@@ -434,6 +467,13 @@ class CreateObituaryStep7 : Fragment() {
     }
 
     private fun downloadAndSaveVideo(videoUrl: String) {
+        // Check if the video is already downloaded
+        if (sharedViewModel.downloadedVideos.value?.contains(videoUrl) == true) {
+            Log.d("VideoDownload", "Video already downloaded: $videoUrl")
+            return
+        }
+
+        // Proceed with the download if the video is not already downloaded
         val request = Request.Builder().url(videoUrl).build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -464,6 +504,10 @@ class CreateObituaryStep7 : Fragment() {
                                 } else {
                                     Log.d("AI Video Urls:", "Duplicate video path not added: $videoPath")
                                 }
+
+                                // Add the video URL to the downloaded videos list
+                                sharedViewModel.downloadedVideos.value?.add(videoUrl)
+                                sharedViewModel.downloadedVideos.postValue(sharedViewModel.downloadedVideos.value)
                             }
                         } catch (e: IOException) {
                             Log.e("VideoDownload", "Failed to save video: ${e.message}")

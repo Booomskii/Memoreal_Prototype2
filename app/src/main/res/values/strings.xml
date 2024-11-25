@@ -207,6 +207,10 @@
     <string name="age">Age</string>
     <string name="editProfile">Edit Profile</string>
     <string name="save">Save</string>
+    <string name="setImage">(Click the photo container to change profile picture)</string>
+    <string name="resetPass">Reset Password</string>
+    <string name="newPass">New Password:</string>
+    <string name="newPassHint">&lt;Enter New Password&gt;</string>
     <!--Memoreal Explore Section-->
     <string name="explore">Explore</string>
     <string name="searchObit">Search Obituaries</string>

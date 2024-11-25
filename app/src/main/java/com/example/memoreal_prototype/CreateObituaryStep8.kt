@@ -237,15 +237,7 @@ class CreateObituaryStep8 : Fragment() {
                     // Save the main image (if it exists)
                     val imageUriString = sharedViewModel.image.value
                     if (imageUriString != null) {
-                        val imageUri = Uri.parse(imageUriString)
-                        val savedFileName = saveMediaToInternalStorage(imageUri, isVideo = false)
-                        if (savedFileName != null) {
-                            Log.d("SaveMedia", "Image saved successfully: $savedFileName")
-                            // Update the sharedViewModel with the new internal storage path
-                            sharedViewModel.image.value = savedFileName
-                        } else {
-                            Log.e("SaveMedia", "Failed to save the image.")
-                        }
+                        saveObituaryWithImage()
                     } else {
                         Log.e("SaveMedia", "Image Uri is null.")
                     }
@@ -306,6 +298,46 @@ class CreateObituaryStep8 : Fragment() {
         }
 
         return view
+    }
+
+    private fun saveObituaryWithImage() {
+        val imageUriString = sharedViewModel.image.value
+        if (imageUriString != null) {
+            val imageUri = Uri.parse(imageUriString)
+            val savedImagePath = saveImageToInternalStorage(imageUri)
+            if (savedImagePath != null) {
+                // Proceed to save the rest of the obituary data, including the saved image path
+                Log.d("Step8Fragment", "Image saved to internal storage at: $savedImagePath")
+                Toast.makeText(requireContext(), "Obituary saved successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Handle the case where no image is available
+            Log.d("Step8Fragment", "No image available to save")
+            Toast.makeText(requireContext(), "Please upload an image before saving", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveImageToInternalStorage(uri: Uri): String? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val file = File(requireContext().filesDir, "saved_image_${System.currentTimeMillis()}.jpg")
+            val outputStream = FileOutputStream(file)
+
+            inputStream?.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            Log.d("CreateObituaryStep8", "Image saved to internal storage: ${file.absolutePath}")
+            file.absolutePath
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "Error saving image to internal storage", Toast.LENGTH_SHORT).show()
+            null
+        }
     }
 
     private fun loadImage(resourceName: String?, imageView: ImageView, resourceMap: Map<String, Int>, defaultResource: Int) {

@@ -146,33 +146,54 @@ class SignUpActivity2 : AppCompatActivity() {
 
     private fun inputValidator(fname: String?, lname: String?, mi: String?, bdate: String?,
                                contact: String?, image: String?): Boolean {
-        return when {
-            fname.isNullOrEmpty() -> {
-                Toast.makeText(this, "Enter your First Name", Toast.LENGTH_SHORT).show()
-                false
-            }
-            lname.isNullOrEmpty() -> {
-                Toast.makeText(this, "Enter your Last Name", Toast.LENGTH_SHORT).show()
-                false
-            }
-            mi.isNullOrEmpty() -> {
-                Toast.makeText(this, "Enter your Middle Initial", Toast.LENGTH_SHORT).show()
-                false
-            }
-            contact.isNullOrEmpty() -> {
-                Toast.makeText(this, "Enter your Contact Number", Toast.LENGTH_SHORT).show()
-                false
-            }
-            bdate.isNullOrEmpty() -> {
-                Toast.makeText(this, "Enter your Birthdate", Toast.LENGTH_SHORT).show()
-                false
-            }
-            imageUri == null -> {
-                Toast.makeText(this, "Please upload an image", Toast.LENGTH_SHORT).show()
-                false
-            }
-            else -> true
+        if (fname.isNullOrEmpty()) {
+            Toast.makeText(this, "Enter your First Name", Toast.LENGTH_SHORT).show()
+            return false
         }
+        if (lname.isNullOrEmpty()) {
+            Toast.makeText(this, "Enter your Last Name", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (mi.isNullOrEmpty()) {
+            Toast.makeText(this, "Enter your Middle Initial", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (contact.isNullOrEmpty()) {
+            Toast.makeText(this, "Enter your Contact Number", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (bdate.isNullOrEmpty()) {
+            Toast.makeText(this, "Enter your Birthdate", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        // Check if the birthdate makes the user younger than 12
+        val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        try {
+            val birthDate = inputFormat.parse(bdate)
+            if (birthDate != null) {
+                val calendar = Calendar.getInstance()
+                calendar.time = birthDate
+
+                val today = Calendar.getInstance()
+                val age = today.get(Calendar.YEAR) - calendar.get(Calendar.YEAR)
+
+                if (age < 12 || (age == 12 && today.get(Calendar.DAY_OF_YEAR) < calendar.get(Calendar.DAY_OF_YEAR))) {
+                    Toast.makeText(this, "You must be at least 12 years old to register.", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Invalid birthdate format", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (imageUri == null) {
+            Toast.makeText(this, "Please upload an image", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        return true
     }
 
     private fun loginSuccess() {
@@ -235,7 +256,7 @@ class SignUpActivity2 : AppCompatActivity() {
                     }
 
                     loginSuccess() // Proceed to the next activity
-                    val intent = Intent(applicationContext, HomePageActivity::class.java)
+                    val intent = Intent(applicationContext, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                 } else {

@@ -3,6 +3,8 @@ package com.example.memoreal_prototype
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.ContactsContract.Profile
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,18 +13,31 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.bumptech.glide.Glide
 import com.example.memoreal_prototype.R
+import com.example.memoreal_prototype.UserSession.Companion.baseUrl
+import com.example.memoreal_prototype.UserSession.Companion.client
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 
 class HomeFragment : Fragment() {
 
     private lateinit var slideshowImageView: ImageView
     private lateinit var previousButton: ImageButton
     private lateinit var nextButton: ImageButton
+    private lateinit var profilePicture: ImageButton
     private val imageResources = arrayOf(R.drawable.slide_image_1, R.drawable.slide_image_2, R.drawable.slide_image_3)
     private var currentIndex = 0
+    private var userId = 0
     private val handler = Handler(Looper.getMainLooper())
     private val slideshowRunnable = object : Runnable {
         override fun run() {
@@ -53,6 +68,10 @@ class HomeFragment : Fragment() {
 
         val btnCreateObituary = view.findViewById<Button>(R.id.btnCreateObituary)
         val username = view.findViewById<TextView>(R.id.tvUsername)
+        profilePicture = view.findViewById(R.id.imgProfilePic)
+
+        getUserId()
+        fetchUser(userId)
 
         btnCreateObituary.setOnClickListener {
             fragmentManager?.beginTransaction()
@@ -61,6 +80,20 @@ class HomeFragment : Fragment() {
                 ?.commit()
 
             btnCreateObituary.isEnabled = false
+        }
+
+        profilePicture.setOnClickListener{
+            fragmentManager?.beginTransaction()
+                ?.replace(R.id.frame_layout, ProfileFragment()) // Replace with MyObituaries
+                // fragment
+                ?.addToBackStack("Home Fragment") // Add to back stack for navigation back
+                ?.commit()
+
+            // Get the BottomNavigationView from the activity
+            val bottomNavigationView = activity?.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigationView)
+
+            // Set the Profile tab as active
+            bottomNavigationView?.selectedItemId = R.id.nav_profile
         }
 
         val storedUsername = sharedPreferences.getString("username", "")
@@ -87,6 +120,81 @@ class HomeFragment : Fragment() {
         handler.postDelayed(slideshowRunnable, 5000) // Start automatic slideshow
 
         return view
+    }
+
+    private fun fetchUser(userId: Int) {
+        val url = "$baseUrl" + "api/fetchUser/$userId"
+        Log.d("API", "Requesting URL: $url")
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Fetch User", "Failed to fetch user: ${e.message}")
+                requireActivity().runOnUiThread {
+                    Toast.makeText(context, "Failed to fetch user", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    response.body?.string()?.let { responseBody ->
+                        try {
+                            // Parse the JSON response as an object
+                            val jsonObject = JSONObject(responseBody)
+
+                            val picture = jsonObject.optString("PICTURE", "")
+
+                            requireActivity().runOnUiThread {
+                                if (picture.isNotEmpty()) {
+                                    // Remove "file://" prefix if present
+                                    val cleanPath = picture.replace("file://", "")
+
+                                    // Create a File object for the given path
+                                    val imgFile = File(cleanPath)
+
+                                    // Load image using Glide
+                                    Glide.with(requireContext())
+                                        .load(imgFile)
+                                        .placeholder(R.drawable.baseline_person_24) // Set placeholder image
+                                        .error(R.drawable.baseline_person_24) // Set error image if loading fails
+                                        .circleCrop()
+                                        .into(profilePicture)
+                                } else {
+                                    // Set a default image if no picture is provided
+                                    profilePicture.setImageResource(R.drawable.baseline_person_24)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("Fetch User", "JSON parsing error: ${e.message}")
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(context, "Error parsing user data", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    Log.e("Fetch User", "Error: ${response.code} - ${response.message}")
+                }
+            }
+        })
+    }
+
+    private fun getUserId(){
+        val masterKey = MasterKey.Builder(requireContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            requireContext(),
+            "userSession",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        userId = sharedPreferences.getInt("userId", -1)
     }
 
     private fun navigateToNextImage() {

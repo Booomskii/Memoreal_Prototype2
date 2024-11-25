@@ -30,7 +30,9 @@ import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.Period
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -56,7 +58,6 @@ class ProfileFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         setupToolbar(view)
         val ageTV = view.findViewById<TextView>(R.id.age)
-        ageTV.text = calculateAge(bdate).toString()
 
         userName = view.findViewById(R.id.username)
         userFullName = view.findViewById(R.id.userFullName)
@@ -74,12 +75,7 @@ class ProfileFragment : Fragment() {
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
 
-        backButton.setOnClickListener {
-            (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, HomeFragment())
-                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .commit()
-        }
+        backButton.visibility = View.GONE
 
         val settings = view.findViewById<ImageView>(R.id.settings)
         settings.setOnClickListener {
@@ -98,6 +94,13 @@ class ProfileFragment : Fragment() {
                     }
                     R.id.deleteProfile -> {
                         confirmDeleteUser()
+                        true
+                    }
+                    R.id.resetPassword -> {
+                        (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame_layout, ResetPasswordFragment())
+                            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
+                            .commit()
                         true
                     }
                     else -> false
@@ -158,8 +161,11 @@ class ProfileFragment : Fragment() {
 
                             val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                             val date = originalFormat.parse(birthDate)
-                            val desiredFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val desiredFormat = SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault())
+                            val desiredFormat2 = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                             val formattedDate = desiredFormat.format(date)
+                            val formattedDate2 = desiredFormat2.format(date)
+                            bdate = formattedDate2
 
                             // Update the UI on the main thread
                             requireActivity().runOnUiThread {
@@ -168,7 +174,16 @@ class ProfileFragment : Fragment() {
                                 userContact.text = contact
                                 userEmail.text = email
                                 userBDate.text = formattedDate
-                                bdate = formattedDate
+
+                                // Adjust the email text size if longer than 20 characters
+                                if (email.length > 20) {
+                                    userEmail.textSize = 14f // Reduce text size by 2 points from original 16sp
+                                } else {
+                                    userEmail.textSize = 16f // Set text size to original value
+                                }
+
+                                val ageTV = view?.findViewById<TextView>(R.id.age)
+                                ageTV?.text = calculateAge(bdate).toString()
 
                                 // Load the user photo from internal storage
                                 if (picture.isNotEmpty()) {
@@ -183,6 +198,7 @@ class ProfileFragment : Fragment() {
                                         .load(imgFile)
                                         .placeholder(R.drawable.baseline_person_24) // Set placeholder image
                                         .error(R.drawable.baseline_person_24) // Set error image if loading fails
+                                        .circleCrop()
                                         .into(userPhoto)
                                 } else {
                                     // Set a default image if no picture is provided
@@ -307,6 +323,12 @@ class ProfileFragment : Fragment() {
     }
 
     private fun calculateAge(birthDate: String): Int {
+        if (birthDate.isEmpty()) {
+            // If the birthDate is empty, return 0 as the age or handle it appropriately
+            Log.e("Calculate Age", "Birthdate is empty, cannot calculate age.")
+            return 0
+        }
+
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val birthDateCalendar = Calendar.getInstance()
 
@@ -315,14 +337,18 @@ class ProfileFragment : Fragment() {
             birthDateCalendar.time = date
         } catch (e: ParseException) {
             e.printStackTrace()
+            Log.e("Calculate Age", "Date parsing error: ${e.message}")
             return 0 // In case of parsing failure
         }
 
         val today = Calendar.getInstance()
-
         var age = today.get(Calendar.YEAR) - birthDateCalendar.get(Calendar.YEAR)
 
-        if (today.get(Calendar.DAY_OF_YEAR) < birthDateCalendar.get(Calendar.DAY_OF_YEAR)) {
+        // Check if the birthday hasn't occurred yet this year
+        if (today.get(Calendar.MONTH) < birthDateCalendar.get(Calendar.MONTH) ||
+            (today.get(Calendar.MONTH) == birthDateCalendar.get(Calendar.MONTH) &&
+                    today.get(Calendar.DAY_OF_MONTH) < birthDateCalendar.get(Calendar.DAY_OF_MONTH))
+        ) {
             age--
         }
 

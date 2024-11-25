@@ -6,6 +6,12 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Shader
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -25,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.Toolbar
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.bumptech.glide.Glide
 import com.yalantis.ucrop.UCrop
 import okhttp3.Call
 import okhttp3.Callback
@@ -38,6 +45,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.min
 
 class EditProfileFragment : Fragment() {
 
@@ -45,8 +53,9 @@ class EditProfileFragment : Fragment() {
     private val baseUrl = UserSession.baseUrl
     private var imageUri: Uri? = null
     private var email = ""
+    private var originalImageUri: String? = null
 
-    private lateinit var userName: EditText
+    private lateinit var userName: TextView
     private lateinit var userFName: EditText
     private lateinit var userMI: EditText
     private lateinit var userLName: EditText
@@ -68,16 +77,26 @@ class EditProfileFragment : Fragment() {
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             val resultUri = UCrop.getOutput(data!!)
             if (resultUri != null) {
-                userPhoto.setImageURI(null)  // Clear previous image first
-                userPhoto.setImageURI(resultUri)  // Set the new cropped image
-                imageUri = resultUri            // Update stored image URI
-                Log.d("SignUpActivity2", "Updated image URI: ${resultUri.toString()}")
+                try {
+                    Glide.with(requireContext())
+                        .load(resultUri)
+                        .placeholder(R.drawable.baseline_person_24)
+                        .error(R.drawable.baseline_person_24)
+                        .circleCrop()
+                        .into(userPhoto)
+
+                    // Update the stored image URI
+                    imageUri = resultUri
+                    Log.d("SignUpActivity2", "Updated image URI: ${resultUri.toString()}")
+                } catch (e: Exception) {
+                    Log.e("EditProfileFragment", "Error processing cropped image: ${e.message}")
+                    Toast.makeText(requireContext(), "Error processing image", Toast.LENGTH_SHORT).show()
+                }
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
             val cropError = UCrop.getError(data!!)
             Log.e("EditProfileFragment", "Crop error: ${cropError?.message}")
-            Toast.makeText(requireContext(), "Crop error: ${cropError?.message}", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireContext(), "Crop error: ${cropError?.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -87,7 +106,7 @@ class EditProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
-        val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
         val save = toolbar.findViewById<TextView>(R.id.save)
 
@@ -129,14 +148,21 @@ class EditProfileFragment : Fragment() {
         }
 
         backButton.setOnClickListener {
-            (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, ProfileFragment())
-                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .commit()
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Return")
+                .setMessage("Are you sure you want to go back? Changes made will not be saved!")
+                .setPositiveButton("Yes") { _, _ ->
+                    (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout, ProfileFragment())
+                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
+                        .commit()
+                }
+                .setNegativeButton("No", null)
+                .show()
         }
 
         save.setOnClickListener {
-            val image = imageUri?.toString() ?: ""
+            val image = imageUri?.toString() ?: originalImageUri ?: ""
             val formattedBDate = formatBDateForMSSQL(userBDate.text.toString()) ?: ""
             val user = com.example.memoreal_prototype.models.User(
                 0, userFName.text.toString(), userLName.text.toString(), userMI.text.toString(),
@@ -194,11 +220,12 @@ class EditProfileFragment : Fragment() {
                             val contact = jsonObject.optString("CONTACT_NUMBER", "N/A")
                             val birthDate = jsonObject.optString("BIRTHDATE", "N/A")
                             val picture = jsonObject.optString("PICTURE", "")
+                            originalImageUri = picture
                             val useremail = jsonObject.optString("EMAIL", "")
 
                             val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                             val date = originalFormat.parse(birthDate)
-                            val desiredFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val desiredFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
                             val formattedDate = desiredFormat.format(date)
 
                             // Update the UI on the main thread
@@ -210,6 +237,12 @@ class EditProfileFragment : Fragment() {
                                 userContact.setText(contact)
                                 userBDate.setText(formattedDate)
                                 email = useremail
+                                Glide.with(requireContext())
+                                    .load(picture)
+                                    .placeholder(R.drawable.baseline_person_24) // Set placeholder image
+                                    .error(R.drawable.baseline_person_24) // Set error image if loading fails
+                                    .circleCrop()
+                                    .into(userPhoto)
                                 // Optionally, load the user picture into userPhoto using a library like Glide or Picasso
                             }
                         } catch (e: Exception) {
@@ -262,6 +295,10 @@ class EditProfileFragment : Fragment() {
                 if (response.isSuccessful) {
                     requireActivity().runOnUiThread {
                         Toast.makeText(requireContext(), "User info updated successfully", Toast.LENGTH_LONG).show()
+                        (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame_layout, ProfileFragment())
+                            .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
+                            .commit()
                     }
                 } else {
                     Log.e("UpdateUserDetails", "Error: ${response.code} - ${response.message}")

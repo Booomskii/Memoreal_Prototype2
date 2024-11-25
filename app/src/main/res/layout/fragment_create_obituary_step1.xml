@@ -75,7 +75,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="330dp"
-                android:layout_height="100dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="5dp"
                 android:background="@drawable/bordered_rectangle"
@@ -88,6 +88,7 @@
                     android:layout_height="35dp"
                     android:layout_gravity="center_vertical"
                     android:backgroundTint="@color/memo_orange"
+                    android:buttonTint="@color/radio_button_color"
                     android:checked="true"
                     android:text="@string/memorialCreation"
                     android:textColor="@color/black"
@@ -98,22 +99,7 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-
-                <TextView
-                    android:id="@+id/tvIncludes1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/includes"
-                    android:textColor="@color/memo_orange"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.113"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.370" />
+                    app:layout_constraintVertical_bias="0.533" />
 
                 <TextView
                     android:id="@+id/subtitleTextView"
@@ -124,51 +110,11 @@
                     android:textSize="16sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.979"
+                    app:layout_constraintHorizontal_bias="0.973"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.105" />
+                    app:layout_constraintVertical_bias="0.521" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="250dp"
-                    android:layout_height="45dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.387"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.900">
-
-                    <TextView
-                        android:id="@+id/tvMC1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:text="@string/memorialCreation_1"
-                        android:textColor="@color/black"
-                        android:textSize="12sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.0" />
-
-                    <TextView
-                        android:id="@+id/tvMC2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:text="@string/memorialCreation_2"
-                        android:textColor="@color/black"
-                        android:textSize="12sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.650" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -182,6 +128,7 @@
                 android:textSize="12sp"
                 android:textStyle="italic"
                 android:gravity="fill_horizontal"/>
+
         </RadioGroup>
 
         <androidx.constraintlayout.widget.ConstraintLayout

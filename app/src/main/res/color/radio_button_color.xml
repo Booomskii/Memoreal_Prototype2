@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- State when the RadioButton is selected -->
+    <item android:color="@color/memo_orange" android:state_checked="true" />
+    <!-- State when the RadioButton is not selected -->
+    <item android:color="@color/memo_orange" android:state_checked="false" />
+</selector>

@@ -220,8 +220,7 @@ class ObituaryFragment : Fragment() {
                             requireActivity().runOnUiThread {
                                 // Update the obitImage UI here
                                 fetchedObituary?.let {
-                                    sharedViewModel.obituaryId.value = it.OBITUARYID
-                                    Log.d("ENAGUESTBOOK IN OBITUARY: ", it.ENAGUESTBOOK.toString())
+                                    sharedViewModel.obituaryId.postValue(it.OBITUARYID)
                                     sharedViewModel.enaGuestbook.postValue(it.ENAGUESTBOOK)
                                     val obitImage = view?.findViewById<ImageView>(R.id.obituary_image)
                                     val obitName = view?.findViewById<TextView>(R.id.tvObitName)

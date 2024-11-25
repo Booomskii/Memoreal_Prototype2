@@ -6,4 +6,7 @@
     <item
         android:id="@+id/deleteProfile"
         android:title="Delete Profile" />
+    <item
+        android:id="@+id/resetPassword"
+        android:title="Reset User Password" />
 </menu>

@@ -40,7 +40,10 @@ class ObituarySharedViewModel: ViewModel() {
     val imgurImageUrl = MutableLiveData<String?>()
     val videoId = MutableLiveData<String?>()
     val aiVideoUrl = MutableLiveData<ArrayList<String>>(ArrayList())
-    var isVideoRetrieved = MutableLiveData<Boolean>().apply { value = false }
+    val videoIds = MutableLiveData<MutableList<String>>().apply { value = mutableListOf() }
+    val retrievedVideos = MutableLiveData<MutableList<String>>().apply { value = mutableListOf() }
+    val isVideoRetrievedMap = MutableLiveData<MutableMap<String, Boolean>>().apply { value = mutableMapOf() }
+    val downloadedVideos = MutableLiveData<MutableSet<String>>().apply { value = mutableSetOf() }
     /*Create Obituary Step 8*/
 
     /*Obituary*/
