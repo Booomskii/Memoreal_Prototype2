@@ -15,10 +15,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.children
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
+import com.example.memoreal_prototype.models.Obituary
+import com.example.memoreal_prototype.models.Obituary_Customization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,22 +40,59 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
-class CreateObituaryStep7 : Fragment() {
+class EditObituaryStep7 : Fragment() {
 
     val client = UserSession.client
     val baseUrl = UserSession.baseUrl
     val url = UserSession.d_idUrl
     val authorization = UserSession.authorization
     private lateinit var aiVideoContainerLayout : LinearLayout
+    private var fetchedObitCust: Obituary_Customization? = null
+    private var fetchedObituary: Obituary? = null
 
     private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
+
+    private val frameItems = listOf(
+        Pair(R.drawable.classic1_option, "Classic 1"),
+        Pair(R.drawable.classic2_option, "Classic 2"),
+        Pair(R.drawable.classic3_option, "Classic 3"),
+        Pair(R.drawable.gold1_option, "Gold 1"),
+        Pair(R.drawable.gold2_option, "Gold 2"),
+        Pair(R.drawable.gold3_option, "Gold 3"),
+        Pair(R.drawable.wood1_option, "Wood 1"),
+        Pair(R.drawable.wood2_option, "Wood 2"),
+        Pair(R.drawable.wood3_option, "Wood 3")
+    )
+
+    private val flowerItems = listOf(
+        Pair(R.drawable.rose, "Rose"),
+        Pair(R.drawable.lily, "Lily"),
+        Pair(R.drawable.carnation, "Carnation"),
+        Pair(R.drawable.chrysanthemum, "Chrysanthemum"),
+        Pair(R.drawable.iris, "Iris"),
+        Pair(R.drawable.orchid, "Orchid"),
+    )
+
+    private val candleItems = listOf(
+        Pair(R.drawable.candle1, "Candle 1"),
+        Pair(R.drawable.candle2, "Candle 2"),
+        Pair(R.drawable.candle3, "Candle 3"),
+        Pair(R.drawable.candle4, "Candle 4"),
+        Pair(R.drawable.candle5, "Candle 5"),
+        Pair(R.drawable.candle6, "Candle 6"),
+        Pair(R.drawable.candle7, "Candle 7"),
+        Pair(R.drawable.candle8, "Candle 8"),
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_create_obituary_step7, container, false)
+        val view = inflater.inflate(R.layout.fragment_edit_obituary_step7, container, false)
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
         val nextButton = view.findViewById<Button>(R.id.btnNext)
@@ -64,38 +104,10 @@ class CreateObituaryStep7 : Fragment() {
         val vcandleSpinner = view.findViewById<Spinner>(R.id.spinnerVCandles)
         val favQuoteET = view.findViewById<EditText>(R.id.etFavQuote)
         val uploadAI = view.findViewById<Button>(R.id.btnUploadAIItem)
+        val obituaryId = sharedViewModel.obituaryId.value
 
-        val frameItems = listOf(
-            Pair(R.drawable.classic1_option, "Classic 1"),
-            Pair(R.drawable.classic2_option, "Classic 2"),
-            Pair(R.drawable.classic3_option, "Classic 3"),
-            Pair(R.drawable.gold1_option, "Gold 1"),
-            Pair(R.drawable.gold2_option, "Gold 2"),
-            Pair(R.drawable.gold3_option, "Gold 3"),
-            Pair(R.drawable.wood1_option, "Wood 1"),
-            Pair(R.drawable.wood2_option, "Wood 2"),
-            Pair(R.drawable.wood3_option, "Wood 3")
-        )
-
-        val flowerItems = listOf(
-            Pair(R.drawable.rose, "Rose"),
-            Pair(R.drawable.lily, "Lily"),
-            Pair(R.drawable.carnation, "Carnation"),
-            Pair(R.drawable.chrysanthemum, "Chrysanthemum"),
-            Pair(R.drawable.iris, "Iris"),
-            Pair(R.drawable.orchid, "Orchid"),
-        )
-
-        val candleItems = listOf(
-            Pair(R.drawable.candle1, "Candle 1"),
-            Pair(R.drawable.candle2, "Candle 2"),
-            Pair(R.drawable.candle3, "Candle 3"),
-            Pair(R.drawable.candle4, "Candle 4"),
-            Pair(R.drawable.candle5, "Candle 5"),
-            Pair(R.drawable.candle6, "Candle 6"),
-            Pair(R.drawable.candle7, "Candle 7"),
-            Pair(R.drawable.candle8, "Candle 8"),
-        )
+        Log.d("Obituary Id:", obituaryId.toString())
+        Log.d("Image:", sharedViewModel.image.value.toString())
 
         /*Background Theme Spinner*/
         val adapter2 = ArrayAdapter.createFromResource(
@@ -218,10 +230,17 @@ class CreateObituaryStep7 : Fragment() {
         }
 
         backButton.setOnClickListener {
-            (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, HomeFragment())
-                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .commit()
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Return")
+                .setMessage("Are you sure you want to go back? Changes made will not be saved!")
+                .setPositiveButton("Yes") { _, _ ->
+                    (activity as HomePageActivity).supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout, MyObituariesFragment())
+                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
+                        .commit()
+                }
+                .setNegativeButton("No", null)
+                .show()
         }
 
         uploadAI.setOnClickListener {
@@ -245,23 +264,16 @@ class CreateObituaryStep7 : Fragment() {
             sharedViewModel.virtualCandle.value = virtualCandle
             sharedViewModel.favQuote.value = favQuote
 
-            Log.d("STEP 7:", sharedViewModel.backgroundTheme.value!!)
-            Log.d("STEP 7:", sharedViewModel.pictureFrame.value!!.toString())
-            Log.d("STEP 7:", sharedViewModel.bgMusic.value!!)
-            Log.d("STEP 7:", sharedViewModel.virtualFlower.value!!.toString())
-            Log.d("STEP 7:", sharedViewModel.virtualCandle.value!!.toString())
-            Log.d("STEP 7:", sharedViewModel.favQuote.value!!)
-
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, CreateObituaryStep8())
+                .replace(R.id.frame_layout, EditObituaryStep8())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
-                .addToBackStack("CreateObituaryStep7")
+                .addToBackStack("EditObituaryStep7")
                 .commit()
         }
 
         prevButton.setOnClickListener {
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, CreateObituaryStep6())
+                .replace(R.id.frame_layout, EditObituaryStep6())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .commit()
         }
@@ -296,8 +308,132 @@ class CreateObituaryStep7 : Fragment() {
             }
         }
 
+        if (obituaryId != null) {
+            fetchObituaryById(obituaryId)
+        }
+
+
         return view
     }
+
+    private fun fetchObituaryById(obituaryId: Int) {
+        val url = "$baseUrl" + "api/fetchObit/$obituaryId"
+        Log.d("API", "Requesting URL: $url")
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Fetch Obituary", "Failed to fetch obituary: ${e.message}")
+                if (isAdded) {
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(context, "Failed to fetch obituary", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.e("Fetch Obituary", "Fetch Successful")
+                    response.body?.string()?.let { responseBody ->
+                        val jsonObject = JSONObject(responseBody)
+                        val obitCustIdArray = jsonObject.getJSONArray("OBITCUSTID")
+                        val obitCustId = obitCustIdArray.getInt(0)
+
+                        fetchedObitCust = Obituary_Customization(
+                            OBITCUSTID = obitCustId,
+                            BGTHEME = jsonObject.getString("BGTHEME"),
+                            PICFRAME = jsonObject.getString("PICFRAME"),
+                            BGMUSIC = jsonObject.getString("BGMUSIC"),
+                            VFLOWER = jsonObject.getString("VFLOWER"),
+                            VCANDLE = jsonObject.getString("VCANDLE")
+                        )
+
+                        if (isAdded) {
+                            requireActivity().runOnUiThread {
+                                // Update vflower, vcandle, and picture frame UI here
+                                fetchedObitCust?.let {
+                                    Log.d("FetchObit", "Updating SharedViewModel with fetched data: $it")
+
+                                    // Update the background theme and music directly
+                                    sharedViewModel.backgroundTheme.postValue(it.BGTHEME)
+                                    Log.d("FetchObit", "Background Theme: ${it.BGTHEME}")
+
+                                    sharedViewModel.bgMusic.postValue(it.BGMUSIC)
+                                    Log.d("FetchObit", "Background Music: ${it.BGMUSIC}")
+
+                                    // Find the corresponding Pair for picture frame
+                                    val pictureFramePair = frameItems.find { pair -> pair.second == it.PICFRAME }
+                                    sharedViewModel.pictureFrame.postValue(pictureFramePair)
+                                    Log.d("FetchObit", "Picture Frame: ${pictureFramePair?.second}")
+
+                                    // Find the corresponding Pair for virtual flower
+                                    val virtualFlowerPair = flowerItems.find { pair -> pair.second == it.VFLOWER }
+                                    sharedViewModel.virtualFlower.postValue(virtualFlowerPair)
+                                    Log.d("FetchObit", "Virtual Flower: ${virtualFlowerPair?.second}")
+
+                                    // Find the corresponding Pair for virtual candle
+                                    val virtualCandlePair = candleItems.find { pair -> pair.second == it.VCANDLE }
+                                    sharedViewModel.virtualCandle.postValue(virtualCandlePair)
+                                    Log.d("FetchObit", "Virtual Candle: ${virtualCandlePair?.second}")
+                                }
+                            }
+                        }
+
+                        fetchedObituary = Obituary(
+                            OBITUARYID = jsonObject.getInt("OBITUARYID"),
+                            USERID = jsonObject.getInt("USERID"),
+                            GALLERYID = jsonObject.getInt("GALLERYID"),
+                            OBITCUSTID = obitCustId,
+                            FAMILYID = jsonObject.getInt("FAMILYID"),
+                            BIOGRAPHY = jsonObject.optString("BIOGRAPHY"),
+                            OBITUARYNAME = jsonObject.getString("OBITUARYNAME"),
+                            OBITUARYPHOTO = jsonObject.getString("OBITUARY_PHOTO"),
+                            DATEOFBIRTH = jsonObject.getString("DATEOFBIRTH"),
+                            DATEOFDEATH = jsonObject.getString("DATEOFDEATH"),
+                            OBITUARYTEXT = jsonObject.optString("OBITUARYTEXT"),
+                            KEYEVENTS = jsonObject.optString("KEYEVENTS"),
+                            FUNDATETIME = jsonObject.optString("FUN_DATETIME"),
+                            FUNLOCATION = jsonObject.optString("FUN_LOCATION"),
+                            ADTLINFO = jsonObject.optString("ADTLINFO"),
+                            PRIVACY = jsonObject.getString("PRIVACY"),
+                            ENAGUESTBOOK = jsonObject.getBoolean("ENAGUESTBOOK"),
+                            FAVORITEQUOTE = jsonObject.optString("FAVORITEQUOTE"),
+                            CREATIONDATE = jsonObject.getString("CREATIONDATE"),
+                            LASTMODIFIED = jsonObject.getString("LASTMODIFIED")
+                        )
+
+                        if (isAdded) {
+                            requireActivity().runOnUiThread {
+                                fetchedObituary?.let {
+                                    sharedViewModel.favQuote.postValue(it.FAVORITEQUOTE)
+                                }
+                            }
+                        }
+                    } ?: run {
+                        Log.e("Fetch Obituary", "Response body is null.")
+                        if (isAdded) {
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(context, "Error: Empty response from server", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    Log.e("Fetch Obituary", "Error: ${response.code} - ${response.message}")
+                    if (isAdded) {
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(context, "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+
 
     private fun setSpinnerTextColor(spinner: Spinner) {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -624,4 +760,3 @@ class CreateObituaryStep7 : Fragment() {
         }
     }
 }
-

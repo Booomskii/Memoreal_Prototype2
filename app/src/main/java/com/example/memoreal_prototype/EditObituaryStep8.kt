@@ -1,8 +1,6 @@
 package com.example.memoreal_prototype
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -13,18 +11,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.activityViewModels
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.bumptech.glide.Glide
+import com.example.memoreal_prototype.models.Obituary
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -32,7 +28,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
-import org.w3c.dom.Text
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -40,7 +35,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class CreateObituaryStep8 : Fragment() {
+class EditObituaryStep8 : Fragment() {
 
     val client = UserSession.client
     val baseUrl = UserSession.baseUrl
@@ -55,11 +50,13 @@ class CreateObituaryStep8 : Fragment() {
     private lateinit var mediaPlayer: MediaPlayer
     private var isPlaying = false
 
+    private var fetchedObituary: Obituary? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_create_obituary_step8, container, false)
+        val view = inflater.inflate(R.layout.fragment_edit_obituary_step8, container, false)
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val backButton = toolbar.findViewById<ImageView>(R.id.backButton)
         val publishButton = view.findViewById<Button>(R.id.btnPublish)
@@ -72,6 +69,15 @@ class CreateObituaryStep8 : Fragment() {
         val playPauseButton = view.findViewById<ImageButton>(R.id.btnPlayPause)
         val stopButton = view.findViewById<ImageButton>(R.id.btnStop)
         val musicLabel = view.findViewById<TextView>(R.id.musicName)
+
+        val obituaryId = sharedViewModel.obituaryId.value
+
+        if (obituaryId != null) {
+            Log.d("EditObituaryStep6", "Fetching obituary with ID: $obituaryId")
+            /*fetchObituaryById(obituaryId)*/
+        } else {
+            Log.d("EditObituaryStep6", "No obituary ID found in sharedViewModel")
+        }
 
         // Load the image using Glide, which also gives you scaling options
         sharedViewModel.image.observe(viewLifecycleOwner) { imageUriString ->
@@ -270,21 +276,10 @@ class CreateObituaryStep8 : Fragment() {
                     sharedViewModel.mediaList.value = ArrayList(updatedMediaList)
 
                     // Proceed with the rest of the operations
-                    Log.d("CreateObituaryStep8", "Starting to register obituary customization")
-                    registerObituaryCustomization(obituary_cust)
-                    Log.d("CreateObituaryStep8", "Finished registering obituary customization")
-
-                    Log.d("CreateObituaryStep8", "Starting to add each family member")
+                    updateObituaryCustomization(obituary_cust)
                     addEachFamilyMember()
-                    Log.d("CreateObituaryStep8", "Finished adding each family member")
-
-                    Log.d("CreateObituaryStep8", "Starting to create gallery and media")
                     createGalleryAndMedia()
-                    Log.d("CreateObituaryStep8", "Finished creating gallery and media")
-
-                    Log.d("CreateObituaryStep8", "Stopping music")
                     stopMusic()
-                    Log.d("CreateObituaryStep8", "Music stopped")
 
                     Toast.makeText(requireContext(), "Obituary created successfully", Toast.LENGTH_SHORT).show()
                     (activity as HomePageActivity).supportFragmentManager.beginTransaction()
@@ -295,7 +290,7 @@ class CreateObituaryStep8 : Fragment() {
                             R.anim.slide_out_left,
                             R.anim.slide_out_right
                         )
-                        .addToBackStack("CreateObituaryStep8")
+                        .addToBackStack("EditObituaryStep8")
                         .commit()
                 }
                 .setNegativeButton("No", null)
@@ -305,7 +300,7 @@ class CreateObituaryStep8 : Fragment() {
         prevButton.setOnClickListener {
             stopMusic()
             (activity as HomePageActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, CreateObituaryStep7())
+                .replace(R.id.frame_layout, EditObituaryStep7())
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_out_left, R.anim.slide_out_right)
                 .commit()
         }
@@ -344,7 +339,7 @@ class CreateObituaryStep8 : Fragment() {
                 }
             }
 
-            Log.d("CreateObituaryStep8", "Image saved to internal storage: ${file.absolutePath}")
+            Log.d("EditObituaryStep8", "Image saved to internal storage: ${file.absolutePath}")
             file.absolutePath
         } catch (e: IOException) {
             e.printStackTrace()
@@ -393,8 +388,9 @@ class CreateObituaryStep8 : Fragment() {
     }
 
 
-    private fun registerObituaryCustomization(obituaryCust: com.example.memoreal_prototype.models.Obituary_Customization) {
-        val url = baseUrl + "api/addObituaryCust"
+    private fun updateObituaryCustomization(obituaryCust: com.example.memoreal_prototype.models
+        .Obituary_Customization) {
+        val url = baseUrl + "api/updateObitCust/${obitCustId}"
 
         val json = JSONObject().apply {
             put("BGTHEME", obituaryCust.BGTHEME)
@@ -407,33 +403,27 @@ class CreateObituaryStep8 : Fragment() {
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
             .url(url)
-            .post(requestBody)
+            .put(requestBody)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("Register Obituary Customization", "Request failed: ${e.message}")
+                Log.e("Update Obituary Customization", "Request failed: ${e.message}")
                 requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Registration failed: ${e.message}", Toast
+                    Toast.makeText(requireContext(), "Update failed: ${e.message}", Toast
                         .LENGTH_LONG).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    responseBody?.let {
-                        val jsonResponse = JSONObject(it)
-                        obitCustId = jsonResponse.getInt("obitCustId")
-                        Log.d("OBITUARY CUSTOMIZATION ID:", obitCustId.toString())
-                    }
                 } else {
                     val errorBody = response.body?.string()
                     val errorMessage = try {
                         val jsonError = JSONObject(errorBody ?: "")
                         jsonError.getString("message")
                     } catch (e: Exception) {
-                        "Registration failed: Unknown error"
+                        "Update failed: Unknown error"
                     }
                     requireActivity().runOnUiThread {
                         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
@@ -453,60 +443,24 @@ class CreateObituaryStep8 : Fragment() {
         }
 
         if (memberName.size == relationship.size) {
-            // First, create a family entry
-            addFamily { familyId ->
-                if (familyId != 0) {
-                    // Now, add each family member with the new family ID
-                    for (i in memberName.indices) {
-                        val name = memberName[i]
-                        val relation = relationship[i]
+            if (familyId != 0) {
+                // Now, add each family member with the new family ID
+                for (i in memberName.indices) {
+                    val name = memberName[i]
+                    val relation = relationship[i]
 
-                        val familyMember = com.example.memoreal_prototype.models.FamilyMembers(
-                            0, // This will be handled by the database
-                            familyId,
-                            name,
-                            relation
-                        )
-                        registerFamilyMember(familyMember)
-                    }
-                } else {
-                    Log.e("Add Family", "Failed to create family, skipping member addition.")
+                    val familyMember = com.example.memoreal_prototype.models.FamilyMembers(
+                        0, // This will be handled by the database
+                        familyId,
+                        name,
+                        relation
+                    )
+                    registerFamilyMember(familyMember)
                 }
+            } else {
+                Log.e("Add Family", "Failed to create family, skipping member addition.")
             }
-        } else {
-            Log.e("Bundle Error", "The familyNames and relationships lists have different sizes!")
         }
-    }
-
-
-    private fun addFamily(callback: (Int) -> Unit) {
-        val url = baseUrl + "api/addFamily"
-        val requestBody = JSONObject().toString().toRequestBody("application/json".toMediaTypeOrNull())
-
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("Add Family", "Request failed: ${e.message}")
-                callback(0) // Pass 0 to callback if the request fails
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    val jsonResponse = JSONObject(responseBody)
-                    familyId = jsonResponse.getInt("FAMILYID")
-                    Log.d("Add Family", "Family created successfully with ID: $familyId")
-                    callback(familyId) // Pass the familyId to the callback
-                } else {
-                    Log.e("Add Family", "Failed to create family: ${response.message}")
-                    callback(0) // Pass 0 if the family creation fails
-                }
-            }
-        })
     }
 
     private fun registerFamilyMember(familyMember: com.example.memoreal_prototype.models.FamilyMembers) {
@@ -548,80 +502,46 @@ class CreateObituaryStep8 : Fragment() {
         val mediaList = sharedViewModel.mediaList.value ?: arrayListOf()
 
         if (mediaList.isNotEmpty()) {
-            addGallery { createdGalleryId ->
-                if (createdGalleryId != 0) {
-                    mediaList.forEach { savedFilePath ->
-                        val mediaFile = File(savedFilePath)
-                        val fileUri = Uri.fromFile(mediaFile)
+            if (galleryId != 0) {
+                mediaList.forEach { savedFilePath ->
+                    val mediaFile = File(savedFilePath)
+                    val fileUri = Uri.fromFile(mediaFile)
 
-                        var mimeType = requireContext().contentResolver.getType(fileUri)
-                        if (mimeType == null) {
-                            mimeType = getMimeTypeFromFilePath(savedFilePath)
+                    var mimeType = requireContext().contentResolver.getType(fileUri)
+                    if (mimeType == null) {
+                        mimeType = getMimeTypeFromFilePath(savedFilePath)
+                    }
+
+                    mimeType?.let {
+                        val fileType = when {
+                            savedFilePath.contains("ai_video") -> "AI Video" // Set media type as AI Video if it matches the file name pattern
+                            mimeType.startsWith("image/") -> "Image"
+                            mimeType.startsWith("video/") -> "Video"
+                            else -> ""
                         }
 
-                        mimeType?.let {
-                            val fileType = when {
-                                savedFilePath.contains("ai_video") -> "AI Video" // Set media type as AI Video if it matches the file name pattern
-                                mimeType.startsWith("image/") -> "Image"
-                                mimeType.startsWith("video/") -> "Video"
-                                else -> ""
-                            }
-
-                            if (fileType.isNotEmpty()) {
-                                val galleryMedia = com.example.memoreal_prototype.models.GalleryMedia(
-                                    0,
-                                    createdGalleryId,
-                                    fileType,
-                                    savedFilePath,
-                                    ""
-                                )
-                                registerMedia(galleryMedia)
-                            } else {
-                                Log.e("MediaType", "Unsupported media type: $mimeType")
-                            }
-                        } ?: Log.e("MediaType", "Unable to determine MIME type for: $savedFilePath")
-                    }
-                    publishObituary {
-                        sharedViewModel.clearData()
-                        sharedViewModel2.clearMedia()
-                    }
-                } else {
-                    Log.e("Gallery Error", "Failed to create gallery. Skipping media addition.")
+                        if (fileType.isNotEmpty()) {
+                            val galleryMedia = com.example.memoreal_prototype.models.GalleryMedia(
+                                0,
+                                galleryId,
+                                fileType,
+                                savedFilePath,
+                                ""
+                            )
+                            registerMedia(galleryMedia)
+                        } else {
+                            Log.e("MediaType", "Unsupported media type: $mimeType")
+                        }
+                    } ?: Log.e("MediaType", "Unable to determine MIME type for: $savedFilePath")
                 }
+                publishObituary {
+                    sharedViewModel.clearData()
+                    sharedViewModel2.clearMedia()
+                }
+            } else {
+                Log.e("Gallery Error", "Failed to create gallery. Skipping media addition.")
             }
-        } else {
-            Log.e("Bundle Error", "Media List is null or empty. Skipping gallery media addition.")
         }
-    }
-
-    private fun addGallery(callback: (Int) -> Unit) {
-        val url = baseUrl + "api/addGallery"
-        val requestBody = JSONObject().toString().toRequestBody("application/json".toMediaTypeOrNull())
-
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("Add Gallery", "Request failed: ${e.message}")
-                callback(0) // Pass 0 to callback if the request fails
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    val jsonResponse = JSONObject(responseBody)
-                    galleryId = jsonResponse.getInt("GALLERYID")
-                    Log.d("Add Gallery", "Gallery created successfully with ID: $galleryId")
-                    callback(galleryId)
-                } else {
-                    Log.e("Add Gallery", "Failed to create gallery: ${response.message}")
-                    callback(0)
-                }
-            }
-        })
     }
 
     private fun registerMedia(galleryMedia: com.example.memoreal_prototype.models.GalleryMedia) {
@@ -701,21 +621,6 @@ class CreateObituaryStep8 : Fragment() {
         val privacy = sharedViewModel.privacy.value ?: "Public"
         val enaGuestbook = sharedViewModel.guestBook.value ?: false
         val favoriteQuote = sharedViewModel.favQuote.value ?: "No favorite quote."
-
-        Log.d("PublishObituary", "Data collected for obituary:")
-        Log.d("PublishObituary", "obituaryPhoto: $obituaryPhoto")
-        Log.d("PublishObituary", "dateOfBirth: $dateOfBirth")
-        Log.d("PublishObituary", "dateOfDeath: $dateOfDeath")
-        Log.d("PublishObituary", "obituaryName: $obituaryName")
-        Log.d("PublishObituary", "biography: $biography")
-        Log.d("PublishObituary", "obituaryText: $obituaryText")
-        Log.d("PublishObituary", "keyEvents: $keyEvents")
-        Log.d("PublishObituary", "funDateTimeFormatted: $funDateTimeFormatted")
-        Log.d("PublishObituary", "funLocation: $funLocation")
-        Log.d("PublishObituary", "adtlInfo: $adtlInfo")
-        Log.d("PublishObituary", "privacy: $privacy")
-        Log.d("PublishObituary", "enaGuestbook: $enaGuestbook")
-        Log.d("PublishObituary", "favoriteQuote: $favoriteQuote")
 
         val obituary = com.example.memoreal_prototype.models.Obituary(
             0,
@@ -807,6 +712,115 @@ class CreateObituaryStep8 : Fragment() {
 
                     requireActivity().runOnUiThread {
                         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun deleteGalleryMedia(galleryId: Int) {
+        val url = "$baseUrl"+"api/deleteGalleryMedia/$galleryId"
+        Log.d("API", "Requesting URL: $url")
+
+        val request = Request.Builder()
+            .url(url)
+            .method("DELETE", null)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Delete Gallery Media", "Failed to delete gallery media: ${e.message}")
+                requireActivity().runOnUiThread {
+                    Toast.makeText(context, "Failed to delete gallery media", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                } else {
+                    Log.e("Delete Gallery Media", "Error: ${response.code} - ${response.message}")
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(context, "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun fetchObituaryById(obituaryId: Int) {
+        val url = "$baseUrl" + "api/fetchObit/$obituaryId"
+        Log.d("API", "Requesting URL: $url")
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Fetch Obituary", "Failed to fetch obituary: ${e.message}")
+                if (isAdded) {
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(context, "Failed to fetch obituary", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    response.body?.string()?.let { responseBody ->
+                        val jsonObject = JSONObject(responseBody)
+                        val obitCustIdArray = jsonObject.getJSONArray("OBITCUSTID")
+                        val obitCustumizationId = obitCustIdArray.getInt(0)
+
+                        fetchedObituary = Obituary(
+                            OBITUARYID = jsonObject.getInt("OBITUARYID"),
+                            USERID = jsonObject.getInt("USERID"),
+                            GALLERYID = jsonObject.getInt("GALLERYID"),
+                            OBITCUSTID = obitCustumizationId,
+                            FAMILYID = jsonObject.getInt("FAMILYID"),
+                            BIOGRAPHY = jsonObject.optString("BIOGRAPHY"),
+                            OBITUARYNAME = jsonObject.getString("OBITUARYNAME"),
+                            OBITUARYPHOTO = jsonObject.getString("OBITUARY_PHOTO"),
+                            DATEOFBIRTH = jsonObject.getString("DATEOFBIRTH"),
+                            DATEOFDEATH = jsonObject.getString("DATEOFDEATH"),
+                            OBITUARYTEXT = jsonObject.optString("OBITUARYTEXT"),
+                            KEYEVENTS = jsonObject.optString("KEYEVENTS"),
+                            FUNDATETIME = jsonObject.optString("FUN_DATETIME"),
+                            FUNLOCATION = jsonObject.optString("FUN_LOCATION"),
+                            ADTLINFO = jsonObject.optString("ADTLINFO"),
+                            PRIVACY = jsonObject.getString("PRIVACY"),
+                            ENAGUESTBOOK = jsonObject.getBoolean("ENAGUESTBOOK"),
+                            FAVORITEQUOTE = jsonObject.optString("FAVORITEQUOTE"),
+                            CREATIONDATE = jsonObject.getString("CREATIONDATE"),
+                            LASTMODIFIED = jsonObject.getString("LASTMODIFIED")
+                        )
+
+                        if (isAdded) {
+                            requireActivity().runOnUiThread {
+                                fetchedObituary?.let {
+                                    galleryId = it.GALLERYID
+                                    familyId = it.FAMILYID
+                                    obitCustId = it.OBITCUSTID
+                                    userId = it.USERID
+                                }
+                            }
+                        }
+                    } ?: run {
+                        Log.e("Fetch Obituary", "Response body is null.")
+                        if (isAdded) {
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(context, "Error: Empty response from server", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    Log.e("Fetch Obituary", "Error: ${response.code} - ${response.message}")
+                    if (isAdded) {
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(context, "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

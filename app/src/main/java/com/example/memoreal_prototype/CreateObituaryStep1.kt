@@ -27,17 +27,6 @@ class CreateObituaryStep1 : Fragment() {
     private var selectedButton: Button? = null
     private val sharedViewModel: ObituarySharedViewModel by activityViewModels()
 
-    private lateinit var slideshowImageView: ImageView
-    private lateinit var previousButton: ImageButton
-    private lateinit var nextButton: ImageButton
-
-    private val imageResIds = listOf(
-        R.drawable.slide_image_1,
-        R.drawable.slide_image_2,
-        R.drawable.slide_image_3
-    )
-    private var currentIndex = 0
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

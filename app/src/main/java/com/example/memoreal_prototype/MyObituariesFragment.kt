@@ -188,6 +188,22 @@ class MyObituariesFragment : Fragment() {
             .commit()
     }
 
+    private fun editObituaryDetailFragment(obituaryId: Int) {
+        val editObituaryStep3 = EditObituaryStep3()
+
+        // Pass the obituary ID as an argument to the new fragment
+        val bundle = Bundle().apply {
+            putInt("obituaryId", obituaryId)
+        }
+        editObituaryStep3.arguments = bundle
+
+        // Replace the current fragment with ObituaryDetailFragment
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.frame_layout, editObituaryStep3)
+            .addToBackStack(null)
+            .commit()
+    }
+
     private val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
         override fun onMove(
             recyclerView: RecyclerView,
@@ -215,7 +231,8 @@ class MyObituariesFragment : Fragment() {
                     .show()
             } else if (direction == ItemTouchHelper.RIGHT) {
                 // Handle Edit
-                Toast.makeText(requireContext(), "Edit feature for obituary ${obituary.OBITUARYNAME} clicked", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Editing obituary ${obituary.OBITUARYNAME}", Toast.LENGTH_SHORT).show()
+                editObituaryDetailFragment(obituary.OBITUARYID)
                 obituaryAdapter.notifyItemChanged(position) // Reset swipe
             }
         }

@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/editProfile"
+        android:text="@string/editObituary"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -37,24 +37,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.551" />
-
-    <TextView
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="16dp"
-        android:text="@string/save"
-        android:textColor="@color/memo_orange"
-        android:textSize="16sp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/baseline_settings_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
 
 </androidx.appcompat.widget.Toolbar>

@@ -182,6 +182,7 @@ class ObituaryFragment : Fragment() {
                         val obitCustIdArray = jsonObject.getJSONArray("OBITCUSTID")
                         val obitCustId = obitCustIdArray.getInt(0)
 
+                        // Use postValue() to clear data safely on a background thread
                         sharedViewModel.clearData()
 
                         fetchedObituary = Obituary(
@@ -240,14 +241,13 @@ class ObituaryFragment : Fragment() {
                                         obitImage?.setImageResource(R.drawable.baseline_person_24)
                                     }
 
+                                    // Parsing date and updating the UI accordingly
                                     val originalFormat = SimpleDateFormat("yyyy-dd-MM'T'HH:mm:ss" +
                                             ".SSS'Z'", Locale.getDefault())
                                     val date = originalFormat.parse(it.DATEOFBIRTH)
                                     val date2 = originalFormat.parse(it.DATEOFDEATH)
 
-                                    // Change the desired format to "MMM. dd, yyyy" to get "Nov. 19, 2024"
                                     val desiredFormat = SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault())
-
                                     val formattedDate = date?.let { desiredFormat.format(it) }
                                     val formattedDate2 = date2?.let { desiredFormat.format(it) }
 

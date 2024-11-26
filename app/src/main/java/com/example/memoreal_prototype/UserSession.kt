@@ -18,7 +18,8 @@ abstract class UserSession: AppCompatActivity() {
 
     companion object {
         val client = OkHttpClient()
-        var baseUrl = "http://192.168.1.9:4848/"
+        /*var baseUrl = "http://192.168.1.9:4848/"*/
+        var baseUrl = "http://192.168.254.111:4848/"
         /*var baseUrl = "http://192.168.152.252:4848/"*/
         val d_idUrl = "https://api.d-id.com/talks"
         val apiKey = "amVjamVjanI4OUBnbWFpbC5jb20:FeDUBSYXek7nUj0stgNgr"

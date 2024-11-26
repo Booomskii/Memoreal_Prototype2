@@ -257,10 +257,14 @@ class UploadPhotoDialogFragment : DialogFragment() {
                                     requireActivity().runOnUiThread {
                                         Toast.makeText(requireContext(), "Video generated successfully", Toast.LENGTH_SHORT).show()
                                         sharedViewModel.videoId.value = videoId
-                                        // Dismiss the dialog with a slight delay
+
+                                        // Update the videoIds list to add the new video ID
+                                        val currentVideoIds = sharedViewModel.videoIds.value ?: mutableListOf()
+                                        currentVideoIds.add(videoId)
+                                        sharedViewModel.videoIds.value = currentVideoIds
+
                                         progressBar.visibility = View.GONE
-                                        handler.postDelayed({ dismiss() }, 8000) // 3-second
-                                    // delay before closing
+                                        dismiss() // Dismiss the dialog immediately
                                     }
                                 } else {
                                     val message = jsonObject.getString("message")

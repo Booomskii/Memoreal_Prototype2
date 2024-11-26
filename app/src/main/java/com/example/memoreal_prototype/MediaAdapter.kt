@@ -85,3 +85,4 @@ class MediaAdapter(
 
     override fun getItemCount(): Int = getMediaList().size
 }
+

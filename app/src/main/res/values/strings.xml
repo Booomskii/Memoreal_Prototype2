@@ -243,6 +243,7 @@
     <string name="date">Date:</string>
     <string name="submit">Submit</string>
     <string name="disabledGB">User has disabled Guestbook.</string>
+    <string name="editObituary">Edit Obituary</string>
 
     <!--Placeholders-->
     <string name="hello_blank_fragment">Hello blank fragment</string>
