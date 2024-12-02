@@ -107,8 +107,9 @@ class CreateObituaryStep3 : Fragment() {
         // Updated DatePickerDialog for Date of Birth EditText
         dateBirthET.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = dateBirthET.compoundDrawables[2]
+                val drawableEnd = dateBirthET.compoundDrawablesRelative[2] ?: dateBirthET.compoundDrawables[2]
                 drawableEnd?.let {
+                    // Check if the touch event was on the drawable end area
                     if (event.rawX >= (dateBirthET.right - it.bounds.width())) {
                         val calendar = Calendar.getInstance()
                         val datePickerDialog = DatePickerDialog(
@@ -125,15 +126,15 @@ class CreateObituaryStep3 : Fragment() {
                     }
                 }
             }
-            v.performClick()
             false
         }
 
         // Updated DatePickerDialog for Date of Passing EditText
         datePassingET.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = datePassingET.compoundDrawables[2]
+                val drawableEnd = datePassingET.compoundDrawablesRelative[2] ?: datePassingET.compoundDrawables[2]
                 drawableEnd?.let {
+                    // Check if the touch event was on the drawable end area
                     if (event.rawX >= (datePassingET.right - it.bounds.width())) {
                         val calendar = Calendar.getInstance()
                         val datePickerDialog = DatePickerDialog(
@@ -150,7 +151,6 @@ class CreateObituaryStep3 : Fragment() {
                     }
                 }
             }
-            v.performClick()
             false
         }
 

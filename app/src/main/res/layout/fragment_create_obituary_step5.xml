@@ -68,63 +68,101 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.107">
 
-                <EditText
-                    android:id="@+id/etFunDateTime"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/funDateTimeTextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bordered_rectangle"
-                    android:drawableEnd="@drawable/baseline_calendar_month_24_black"
-                    android:ems="10"
-                    android:hint="@string/dateTime"
-                    android:inputType="date"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
+                    android:layout_marginBottom="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintVertical_bias="0.0"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
 
-                <EditText
-                    android:id="@+id/etFunLocation"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFunDateTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:drawableEnd="@drawable/baseline_calendar_month_24_black"
+                        android:ems="10"
+                        android:hint="@string/dateTime"
+                        android:inputType="date"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/funLocationTextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bordered_rectangle"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="@string/location"
-                    android:inputType="text"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.222" />
+                    app:layout_constraintVertical_bias="0.222"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
 
-                <EditText
-                    android:id="@+id/etAdtlInfo"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFunLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="@string/location"
+                        android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/adtlInfoTextInputLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="@string/adtlInfo"
-                    android:inputType="textMultiLine"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
-                    android:lines="4"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.622" />
+                    app:layout_constraintVertical_bias="0.622"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etAdtlInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="@string/adtlInfo"
+                        android:inputType="textMultiLine"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"
+                        android:lines="4" />
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

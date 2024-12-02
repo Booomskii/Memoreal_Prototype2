@@ -251,11 +251,6 @@ class GalleryFragment : Fragment() {
                     }
                 } else {
                     Log.e("Fetch Gallery", "Error: ${response.code} - ${response.message}")
-                    if (isAdded) {
-                        requireActivity().runOnUiThread {
-                            Toast.makeText(context, "Error: ${response.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
                 }
             }
         })

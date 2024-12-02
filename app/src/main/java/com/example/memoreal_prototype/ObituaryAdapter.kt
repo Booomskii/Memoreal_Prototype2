@@ -12,7 +12,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memoreal_prototype.models.Obituary
 import java.io.File
+import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class ObituaryAdapter(
@@ -84,17 +86,45 @@ class ObituaryAdapter(
         return obituaries[position]
     }
 
-    fun filter(query: String) {
+    fun filter(query: String, filterType: String) {
         obituaries = if (query.isEmpty()) {
             originalObituaries
         } else {
-            originalObituaries.filter { obituary ->
-                obituary.OBITUARYNAME.contains(query, ignoreCase = true) ||
-                        obituary.BIOGRAPHY.contains(query, ignoreCase = true)
+            when (filterType) {
+                "All" -> {
+                    originalObituaries.filter { obituary ->
+                        obituary.OBITUARYNAME.contains(query, ignoreCase = true) ||
+                                obituary.FUNLOCATION?.contains(query, ignoreCase = true) == true ||
+                                obituary.DATEOFBIRTH.contains(query, ignoreCase = true) ||
+                                obituary.DATEOFDEATH.contains(query, ignoreCase = true)
+                    }
+                }
+                "Obituary Name" -> {
+                    originalObituaries.filter { obituary ->
+                        obituary.OBITUARYNAME.contains(query, ignoreCase = true)
+                    }
+                }
+                "Location" -> {
+                    originalObituaries.filter { obituary ->
+                        obituary.FUNLOCATION?.contains(query, ignoreCase = true) == true
+                    }
+                }
+                "Date of Birth" -> {
+                    originalObituaries.filter { obituary ->
+                        obituary.DATEOFBIRTH.contains(query, ignoreCase = true)
+                    }
+                }
+                "Date of Death" -> {
+                    originalObituaries.filter { obituary ->
+                        obituary.DATEOFDEATH.contains(query, ignoreCase = true)
+                    }
+                }
+                else -> originalObituaries
             }
         }
         notifyDataSetChanged()
     }
+
 
     private fun loadImageFromInternalStorage(imagePath: String): Bitmap? {
         return try {
@@ -111,5 +141,38 @@ class ObituaryAdapter(
             null
         }
     }
+
+    fun filterByDateRange(startDate: Date?, endDate: Date?, filterType: String) {
+        if (startDate == null || endDate == null) return
+
+        obituaries = when (filterType) {
+            "Date of Birth" -> {
+                originalObituaries.filter { obituary ->
+                    try {
+                        val obituaryDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(obituary.DATEOFBIRTH)
+                        obituaryDate != null && (obituaryDate.after(startDate) || obituaryDate == startDate) &&
+                                (obituaryDate.before(endDate) || obituaryDate == endDate)
+                    } catch (e: ParseException) {
+                        false
+                    }
+                }
+            }
+            "Date of Death" -> {
+                originalObituaries.filter { obituary ->
+                    try {
+                        val obituaryDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(obituary.DATEOFDEATH)
+                        obituaryDate != null && (obituaryDate.after(startDate) || obituaryDate == startDate) &&
+                                (obituaryDate.before(endDate) || obituaryDate == endDate)
+                    } catch (e: ParseException) {
+                        false
+                    }
+                }
+            }
+            else -> originalObituaries
+        }
+
+        notifyDataSetChanged()
+    }
+
 }
 

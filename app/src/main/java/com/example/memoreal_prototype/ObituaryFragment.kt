@@ -242,7 +242,7 @@ class ObituaryFragment : Fragment() {
                                     }
 
                                     // Parsing date and updating the UI accordingly
-                                    val originalFormat = SimpleDateFormat("yyyy-dd-MM'T'HH:mm:ss" +
+                                    val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" +
                                             ".SSS'Z'", Locale.getDefault())
                                     val date = originalFormat.parse(it.DATEOFBIRTH)
                                     val date2 = originalFormat.parse(it.DATEOFDEATH)

@@ -1,5 +1,6 @@
 package com.example.memoreal_prototype
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,8 +9,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +24,10 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import java.io.IOException
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ExploreFragment : Fragment() {
 
@@ -28,7 +35,15 @@ class ExploreFragment : Fragment() {
     private val baseUrl = UserSession.baseUrl
     private lateinit var recyclerView: RecyclerView
     private lateinit var obituaryAdapter: ObituaryAdapter
+    private lateinit var filterButton: Button
     private lateinit var searchInput: EditText
+    private lateinit var dateBirthInput: TextView
+    private lateinit var dateDeathInput: TextView
+
+    private var selectedFilter: String = "All"
+    private var selectedDateBirth: String? = null
+    private var selectedDateDeath: String? = null
+    private lateinit var noResultsTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,14 +52,20 @@ class ExploreFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
         setupToolbar(view)
         recyclerView = view.findViewById(R.id.recyclerView)
+        noResultsTextView = view.findViewById(R.id.noResultsTextView)
 
         // Initialize RecyclerView with an empty list to start
         setupRecyclerView(emptyList())
         fetchObituaries()
 
-        // Initialize the search input
         searchInput = view.findViewById(R.id.searchInput)
-        setupSearchListener()
+        dateBirthInput = view.findViewById(R.id.dateStartInput)
+        dateDeathInput = view.findViewById(R.id.dateEndInput)
+        filterButton = view.findViewById(R.id.filterButton)
+
+        setupDatePickers()
+        setupFilterButton()
+        setupSearchListeners()
 
         return view
     }
@@ -72,9 +93,12 @@ class ExploreFragment : Fragment() {
                     .commit()
             }
         )
+
+        // Set layout manager for vertical scrolling
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = obituaryAdapter
     }
+
 
     private fun fetchObituaries() {
         val url = "$baseUrl" + "api/allObit"
@@ -149,15 +173,118 @@ class ExploreFragment : Fragment() {
         return obituaries
     }
 
-    private fun setupSearchListener() {
+    private fun setupDatePickers() {
+        val calendar = Calendar.getInstance()
+
+        // Date of Birth Picker for Start Date
+        dateBirthInput.setOnClickListener {
+            DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    selectedDateBirth = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                    dateBirthInput.text = selectedDateBirth
+                    applyFilters()
+                },
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        // Date of Death Picker for End Date
+        dateDeathInput.setOnClickListener {
+            DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    selectedDateDeath = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                    dateDeathInput.text = selectedDateDeath
+                    applyFilters()
+                },
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+    }
+
+    private fun setupFilterButton() {
+        filterButton.setOnClickListener {
+            showFilterDialog()
+        }
+    }
+
+    private fun showFilterDialog() {
+        val options = arrayOf("All", "Obituary Name", "Location", "Date of Birth", "Date of Death")
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Choose Filter Type")
+            .setItems(options) { _, which ->
+                selectedFilter = options[which]
+                filterButton.text = selectedFilter
+                filterButton.textSize = 12f // Set smaller font size for better UX when selecting options like "Obituary Name"
+                adjustSearchUI()
+                applyFilters() // Update the search results immediately if needed
+            }
+            .show()
+    }
+
+    private fun adjustSearchUI() {
+        when (selectedFilter) {
+            "Date of Birth", "Date of Death" -> {
+                // Show date range inputs and hide search bar
+                searchInput.visibility = View.GONE
+                dateBirthInput.visibility = View.VISIBLE
+                dateDeathInput.visibility = View.VISIBLE
+            }
+            else -> {
+                // Show search bar and hide date range inputs
+                searchInput.visibility = View.VISIBLE
+                dateBirthInput.visibility = View.GONE
+                dateDeathInput.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun setupSearchListeners() {
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                obituaryAdapter.filter(s.toString()) // Call the filter method
+                applyFilters()
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    private fun applyFilters() {
+        val query = when (selectedFilter) {
+            "Date of Birth", "Date of Death" -> {
+                val startDateStr = selectedDateBirth
+                val endDateStr = selectedDateDeath
+
+                if (!startDateStr.isNullOrEmpty() && !endDateStr.isNullOrEmpty()) {
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    try {
+                        val startDate = dateFormat.parse(startDateStr)
+                        val endDate = dateFormat.parse(endDateStr)
+
+                        obituaryAdapter.filterByDateRange(startDate, endDate, selectedFilter)
+                    } catch (e: ParseException) {
+                        Toast.makeText(requireContext(), "Invalid date format", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                ""
+            }
+            else -> searchInput.text.toString()
+        }
+
+        if (selectedFilter != "Date of Birth" && selectedFilter != "Date of Death") {
+            obituaryAdapter.filter(query, selectedFilter)
+        }
+
+        // Show or hide the "No Results" message based on the filtered result count
+        if (obituaryAdapter.itemCount == 0) {
+            noResultsTextView.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+        } else {
+            noResultsTextView.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+        }
     }
 }

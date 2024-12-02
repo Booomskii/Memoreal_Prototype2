@@ -100,81 +100,125 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView11"
                 app:layout_constraintVertical_bias="0.188">
 
-                <EditText
-                    android:id="@+id/etFullName"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/fullNameTextInputLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:ems="10"
-                    android:hint="@string/fullName"
-                    android:inputType="text"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintVertical_bias="0.0"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
 
-                <EditText
-                    android:id="@+id/etDateBirth"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFullName"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:ems="10"
+                        android:hint="@string/fullName"
+                        android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/dateBirthTextInputLayout"
                     android:layout_width="155dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:drawableEnd="@drawable/baseline_calendar_month_24_black"
-                    android:ems="10"
-                    android:hint="@string/dateBirth"
-                    android:inputType="date"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.312" />
+                    app:layout_constraintVertical_bias="0.312"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
 
-                <EditText
-                    android:id="@+id/etDatePassing"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDateBirth"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:ems="10"
+                        android:drawableEnd="@drawable/baseline_calendar_month_24_black"
+                        android:hint="@string/dateBirth"
+                        android:inputType="date"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/datePassingTextInputLayout"
                     android:layout_width="160dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:drawableEnd="@drawable/baseline_calendar_month_24_black"
-                    android:ems="10"
-                    android:hint="@string/datePassing"
-                    android:inputType="date"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.312" />
+                    app:layout_constraintVertical_bias="0.312"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
 
-                <EditText
-                    android:id="@+id/etBiography"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDatePassing"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:ems="10"
+                        android:drawableEnd="@drawable/baseline_calendar_month_24_black"
+                        android:hint="@string/datePassing"
+                        android:inputType="date"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/biographyTextInputLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="@string/biography"
-                    android:inputType="textMultiLine"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
-                    android:lines="4"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0" />
+                    app:layout_constraintVertical_bias="1.0"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBiography"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="@string/biography"
+                        android:inputType="textMultiLine"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"
+                        android:lines="6"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

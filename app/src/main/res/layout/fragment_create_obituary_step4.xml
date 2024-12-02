@@ -60,52 +60,74 @@
                 android:id="@+id/constraintLayout5"
                 android:layout_width="325dp"
                 android:layout_height="650dp"
-                android:layout_marginTop="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <EditText
-                    android:id="@+id/etObituaryText"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/obituaryTextInputLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="@string/obituaryText"
-                    android:inputType="textMultiLine"
-                    android:maxLength="500"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
-                    android:lines="4"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintVertical_bias="0.0"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
 
-                <EditText
-                    android:id="@+id/etKeyEvents"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etObituaryText"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="@string/obituaryText"
+                        android:inputType="textMultiLine"
+                        android:maxLength="500"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"
+                        android:lines="6" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/keyEventsTextInputLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:background="@drawable/bordered_rectangle"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="@string/keyEvents"
-                    android:inputType="textMultiLine"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/grey"
-                    android:textSize="14sp"
-                    android:lines="4"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.243" />
+                    app:layout_constraintVertical_bias="0.243"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="2dp"
+                    app:boxStrokeWidthFocused="3dp"
+                    app:boxStrokeColor="@color/black"
+                    app:hintEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Caption">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etKeyEvents"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="@string/keyEvents"
+                        android:inputType="textMultiLine"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="14sp"
+                        android:lines="6" />
+                </com.google.android.material.textfield.TextInputLayout>
+
 
                 <ImageView
                     android:id="@+id/btnAddMedia"

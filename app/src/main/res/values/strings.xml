@@ -56,6 +56,8 @@
     <string name="package4">125 CREDITS</string>
     <string name="package4Price">499</string>
     <string name="package4PriceDec">₱499</string>
+    <string name="creditGen">Credits for AI Video Generation</string>
+    <string name="aiGenInfo">Use credits to convert photos into captivating videos. Each AI-generated video consumes credits based on its complexity. Choose a package that fits your needs and bring your memories to life.</string>
     <!--Basic Plan-->
     <!--<string name="basic"><b>Basic Plan</b></string>
     <string name="basicFee">₱199</string>
